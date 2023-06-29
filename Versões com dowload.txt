@@ -1,1 +1,8 @@
+Versão 0.1 : 
 https://greasyfork.org/scripts/469503-mikill-animefire-mod/code/Mikill%20AnimeFire%20Mod.user.js
+
+Versão 0.2 :
+-Cliente :
+
+-Senha :
+https://greasyfork.org/scripts/469761-animefiremod-senhas/code/AnimeFireMod%20Senhas.user.js
