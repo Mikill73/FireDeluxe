@@ -1,1 +1,1 @@
-(2)(Pedir Senha)(Página Inicial)
+PedirSenha PáginaInicial
