@@ -1,6 +1,4 @@
-Versão 0.1 lançada!
-
-Versão 0.2 lançada! Vá para a aba de "dowloads" para realizar o dowload!
+(#21D3FF)Versão 0.2 lançada! Vá para a aba de "dowloads" para realizar o dowload!
 - Updates : 
 
 Adicionado botão "Mudar color input" (muda a cor de certa parte do fundo)
