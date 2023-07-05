@@ -16,3 +16,25 @@ https://greasyfork.org/scripts/469811-dcarregador-de-imagem-do-chat/code/dCarreg
 
 -AdBlocker :
 https://greasyfork.org/scripts/469813-eadblocker/code/eAdBlocker.user.js 
+
+Dowloads Versão 0.3 :
+
+Arquivo 1 : 
+||https://greasyfork.org/scripts/470227-adepend%C3%AAncia/code/aDepend%C3%AAncia.user.js||
+
+Arquivo 2 :
+||https://greasyfork.org/scripts/470228-bcarregamento-sistemadepontos/code/bCarregamento+SistemadePontos.user.js||
+Arquivo 3 : 
+||https://greasyfork.org/scripts/470229-cverifica%C3%A7%C3%A3o/code/cVerifica%C3%A7%C3%A3o.user.js||
+
+Arquivo 4 :
+||https://greasyfork.org/scripts/469761-dsenhas/code/dSenhas.user.js||
+
+Arquivo 5 :
+||https://greasyfork.org/scripts/469757-emikill-animefire-mod/code/eMikill%20AnimeFire%20Mod.user.js||
+
+Arquivo 6 :
+||https://greasyfork.org/scripts/469811-fcarregador-de-imagem-do-chat/code/fCarregador%20de%20imagem%20do%20chat.user.js||
+
+Arquivo 7 :
+||https://greasyfork.org/scripts/469813-gp0rnblocker/code/gP0rnBlocker.user.js||
