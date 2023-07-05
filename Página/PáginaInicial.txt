@@ -1,3 +1,21 @@
+AnimeFireMod Versão 0.3
+
+- O botão MENU agora combina com a cor do site #21D3FF
+
+- Adicionado botão "Site" dentro do MENU, o botão Site abre uma nova guia com o link do site.
+
+- Novo sistema de verificação, você precisa ir no site do mod e apertar "Pedir Acesso" então coloque o link do seu perfil no animefire e clique enviar, então aguarde aprovação.
+
+- Função de bloquear perfis pornograficos, você pode reportar usuários que postam esse tipo de conteúdo no #site .
+
+- Sistema de pontos, você ganha 1 ponto a cada 30 minutos usando o mod, esses pontos serão usados em uma lojinha de privilégios, como mais tempo de acesso e etc...
+
+- Converter Player agora é REALMENTE universal para o site, basta entrar no link de um episódio, apertar converter player e assistir.
+
+- Criado um site com "Página Inicial" mostra os ultimos updates, "Pedir Acesso" onde você pode pedir para usar o mod e "Reportar Usuário" onde você reportar usuários que postam conteúdo +18 no site.
+
+- Codigo otimizado para não causa problemas na RAM do navegador.
+
 Versao 0.2 lancada! Va para a aba de "dowloads" para realizar o dowload!
 - Updates : 
 
