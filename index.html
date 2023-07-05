@@ -55,20 +55,25 @@
   <hr>
         <button id="PGINI" class="botaopc">Página Inicial</button>
         <button id="GESN" class="botaopc">Pedir Acesso</button>
-        <button id="SASE" class="botaopc">Reportar Usuário</button>
+        <button id="REUS" class="botaopc">Reportar Usuário</button>
   <hr>
     <span id="pginitextotxt" class="pginitexto"></span>
     <hr style="display:none">
-    <textarea id="txtareaGESN" style="display: none;" placeholder="Coloque o link do seu perfil do animefire aqui" rows = 3></textarea>
+    <textarea id="txtareaGESN" style="display: none; width: 500px;" placeholder="Coloque o link do seu perfil do animefire aqui, é obrigatório que você tenha na sua bio do seu perfil escrito : Usuário de FIREMOD, pois isso pode ajudar a divulgar!" rows = 7></textarea>
     <button id = btnEnviarGESN class="botaopc" style="display: none">Enviar</button>
     </hr>
+    <textarea id = txtareaREUS class="txt" style="display: none; width: 500px;" placeholder="Coloque o link do perfil do usuário a ser reportado e insira o motivo da denúncia, caso não haja motivo será automaticamente anulada" rows =7 = ></textarea>
+    <button id = enviarREUS class="botaopc" style="display:none">Enviar</button>
     <script>
         var btnPGINI = document.getElementById("PGINI");
         var btnGESN = document.getElementById("GESN");
+        var btnREUS = document.getElementById("REUS");
         var pginitextoElement = document.getElementById("pginitextotxt");
 //botão pagina inicial
         btnPGINI.addEventListener("click", function() {
             txtareaGESN.style.display = "none";
+            txtareaREUS.style.display = "none";
+            enviarREUS.style.display = "none";
             btnEnviarGESN.style.display = "none";
             fetch('https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/P%C3%A1gina/P%C3%A1ginaInicial.txt')
                 .then(response => response.text())
@@ -80,6 +85,8 @@
 //botão de pedir acesso
         btnGESN.addEventListener("click", function() {
             pginitextoElement.textContent = '';
+            txtareaREUS.style.display = "none";
+            enviarREUS.style.display = "none";
             txtareaGESN.style.display = "block";
             btnEnviarGESN.style.display = "block";
        });
@@ -99,6 +106,32 @@
     };
     fetch(url, requestOptions)
        });
+//botão reportar usuário
+    btnREUS.addEventListener("click", function() {
+    pginitextoElement.textContent = '';
+    txtareaREUS.style.display = "block";
+    enviarREUS.style.display = "block";
+    txtareaGESN.style.display = "none";
+    btnEnviarGESN.style.display = "none";
+    
+    });
+    enviarREUS.addEventListener("click", function() {
+           var url = "https://discord.com/api/webhooks/1126093523918278676/tLOMeaRZyTav5oSNX8EpN92qJoWM8BRJfR5BVI6J25-F7V8fBltwIuiJTFR_UbCAVLhG";
+    
+    var payload = {
+      content: 
+      "**Denuncia : ** " + txtareaREUS.value
+    };
+    var requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    };
+    fetch(url, requestOptions)
+       });
+        
     </script>
 </body>
 </html>
