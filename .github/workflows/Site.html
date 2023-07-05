@@ -53,9 +53,9 @@
         <span class="firemod">FireMod</span>
     </div>
   <hr>
-        <button id="PGINI" class="botaopc">P�gina Inicial</button>
-        <button id="GESN" class="botaopc">Gerar Senha</button>
-        <button id="SASE" class="botaopc">Sacar Senha</button>
+        <button id="PGINI" class="botaopc">Página Inicial</button>
+        <button id="GESN" class="botaopc">Pedir Acesso</button>
+        <button id="SASE" class="botaopc">Reportar Usuário</button>
   <hr>
     <span id="pginitextotxt" class="pginitexto"></span>
     <hr style="display:none">
@@ -66,7 +66,7 @@
         var btnPGINI = document.getElementById("PGINI");
         var btnGESN = document.getElementById("GESN");
         var pginitextoElement = document.getElementById("pginitextotxt");
-
+//botão pagina inicial
         btnPGINI.addEventListener("click", function() {
             txtareaGESN.style.display = "none";
             btnEnviarGESN.style.display = "none";
@@ -77,7 +77,7 @@
                     pginitextoElement.innerHTML = pginitexto;
                 });
        });
-
+//botão de pedir acesso
         btnGESN.addEventListener("click", function() {
             pginitextoElement.textContent = '';
             txtareaGESN.style.display = "block";
@@ -87,7 +87,8 @@
            var url = "https://discord.com/api/webhooks/1124154507429941329/Ajz7jSpBbDIjPR_FxVJ-d8LyfGZojlJybC88fxfZ50verNfC6Rr7L3xG3vtxW27Eg7uI";
     
     var payload = {
-      content: "Mensagem de teste para o webhook do Discord"
+      content: 
+      "**Link Perfil : ** " + txtareaGESN.value
     };
     var requestOptions = {
       method: "POST",
@@ -96,6 +97,7 @@
       },
       body: JSON.stringify(payload)
     };
+    fetch(url, requestOptions)
        });
     </script>
 </body>
