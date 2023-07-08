@@ -19,12 +19,15 @@
             color: white;
         }
 
-            .firemod {
-            font-style: italic;
-            font-size: 50px;
-            color: #21D3FF;
-            text-shadow: 0 0 10px #21D3FF, 0 0 20px #21D3FF, 0 0 30px #21D3FF, 0 0 40px #21D3FF, 0 0 50px #21D3FF, 0 0 60px #21D3FF, 0 0 70px #21D3FF;
-        }
+.firedeluxe {
+    font-style: italic;
+    font-size: 50px;
+    color: white;
+    background-image: linear-gradient(to right, #FF6347, #FFFFFF, #FF63FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px #FF6347, 0 0 20px #FF6347, 0 0 30px #FF6347, 0 0 40px #FF6347, 0 0 50px #FF6347, 0 0 60px #FF6347, 0 0 70px #FF6347;
+}
 
         .anime {
             font-size: 50px;
@@ -33,7 +36,7 @@
         }
 
         .botaopc {
-            background-color: #21D3FF;
+            background-color: #FF4500;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -41,26 +44,36 @@
             font-size: 15px;
             cursor: pointer;
             
+            
         }
 
         .pginitexto {
-            color: #21D3FF;
+            color: #FF4500;
             font-size: 12px;
             white-space: pre-line;
-            text-shadow: 0 0 10px #21D3FF, 0 0 20px #21D3FF, 0 0 30px #21D3FF, 0 0 40px #21D3FF;
+            text-shadow: 0 0 10px red, 0 0 20px red, 0 0 30px red, 0 0 40px red;
+        }
+
+        .linhas {
+            background-color: #FF4500;
+            padding: 1px 1px;
+            border: none;
+            border-radius: 5px;
+            font-size: 20px;
+            text-shadow: 0 0 10px red, 0 0 20px red, 0 0 30px red, 0 0 40px red;
         }
     </style>
 </head>
 <body>
     <div class="content">
         <span class="inline anime">Anime</span>
-        <span class="firemod">FireMod</span>
+        <span class="firedeluxe">FireDeluxe</span>
     </div>
-  <hr>
+  <hr class="linhas">
         <button id="PGINI" class="botaopc">Página Inicial</button>
         <button id="GESN" class="botaopc">Pedir Acesso</button>
         <button id="REUS" class="botaopc">Reportar Usuário</button>
-  <hr>
+  <hr class="linhas">
     <span id="pginitextotxt" class="pginitexto"></span>
     <hr style="display:none">
     <textarea id="txtareaGESN" style="display: none; width: 500px;" placeholder="Coloque o link do seu perfil do animefire aqui" rows = 7></textarea>
