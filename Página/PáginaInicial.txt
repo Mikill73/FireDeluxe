@@ -1,17 +1,29 @@
-AnimeFireMod Versão 0.3 já está disponivel para dowload no discord!
+Versão 0.4 :
 
-- O botão MENU agora combina com a cor do site #21D3FF
+O bloqueador de pornografia bloqueia além da mensagem a foto de perfil também agora, isso pois o usuário pode estar usando algo pornografico na sua foto.
 
-- Adicionado botão "Site" dentro do MENU, o botão Site abre uma nova guia com o link do site.
+Log de comentários, seus comentários são registrados para monitoramento, ver se você está comentando coisas erradas...
 
-- Novo sistema de verificação, você precisa ir no site do mod e apertar "Pedir Acesso" então coloque o link do seu perfil no animefire e clique enviar, então aguarde aprovação.
+Logo do site alterada para "Fire Deluxe" em neon.
 
-- Função de bloquear perfis pornograficos, você pode reportar usuários que postam esse tipo de conteúdo no #site .
+Adicionado botão no Menu chamado "Anime Aleatorio" te leva para um anime aleatorio caso não saiba o que assistir.
 
-- Sistema de pontos, você ganha 1 ponto a cada 30 minutos usando o mod, esses pontos serão usados em uma lojinha de privilégios, como mais tempo de acesso e etc...
+Adicionado a primeira função que pode ser comprada com pontos, com 100 pontos você pode comprar um nome em neon roxo ( por enquanto apenas roxo ), esse nome aparece em neon em comentários, chat e até perfil, todos que usam o mod veram o seu nome customizado.
 
-- Converter Player agora é REALMENTE universal para o site, basta entrar no link de um episódio, apertar converter player e assistir.
+Adicionado um sistema de monitoramento de comentários, isso para evitar que você, usuário do mod esteja quebrando alguma regra ao comentar, caso isso seja feito, você terá seu acesso ao mod removido.
 
-- Criado um site com "Página Inicial" mostra os ultimos updates, "Pedir Acesso" onde você pode pedir para usar o mod e "Reportar Usuário" onde você reportar usuários que postam conteúdo +18 no site.
+Adicionado um botão nos comentários para deixar mais prático o acesso ao site para reportar, sem necessidade de entrar no discord para isso.
 
-- Codigo otimizado para não causa problemas na RAM do navegador.
+Adicionado um botão chamado "Página Colorida", esse botão muda a cor de todos os textos na página a cada segundo por uma cor aleátoria.
+
+Mensagem de divulgação com uma imagem nos comentários, te dando a opção de ajudar a divulgar o mod.
+
+O botão menu agora combina com a temática "Fire Deluxe".
+
+Neon aplicado no botão menu além de deixar ele transparente.
+
+Nome do mod alterado para firedeluxe, logo alterada para uma versão de fogo, link de imagem para divulgação alterado.
+
+Fundo do carregamento alterado para firedeluxe.
+
+É necessário abaixar apenas 1 arquivo para instalar agora, sem a necessidade de gastar tempo com varios e varios arquivos.
