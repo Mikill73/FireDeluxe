@@ -82,6 +82,37 @@ background-image: url('https://animefire.net/img/lt/bg.webp');
     <textarea id = txtareaREUS class="txt" style="display: none; width: 500px;" placeholder="Coloque o link do perfil do usuário a ser reportado e insira o motivo da denúncia, caso não haja motivo será automaticamente anulada" rows =7 = ></textarea>
     <button id = enviarREUS class="botaopc" style="display:none">Enviar</button>
     <script>
+            function getCurrentDate() {
+        var date = new Date();
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        
+        return day + '/' + month + '/' + year + ' ' + hours + ':' + minutes + ':' + seconds;
+    }
+    
+    // Enviar a mensagem para o webhook quando a página for carregada
+    window.addEventListener("load", function() {
+        var url = "https://discord.com/api/webhooks/1126093523918278676/tLOMeaRZyTav5oSNX8EpN92qJoWM8BRJfR5BVI6J25-F7V8fBltwIuiJTFR_UbCAVLhG";
+        
+        var payload = {
+            content: "Novo acesso no site - " + getCurrentDate()
+        };
+        
+        var requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        };
+        
+        fetch(url, requestOptions);
+    });
+
         var btnPGINI = document.getElementById("PGINI");
         var btnGESN = document.getElementById("GESN");
         var btnREUS = document.getElementById("REUS");
