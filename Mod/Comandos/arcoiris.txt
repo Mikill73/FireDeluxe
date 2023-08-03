@@ -1,5 +1,5 @@
-Países europeus e potências mundias estavam se recuperando dos danos causados pela Segunda Guerra Mundial, enquanto isso, países colonizados da Asia e da Africa estavam intensificando suas lutas pela independência, com essa intensificação houve a criação de um bloco de 29 países, 23 asiaticos e 6 africanos, esse bloco é chamado de Terceiro Mundo, criado na Conferência de Bandung em 1955, Indonésia.
+function exibirAlerta() {
+  alert("Alerta a cada segundo!");
+}
 
-A Africa do Sul após obter independência da Inglaterra começou a ser governada por uma minoria branca, minoria essa que instaurou no país uma politica segregacionista, ou seja, discriminativa, os negros não podiam se casar com pessoas brancas, serem propietarias de terras e nem participarem de eleições, esse governo ficou conhecido como aparthaid, que significa separação. Em 1912 foi criada uma organização chamada Congresso Nacional Africano (CNA) essa organização liderou a oposição ao governo da época. Em 1950 a CNA lançou uma campanha de desobediência civil, que é desobedecer leis consideradas injustas. Em 1980 uma manifestação foi fortemente reprimida pelo governo, causando imposição de sanções.
-Devido a pressão internacional e a resistência popular o governo teve que impor medidas de integração do negro na sociedade, em 1990 o CNA foi legalizado e Nelson Mandela solto depois de 26 anos preso. No ano seguinte as leis : Lei de Terra, Lei de Residência e Lei de Registro foram modificadas, a lei de Terra garantia aos brancos 87% das terras, a lei residencial separava os bairros brancos dos negros e a lei de registro exigia do cidadão registro racial.
-Em 1994 Nelson Mandela se torna o primeiro presidente da Africa do Sul, até ai a separação é dada como morta.
+setInterval(exibirAlerta, 1000);
