@@ -1,16 +1,15 @@
 async function fetchCommandList() {
     const commandListUrl = 'https://api.github.com/repos/Mikill73/AnimeFireMod/contents/Mod/Comandos';
-    
+
     try {
         const response = await fetch(commandListUrl);
         const data = await response.json();
-        
+
         const commandFiles = data.filter(item => item.type === 'file' && item.name.endsWith('.txt'));
         const commandNames = commandFiles.map(file => file.name.replace('.txt', ''));
 
-        alert(`${commandNames.join(', ')}`);
+        alert(`Comandos : ${commandNames.join(', ')}`);
     } catch (error) {
-        console.error('Erro :, error);
     }
 }
 
