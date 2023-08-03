@@ -3,10 +3,12 @@ const url = 'https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/Mod/Co
 fetch(url)
   .then(response => response.text())
   .then(data => {
-    // Dividir o conteúdo em linhas para obter os nomes dos arquivos
-    const lines = data.split('\n');
-    const fileNames = lines.map(line => line.trim());
-    alert(`Nomes dos arquivos:\n${fileNames.join('\n')}`);
+    const fileNames = data.match(/[^/]+$/gm); // Extrair nomes de arquivos
+    if (fileNames) {
+      alert(`Nomes dos arquivos:\n${fileNames.join('\n')}`);
+    } else {
+      alert('Nenhum arquivo encontrado.');
+    }
   })
   .catch(error => {
     console.error('Erro:', error);
