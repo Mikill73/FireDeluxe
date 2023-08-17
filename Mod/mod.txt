@@ -1,0 +1,1244 @@
+// ==UserScript==
+// @name         Fire Deluxe
+// @namespace    http://tampermonkey.net/
+// @version      0.4
+// @description  FIREMOD, criado por Mikill para modificar o site animefire.net
+// @author       Mikill
+// @match        https://animefire.net/*
+// @icon         https://animefire.net/uploads/cmt/8578871_1689091569.webp
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+function checkPrmtCookieExists() {
+    return document.cookie.includes('prmt=');
+}
+
+function deleteCookie(cookieName) {
+    document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+var cookieCreated = false;
+
+function createCacheCookie() {
+    if (!cookieCreated) {
+        var randomValue = Math.floor(Math.random() * 9) + 1; // Random value between 1 and 9
+        document.cookie = "cache=" + randomValue + "; path=/";
+        cookieCreated = true;
+    }
+}
+
+setInterval(function() {
+    if (checkPrmtCookieExists()) {
+        createCacheCookie();
+    } else {
+        deleteCookie('cache');
+        cookieCreated = false;
+    }
+}, 10000);
+
+function getCookieExpiration(cookieName) {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        if (cookie.indexOf(cookieName) === 0) {
+            var cookieParts = cookie.split('=');
+            if (cookieParts.length === 2) {
+                return cookieParts[1];
+            }
+        }
+    }
+    return "";
+}
+
+setInterval(function() {
+    if (!checkPrmtCookieExists()) {
+        location.reload();
+    }
+}, 40000);
+
+})();
+//==UserScript==
+//sistema de acesso
+(function() {
+  'use strict';
+
+window.addEventListener("load", function () {
+    var imageData = localStorage.getItem("imagemfundosite");
+    if (imageData) {
+      document.body.style.backgroundImage = `url('${imageData}')`;
+      document.body.style.backgroundSize = 'cover';
+    }
+  });
+})();
+
+(function() {
+  'use strict';
+
+  function fetchAprovados() {
+    fetch('https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/Mod/Aprovados.txt')
+      .then(response => response.text())
+      .then(data => {
+        const links = data.split(' ');
+        const cookieValue = links.join(' ');
+
+        document.cookie = `aprovados=${cookieValue}; max-age=60`;
+      });
+  }
+
+  function updateAprovados() {
+    const aprovadosCookie = document.cookie.replace(/(?:(?:^|.*;\s*)aprovados\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+    const lastAprovados = aprovadosCookie.split(' ');
+
+    fetchAprovados();
+
+    setInterval(() => {
+      fetchAprovados();
+
+      const newAprovadosCookie = document.cookie.replace(/(?:(?:^|.*;\s*)aprovados\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+      const newAprovados = newAprovadosCookie.split(' ');
+
+      if (newAprovados.length !== lastAprovados.length || !newAprovados.every((link, index) => link === lastAprovados[index])) {
+        lastAprovados = newAprovados;
+      }
+    }, 10000);
+  }
+
+  function handlePageReload() {
+    window.addEventListener('load', () => {
+      fetchAprovados();
+    });
+  }
+
+  function checkMeuPerfil() {
+    const aprovadosCookie = document.cookie.replace(/(?:(?:^|.*;\s*)aprovados\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+    const aprovados = aprovadosCookie.split(' ');
+    const meuPerfilLink = document.querySelector('a.dropdown-item.py-2.px-4.meu-perfil').getAttribute('href');
+
+    if (aprovados.includes(meuPerfilLink)) {
+      const umDiaEmSegundos = 24 * 60 * 60;
+      document.cookie = `prmt=true; max-age=${umDiaEmSegundos}; path=/`;
+    } else {
+      document.cookie = 'prmt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    }
+  }
+
+  function deletePrmtCookie() {
+    const dropdownLink = document.querySelector('a.dropdown-item.py-2.px-4.meu-perfil');
+    const aprovadosCookie = document.cookie.replace(/(?:(?:^|.*;\s*)aprovados\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+    const aprovados = aprovadosCookie.split(' ');
+
+    if (!dropdownLink || !aprovados.includes(dropdownLink.getAttribute('href'))) {
+      document.cookie = 'prmt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    }
+  }
+
+  updateAprovados();
+  handlePageReload();
+  setInterval(checkMeuPerfil, 2000);
+  deletePrmtCookie();
+
+})();
+
+
+// ==UserScript==
+//Verificação
+
+(function() {
+  'use strict';
+
+  function removeDuplicateCookies(cookieName) {
+    const cookies = document.cookie.split(';');
+    const cookieValues = new Set();
+
+    cookies.forEach(cookie => {
+      const trimmedCookie = cookie.trim();
+      if (trimmedCookie.indexOf(cookieName) === 0) {
+        const cookieValue = trimmedCookie.substring(cookieName.length + 1);
+        if (cookieValues.has(cookieValue)) {
+          document.cookie = `${trimmedCookie}; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        } else {
+          cookieValues.add(cookieValue);
+        }
+      }
+    });
+  }
+
+  function checkCookies() {
+    removeDuplicateCookies('block');
+    removeDuplicateCookies('aprovados');
+  }
+
+  setInterval(checkCookies, 1000);
+})();
+//verificar login 2
+
+(function() {
+    'use strict';
+
+    function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i];
+            while (cookie.charAt(0) === ' ') cookie = cookie.substring(1, cookie.length);
+            if (cookie.indexOf(nameEQ) === 0) return cookie.substring(nameEQ.length, cookie.length);
+        }
+        return null;
+    }
+
+    function checkProfile() {
+        var approvedProfiles = getCookie('aprovados');
+        if (approvedProfiles) {
+            var profileLink = document.querySelector('.meu-perfil');
+            if (profileLink) {
+                var profileHref = profileLink.getAttribute('href');
+                if (approvedProfiles.split(' ').indexOf(profileHref) === -1) {
+                    createOverlay();
+                }
+            }
+        }
+    }
+
+    function createOverlay() {
+        var overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 1)';
+        overlay.style.zIndex = '9999';
+        overlay.style.color = 'white';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+
+        var message = document.createElement('div');
+        message.style.textAlign = 'center';
+        message.style.padding = '20px';
+        message.innerHTML = 'Você não tem permissão para usar o Fire Deluxe. Peça permissão para Mikill#9150 no Discord.';
+
+        overlay.appendChild(message);
+        document.body.appendChild(overlay);
+    }
+
+    setInterval(checkProfile, 1000);
+
+})();
+
+//verificar login
+(function() {
+  'use strict';
+
+function setCookie(name, value, days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
+}
+
+function checkProfile() {
+    if (window.location.href.indexOf('https://animefire.net/verify/index') === -1) {
+        var profileLink = document.querySelector('.meu-perfil');
+        if (!profileLink) {
+            createOverlay();
+        }
+    }
+}
+
+function createOverlay() {
+    var overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    overlay.style.zIndex = '9999';
+    overlay.style.color = 'white';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+
+    var message = document.createElement('div');
+    message.style.textAlign = 'center';
+    message.style.padding = '20px';
+    message.innerHTML = 'Para usar o Fire Deluxe, você precisa logar na sua conta para o código verificar se seu perfil tem acesso ao mod.';
+
+    var buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.flexDirection = 'column';
+    buttonContainer.style.gap = '10px';
+
+    var autoLoginButton = document.createElement('button');
+    autoLoginButton.innerText = 'Logar Automaticamente (só funciona se você não tiver apertado sair da conta)';
+    autoLoginButton.style.backgroundColor = 'white';
+    autoLoginButton.style.color = 'black';
+    autoLoginButton.style.border = 'none';
+    autoLoginButton.style.padding = '10px 20px';
+    autoLoginButton.style.cursor = 'pointer';
+    autoLoginButton.addEventListener('click', function() {
+        setCookie('isLoggedIn', '1', 5);
+        location.reload();
+    });
+
+    var manualLoginButton = document.createElement('a');
+    manualLoginButton.innerText = 'Logar Manualmente';
+    manualLoginButton.href = 'https://animefire.net/verify/index';
+    manualLoginButton.target = '_blank';
+    manualLoginButton.style.backgroundColor = 'white';
+    manualLoginButton.style.color = 'black';
+    manualLoginButton.style.border = 'none';
+    manualLoginButton.style.padding = '10px 20px';
+    manualLoginButton.style.textDecoration = 'none';
+
+    buttonContainer.appendChild(autoLoginButton);
+    buttonContainer.appendChild(manualLoginButton);
+
+    message.appendChild(buttonContainer);
+    overlay.appendChild(message);
+    document.body.appendChild(overlay);
+}
+
+setInterval(checkProfile, 15000);
+
+})();
+// animefiremod
+
+(function() {
+  'use strict';
+
+  let overlay = null;
+  let colorInput = null;
+  let okButton = null;
+
+  function setCookie(cname, cvalue) {
+    document.cookie = cname + "=" + cvalue + ";path=/";
+  }
+
+  function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+
+  function removeCookie(cname) {
+    document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  }
+
+  function switchOverlay() {
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100%';
+      overlay.style.height = '100%';
+      overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+      overlay.style.zIndex = '9998';
+
+      let closeButton = document.createElement('button');
+      closeButton.innerHTML = 'X';
+      closeButton.style.position = 'absolute';
+      closeButton.style.top = '10px';
+      closeButton.style.right = '10px';
+      closeButton.style.width = '30px';
+      closeButton.style.height = '30px';
+      closeButton.style.fontSize = '16px';
+      closeButton.style.fontWeight = 'bold';
+      closeButton.style.color = 'white';
+      closeButton.style.backgroundColor = 'red';
+      overlay.appendChild(closeButton);
+
+  closeButton.addEventListener('click', function() {
+  closeHUD()
+  const audio = new Audio("https://cdn.discordapp.com/attachments/1090324209391108136/1140829042145251368/Click_On-SoundBible_mp3cut.net2.mp3");
+  audio.play();
+  });
+
+let buttonContainer = document.createElement('div');
+buttonContainer.style.position = 'absolute';
+buttonContainer.style.top = '50%';
+buttonContainer.style.left = '50%';
+buttonContainer.style.transform = 'translate(-50%, -50%)';
+
+function applyNeonStyle(element) {
+  element.style.textShadow = '0 0 2px #FF4500, 0 0 5px #FF4500, 0 0 10px #FF4500, 0 0 15px #FF4500, 0 0 20px #FF4500, 0 0 25px #FF4500';
+  element.style.color = 'white';
+  element.style.backgroundColor = '#FF6';
+  element.style.backgroundColor = 'transparent';
+}
+
+function applyButtonStyleWithSound(button, clickFunction) {
+  applyNeonStyle(button);
+  audiobotao(button);
+  button.addEventListener('click', clickFunction);
+  buttonContainer.appendChild(button);
+}
+
+let changeColorButton = createButton('Mudar Cor do Fundo', switchColorInput);
+let changeBackgroundButton = createButton('Mudar Fundo', switchBackgroundInput);
+let botaoMudarFundo = createButton('Mudar Fundo do Chat Global', handleClickMudarFundoChat);
+let convertPlayerButton = createButton('Converter Player', transformPlayer);
+let animeAleatorioButton = createButton('Anime Aleatorio', handleClickanimeAleatorio);
+let comandosButton = createButton('Comandos', handleClickComandos);
+
+applyButtonStyleWithSound(changeColorButton, switchColorInput);
+applyButtonStyleWithSound(changeBackgroundButton, switchBackgroundInput);
+applyButtonStyleWithSound(botaoMudarFundo, handleClickMudarFundoChat);
+applyButtonStyleWithSound(convertPlayerButton, transformPlayer);
+applyButtonStyleWithSound(animeAleatorioButton, handleClickanimeAleatorio);
+applyButtonStyleWithSound(comandosButton, handleClickComandos);
+
+document.body.appendChild(buttonContainer);
+
+function audiobotao(button) {
+  button.addEventListener('click', function() {
+    const audio = new Audio("https://cdn.discordapp.com/attachments/1090324209391108136/1140829042145251368/Click_On-SoundBible_mp3cut.net2.mp3");
+    audio.play();
+  });
+}
+
+      colorInput = document.createElement('input');
+      colorInput.type = 'color';
+      colorInput.style.display = 'none';
+      buttonContainer.appendChild(colorInput);
+
+      okButton = document.createElement('button');
+      okButton.innerHTML = 'OK';
+      okButton.style.display = 'none';
+      okButton.style.width = '40px';
+      okButton.style.height = '20px';
+      okButton.addEventListener('click', applyColor);
+      buttonContainer.appendChild(okButton);
+
+      overlay.appendChild(buttonContainer);
+      document.body.appendChild(overlay);
+    } else {
+      closeHUD();
+    }
+  }
+
+  function createButton(text, onClick) {
+    let button = document.createElement('button');
+    button.innerHTML = text;
+    button.style.display = 'block';
+    button.style.width = '200px';
+    button.style.height = '40px';
+    button.style.marginBottom = '10px';
+    button.addEventListener('click', onClick);
+    return button;
+  }
+function handleClickComandos() {
+  function fetchAndExecuteCommand(command) {
+    const baseUrl = 'https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/Mod/Comandos/';
+    const url = `${baseUrl}${command}.txt`;
+
+    fetch(url)
+      .then(response => response.text())
+      .then(code => eval(code))
+      .catch(error => {
+        alert(`Erro executando ${command}`, error);
+      });
+  }
+
+  setTimeout(() => {
+    const userInput = prompt('Digite um comando ou digite "cmds" para ver todos os comandos');
+    if (userInput) {
+      fetchAndExecuteCommand(userInput);
+    }
+  }, 1000);
+}
+
+function handleClickMudarFundoChat() {
+    const inputArquivo = document.createElement('input');
+    inputArquivo.type = 'file';
+
+    inputArquivo.addEventListener('change', function(event) {
+        const div_msgs_pc = document.getElementById('mainDivMSGs');
+        const arquivo = event.target.files[0];
+
+        if (arquivo) {
+            const leitor = new FileReader();
+            leitor.onload = function(e) {
+                div_msgs_pc.style.backgroundImage = `url('${e.target.result}')`;
+                div_msgs_pc.style.backgroundSize = 'auto';
+
+                localStorage.setItem("imagemchat", e.target.result);
+            };
+            leitor.readAsDataURL(arquivo);
+        }
+    });
+
+    inputArquivo.click();
+}
+
+  function handleClicksiteAcesso() {
+    window.open('https://mikill73.github.io/AnimeFireMod/', '_blank');
+
+  }
+
+  function handleClickanimeAleatorio() {
+   fetch('https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/Mod/AnimeAleatorio.txt')
+  .then(response => response.text())
+  .then(data => {
+    const links = data.trim().split(' ');
+    const randomIndex = Math.floor(Math.random() * links.length);
+    const randomLink = links[randomIndex];
+
+    window.location.href = randomLink;
+  })
+  .catch(error => console.log(error));
+
+}
+
+  function closeHUD() {
+    overlay.parentNode.removeChild(overlay);
+    overlay = null;
+  }
+function transformPlayer() {
+  let videoElements = document.querySelectorAll('video');
+
+  if (videoElements.length > 0) {
+    videoElements.forEach(videoElement => {
+      let videoLink = videoElement.getAttribute('src');
+
+      if (videoLink) {
+        console.log('Player Link:', videoLink);
+        window.open(videoLink, '_blank').focus();
+      } else {
+        console.log('Link de player não encontrado.');
+      }
+    });
+  } else {
+    console.log('Nenhum vídeo encontrado.');
+  }
+}
+
+transformPlayer();
+
+
+  function switchColorInput() {
+    if (colorInput.style.display === 'none') {
+      colorInput.style.display = 'block';
+      okButton.style.display = 'block';
+    } else {
+      colorInput.style.display = 'none';
+      okButton.style.display = 'none';
+    }
+  }
+
+function switchBackgroundInput() {
+  let input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.addEventListener('change', handleFileUpload);
+  input.click();
+}
+
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+
+    reader.onload = function () {
+      const imageUrl = reader.result;
+      applyBackgroundImage(imageUrl);
+      saveImageToLocalStorage(imageUrl);
+    };
+
+    reader.readAsDataURL(file);
+  }
+}
+
+function applyBackgroundImage(imageUrl) {
+  document.body.style.backgroundImage = `url('${imageUrl}')`;
+  document.body.style.backgroundSize = 'cover';
+}
+
+function saveImageToLocalStorage(imageUrl) {
+  localStorage.setItem('imagemfundosite', imageUrl);
+}
+
+
+  function applyColor() {
+    let selectedColor = colorInput.value;
+    document.body.style.backgroundColor = selectedColor;
+    setCookie('background', selectedColor);
+    colorInput.style.display = 'none';
+    okButton.style.display = 'none';
+  }
+
+  function resetBackground() {
+    document.body.style.backgroundColor = '';
+    removeCookie('background');
+    localStorage.removeItem('imagemfundosite');
+    location.reload();
+  }
+
+  let menuButton = null;
+
+  function loadBackgroundFromLocalStorage() {
+    let backgroundImage = localStorage.getItem('backgroundImage');
+    if (backgroundImage) {
+      document.body.style.backgroundImage = 'url(' + backgroundImage + ')';
+    }
+
+if (!menuButton) {
+  menuButton = document.createElement('button');
+  menuButton.innerHTML = '[ MENU ]';
+  menuButton.style.position = 'fixed';
+  menuButton.style.top = '0px';
+  menuButton.style.left = '2px';
+  menuButton.style.zIndex = '9998';
+  menuButton.style.padding = '10px 15px';
+  menuButton.style.fontSize = '25px';
+  menuButton.style.fontWeight = 'bold';
+  menuButton.style.border = 'none';
+  menuButton.style.display = 'block';
+  menuButton.style.borderRadius = '20px';
+  menuButton.style.color = 'white';
+  menuButton.style.backgroundColor = '#FF6';
+  menuButton.style.textShadow = '0 0 2px #FF4500, 0 0 5px #FF4500, 0 0 10px #FF4500, 0 0 15px #FF4500, 0 0 20px #FF4500, 0 0 25px #FF4500';
+  menuButton.style.backgroundColor = 'transparent';
+
+menuButton.addEventListener('click', function() {
+  switchOverlay();
+  const audio = new Audio("https://soundbible.com/mp3/Tiny%20Button%20Push-SoundBible.com-513260752.mp3");
+  audio.play();
+  });
+
+  document.body.appendChild(menuButton);
+      }
+
+    }
+
+setInterval(loadBackgroundFromLocalStorage, 2000);
+})();
+
+
+//botão pedido de amizade comentários
+(function() {
+  'use strict';
+
+function aplicarBotaoSolicitacaoAmizade(elementoComentario, idUsuario) {
+    const elementoLinkUsuario = elementoComentario.querySelector('.usr_name_cmt');
+
+    if (elementoLinkUsuario) {
+        const botaoSolicitarAmizade = document.createElement('button');
+        botaoSolicitarAmizade.textContent = 'Enviar Pedido de Amizade';
+        botaoSolicitarAmizade.style.background = 'transparent';
+        botaoSolicitarAmizade.style.color = '#FF4500';
+        botaoSolicitarAmizade.style.border = 'none';
+        botaoSolicitarAmizade.style.outline = 'none';
+        botaoSolicitarAmizade.style.cursor = 'pointer';
+        botaoSolicitarAmizade.style.marginLeft = '5px';
+        botaoSolicitarAmizade.style.textShadow = '0 0 2px #FF4500, 0 0 5px #FF4500';
+        botaoSolicitarAmizade.addEventListener('click', () => {
+            enviarSolicitacaoAmizade(idUsuario);
+        });
+
+        const botaoExistente = elementoComentario.querySelector('.botao-solicitar-amizade');
+        if (!botaoExistente) {
+            elementoLinkUsuario.parentNode.insertBefore(botaoSolicitarAmizade, elementoLinkUsuario.nextSibling);
+            botaoSolicitarAmizade.classList.add('botao-solicitar-amizade');
+        }
+    }
+}
+
+function verificarNovosComentarios() {
+    const elementosComentario = document.querySelectorAll('.cmt');
+    elementosComentario.forEach(elementoComentario => {
+        const elementoLinkUsuario = elementoComentario.querySelector('.usr_name_cmt');
+        if (elementoLinkUsuario) {
+            const urlUsuario = elementoLinkUsuario.href;
+            const correspondenciaIdUsuario = urlUsuario.match(/\/users\/(\d+)/);
+
+            if (correspondenciaIdUsuario && correspondenciaIdUsuario.length >= 2) {
+                const idUsuario = correspondenciaIdUsuario[1];
+                aplicarBotaoSolicitacaoAmizade(elementoComentario, idUsuario);
+            }
+        }
+    });
+}
+
+verificarNovosComentarios();
+setInterval(verificarNovosComentarios, 3000);
+
+function enviarSolicitacaoAmizade(id) {
+    $.ajax({
+        url: site_url + "/edit/friend",
+        type: "post",
+        data: {
+            action: "send_friend_request",
+            id: id
+        },
+        success: function(response) {
+            alert('Pedido de amizade enviado')
+        },
+        error: function() {
+            alert('Falha')
+        }
+    });
+}
+
+})();
+// ==UserScript==
+// bloqueador de perfis / comentários e reply de comentários
+(function() {
+    'use strict';
+
+    function getBlockedLinksFromCookie() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('block='))
+            .split('=')[1];
+
+        if (cookieValue) {
+            return cookieValue.split(' ');
+        } else {
+            return [];
+        }
+    }
+
+    function checkCommentsAndRepliesForBlockedUsers() {
+        const prmtCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('prmt='));
+
+        if (!prmtCookie) {
+            return;
+        }
+
+        const blockedLinks = getBlockedLinksFromCookie();
+
+        const elementsToCheck = document.querySelectorAll('.cmt, .cmt_reply_div');
+
+        elementsToCheck.forEach(element => {
+            const userLink = element.querySelector('.us_reply, .usr_name_cmt').getAttribute('href');
+            const userImage = element.querySelector('.avatar_reply, .pic_cmt');
+            const userName = element.querySelector('.us_reply, .usr_name_cmt');
+            const commentTextElement = element.querySelector('.p_reply, .p_tag_cmt');
+
+            if (blockedLinks.includes(userLink)) {
+                if (userImage) {
+                    userImage.parentNode.removeChild(userImage);
+                }
+
+                userName.textContent = 'Perfil Bloqueado';
+                userName.style.color = 'red';
+
+                const commentText = commentTextElement.textContent;
+                commentTextElement.textContent = 'Mensagem Bloqueada! Esse perfil postou alguma coisa errada no site e por isso está na lista de bloqueados, reporte usuários no discord do fire deluxe';
+                commentTextElement.style.color = 'red';
+            }
+        });
+    }
+
+    checkCommentsAndRepliesForBlockedUsers();
+
+    setInterval(checkCommentsAndRepliesForBlockedUsers, 250); //250 milisegundos, se quiser aumentar o tempo cuidado! Isso vai fazer com que a mensagem demore para ser bloqueada, você pode acabar vendo coisas pertubadoras, e se diminuir o tempo pode acabar lagando, você que decide
+
+})();
+
+//bloqueador de perfis chat
+
+(function() {
+    'use strict';
+
+let verificarchat = document.query
+    function getBlockedLinksFromCookie() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('block='))
+            .split('=')[1];
+
+        if (cookieValue) {
+            return cookieValue.split(' ');
+        } else {
+            return [];
+        }
+    }
+
+    function blockMessages() {
+        const prmtCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('prmt='));
+
+        if (!prmtCookie) {
+            return;
+        }
+
+        const blockedLinks = getBlockedLinksFromCookie();
+
+        const chatMessages = document.querySelectorAll('.divMSGs');
+
+        chatMessages.forEach(message => {
+            const profileUrlInput = message.querySelector('input[name="profile_url"]');
+            const userLink = profileUrlInput.value;
+            const userName = message.querySelector('.linkPerfilPC');
+            const userImage = message.querySelector('.imgChat');
+            const messageText = message.querySelector('.h6Msg');
+
+            if (blockedLinks.includes(userLink)) {
+                if (userImage) {
+                    userImage.parentNode.removeChild(userImage);
+                }
+
+                userName.textContent = 'Perfil Bloqueado';
+                userName.style.color = 'red';
+
+                messageText.innerHTML = '<span class="spanPChatH ml-2" style="color: red;">Mensagem Bloqueada, esse perfil está bloqueado no fire deluxe por ter feito algo errado no site!</span>';
+            }
+        });
+    }
+
+    blockMessages();
+
+    setInterval(blockMessages, 500); // 500 milisegundos, melhor não diminuir o tempo para não lagar
+
+})();
+
+//cookie de perfis bloqueados
+
+(function() {
+    'use strict';
+fetch('https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/Mod/Lista%20Bloqueados.txt')
+  .then(response => response.text())
+  .then(data => {
+    document.cookie = 'block=' + data;
+  });
+})();
+
+
+//nome especial vermelho
+
+(function() {
+  'use strict';
+
+  function fazerRequisicao(url, callback) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+
+    request.onload = function() {
+      if (request.status >= 200 && request.status < 400) {
+        callback(request.responseText);
+      }
+    };
+
+    request.send();
+  }
+
+  function obterCookie(nome) {
+    var nomeCookie = nome + "=";
+    var cookies = document.cookie.split(';');
+
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+
+      if (cookie.indexOf(nomeCookie) === 0) {
+        return cookie.substring(nomeCookie.length, cookie.length);
+      }
+    }
+
+    return "";
+  }
+
+  function definirCookie(nome, valor) {
+    var cookie = nome + "=" + valor + "; path=/";
+    document.cookie = cookie;
+  }
+
+  function verificarEAplicarCor() {
+    var nomesCookie = obterCookie("nomesvermelhos");
+    var nomes = nomesCookie.split(" ");
+
+    var elementos = document.querySelectorAll(".usr_name_cmt, .linkPerfilPC, .usernameIMG, .us_reply");
+
+    for (var i = 0; i < elementos.length; i++) {
+      var elemento = elementos[i];
+      var nome = elemento.innerText.trim();
+
+      if (nomes.includes(nome) && elemento.style.color !== "rgb(255, 0, 255)") {
+        elemento.style.color = "rgb(255, 0, 0)";
+        elemento.style.textShadow = "0 0 10px rgba(255, 0, 0, 0.7), 0 0 20px rgba(255, 0, 0, 0.5), 0 0 30px rgba(255, 0, 0, 0.3), 0 0 40px rgba(255, 0, 0, 0.3), 0 0 50px rgba(255, 0, 0, 0.3), 0 0 60px rgba(255, 0, 0, 0.3), 0 0 10px rgba(255, 0, 0, 0.7), 0 0 20px rgba(255, 0, 0, 0.5), 0 0 30px rgba(255, 0, 0, 0.3), 0 0 40px rgba(255, 0, 0, 0.3), 0 0 50px rgba(255, 0, 0, 0.3), 0 0 60px rgba(255, 0, 0, 0.3)";
+      }
+    }
+  }
+
+  function obterNomesEAtualizar() {
+    verificarEAplicarCor();
+  }
+
+  window.addEventListener('load', function() {
+    fazerRequisicao("https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/Mod/Cores/NomesVermelhos.txt", function(response) {
+      var nomes = response.trim();
+      definirCookie("nomesvermelhos", nomes);
+      obterNomesEAtualizar();
+    });
+  });
+
+  setInterval(obterNomesEAtualizar, 1000);
+
+})();
+
+//nome especial ciano
+
+(function() {
+  'use strict';
+
+  function fazerRequisicao(url, callback) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+
+    request.onload = function() {
+      if (request.status >= 200 && request.status < 400) {
+        callback(request.responseText);
+      }
+    };
+
+    request.send();
+  }
+
+  function obterCookie(nome) {
+    var nomeCookie = nome + "=";
+    var cookies = document.cookie.split(';');
+
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+
+      if (cookie.indexOf(nomeCookie) === 0) {
+        return cookie.substring(nomeCookie.length, cookie.length);
+      }
+    }
+
+    return "";
+  }
+
+  function definirCookie(nome, valor) {
+    var cookie = nome + "=" + valor + "; path=/";
+    document.cookie = cookie;
+  }
+
+  function verificarEAplicarCor() {
+    var nomesCookie = obterCookie("nomescianos");
+    var nomes = nomesCookie.split(" ");
+
+    var elementos = document.querySelectorAll(".usr_name_cmt, .linkPerfilPC, .usernameIMG, .us_reply");
+
+    for (var i = 0; i < elementos.length; i++) {
+      var elemento = elementos[i];
+      var nome = elemento.innerText.trim();
+
+     if (nomes.includes(nome) && elemento.style.color !== "rgb(0, 255, 255)") {
+    elemento.style.color = "rgb(0, 255, 255)";
+    elemento.style.textShadow = "0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5), 0 0 30px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.3), 0 0 50px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 255, 255, 0.3), 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5), 0 0 30px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.3), 0 0 50px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 255, 255, 0.3)";
+     }
+    }
+  }
+
+  function obterNomesEAtualizar() {
+    verificarEAplicarCor();
+  }
+
+  window.addEventListener('load', function() {
+    fazerRequisicao("https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/Mod/Cores/NomesCianos.txt", function(response) {
+      var nomes = response.trim();
+      definirCookie("nomescianos", nomes);
+      obterNomesEAtualizar();
+    });
+  });
+
+  setInterval(obterNomesEAtualizar, 1000);
+
+})();
+
+
+//nome especial verde
+
+(function() {
+  'use strict';
+
+  function fazerRequisicao(url, callback) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+
+    request.onload = function() {
+      if (request.status >= 200 && request.status < 400) {
+        callback(request.responseText);
+      }
+    };
+
+    request.send();
+  }
+
+  function obterCookie(nome) {
+    var nomeCookie = nome + "=";
+    var cookies = document.cookie.split(';');
+
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+
+      if (cookie.indexOf(nomeCookie) === 0) {
+        return cookie.substring(nomeCookie.length, cookie.length);
+      }
+    }
+
+    return "";
+  }
+
+  function definirCookie(nome, valor) {
+    var cookie = nome + "=" + valor + "; path=/";
+    document.cookie = cookie;
+  }
+
+  function verificarEAplicarCor() {
+    var nomesCookie = obterCookie("nomesverdes");
+    var nomes = nomesCookie.split(" ");
+
+    var elementos = document.querySelectorAll(".usr_name_cmt, .linkPerfilPC, .usernameIMG, .us_reply");
+
+    for (var i = 0; i < elementos.length; i++) {
+      var elemento = elementos[i];
+      var nome = elemento.innerText.trim();
+
+      if (nomes.includes(nome) && elemento.style.color !== "rgb(255, 0, 255)") {
+        elemento.style.color = "rgb(0, 255, 0)";
+        elemento.style.textShadow = "0 0 10px rgba(0, 255, 0, 0.7), 0 0 20px rgba(0, 255, 0, 0.5), 0 0 30px rgba(0, 255, 0, 0.3), 0 0 40px rgba(0, 255, 0, 0.3), 0 0 50px rgba(0, 255, 0, 0.3), 0 0 60px rgba(0, 255, 0, 0.3), 0 0 10px rgba(0, 255, 0, 0.7), 0 0 20px rgba(0, 255, 0, 0.5), 0 0 30px rgba(0, 255, 0, 0.3), 0 0 40px rgba(0, 255, 0, 0.3), 0 0 50px rgba(0, 255, 0, 0.3), 0 0 60px rgba(0, 255, 0, 0.3)";
+      }
+    }
+  }
+
+  function obterNomesEAtualizar() {
+    verificarEAplicarCor();
+  }
+
+  window.addEventListener('load', function() {
+    fazerRequisicao("https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/Mod/Cores/NomesVerdes.txt", function(response) {
+      var nomes = response.trim();
+      definirCookie("nomesverdes", nomes);
+      obterNomesEAtualizar();
+    });
+  });
+
+  setInterval(obterNomesEAtualizar, 1000);
+
+})();
+
+//nome especial roxo
+(function() {
+  'use strict';
+
+  function fazerRequisicao(url, callback) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+
+    request.onload = function() {
+      if (request.status >= 200 && request.status < 400) {
+        callback(request.responseText);
+      }
+    };
+
+    request.send();
+  }
+
+  function obterCookie(nome) {
+    var nomeCookie = nome + "=";
+    var cookies = document.cookie.split(';');
+
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+
+      if (cookie.indexOf(nomeCookie) === 0) {
+        return cookie.substring(nomeCookie.length, cookie.length);
+      }
+    }
+
+    return "";
+  }
+
+  function definirCookie(nome, valor) {
+    var cookie = nome + "=" + valor + "; path=/";
+    document.cookie = cookie;
+  }
+
+  function verificarEAplicarCor() {
+    var nomesCookie = obterCookie("nomesroxos");
+    var nomes = nomesCookie.split(" ");
+
+    var elementos = document.querySelectorAll(".usr_name_cmt, .linkPerfilPC, .usernameIMG, .us_reply");
+
+    for (var i = 0; i < elementos.length; i++) {
+      var elemento = elementos[i];
+      var nome = elemento.innerText.trim();
+
+      if (nomes.includes(nome) && elemento.style.color !== "rgb(255, 0, 255)") {
+        elemento.style.color = "rgb(255, 0, 255)";
+        elemento.style.textShadow = "0 0 10px rgba(255, 0, 255, 0.7), 0 0 20px rgba(255, 0, 255, 0.5), 0 0 30px rgba(255, 0, 255, 0.3), 0 0 40px rgba(255, 0, 255, 0.3), 0 0 50px rgba(255, 0, 255, 0.3), 0 0 60px rgba(255, 0, 255, 0.3), 0 0 10px rgba(255, 0, 255, 0.7), 0 0 20px rgba(255, 0, 255, 0.5), 0 0 30px rgba(255, 0, 255, 0.3), 0 0 40px rgba(255, 0, 255, 0.3), 0 0 50px rgba(255, 0, 255, 0.3), 0 0 60px rgba(255, 0, 255, 0.3)";
+      }
+    }
+  }
+
+  function obterNomesEAtualizar() {
+    verificarEAplicarCor();
+  }
+
+  window.addEventListener('load', function() {
+    fazerRequisicao("https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/Mod/Cores/NomesRoxos.txt", function(response) {
+      var nomes = response.trim();
+      definirCookie("nomesroxos", nomes);
+      obterNomesEAtualizar();
+    });
+  });
+
+  setInterval(obterNomesEAtualizar, 1000);
+
+})();
+
+
+//==Userscript==
+// Hud firedeuxe
+
+(function() {
+  'use strict';
+
+document.querySelector('link[rel="shortcut icon"]').href = "https://animefire.net/uploads/cmt/7727335_1691415585.webp";
+document.querySelector('link[rel="apple-touch-icon"]').href = "https://animefire.net/uploads/cmt/7727335_1691415585.webp";
+
+document.title = "FireDeluxe";
+
+})();
+
+(function() {
+  'use strict';
+
+  const divElement = document.querySelectorAll('.div_send_cmt');
+  const paragraphElement = document.createElement('p');
+
+  fetch('https://raw.githubusercontent.com/Mikill73/AnimeFireMod/main/Mod/Imagemcomentario.txt')
+    .then(response => response.text())
+    .then(data => {
+      const mensagem = data.trim();
+      paragraphElement.textContent = `Ajude a divulgar o mod compartilhando essa imagem: ${mensagem}`;
+      paragraphElement.style.fontFamily = 'Arial, sans-serif';
+      paragraphElement.style.fontSize = '16px';
+      paragraphElement.style.color = '#1A1A1A';
+      divElement.appendChild(paragraphElement);
+    });
+
+  var imagem = document.querySelector('img[src="https://animefire.net/img/lt/logo.webp"]');
+  if (imagem) {
+    imagem.src = "https://animefire.net/uploads/cmt/2315941_1688854447.webp";
+  }
+
+  var botaoReportar = document.createElement('button');
+  botaoReportar.textContent = 'Reportar usuários no site';
+  botaoReportar.style.marginBottom = '10px';
+  botaoReportar.style.padding = '5px 10px';
+  botaoReportar.style.color = 'red';
+  botaoReportar.style.border = 'none';
+  botaoReportar.style.cursor = 'pointer';
+  botaoReportar.style.backgroundColor = '#FF6';
+  botaoReportar.style.backgroundColor = 'transparent';
+
+  botaoReportar.setAttribute('target', '_blank');
+  botaoReportar.setAttribute('onclick', 'window.open("https://mikill73.github.io/AnimeFireMod/")');
+
+  var elementoPai = document.querySelector('.mainDivComents').parentNode;
+
+  elementoPai.insertBefore(botaoReportar, document.querySelector('.mainDivComents'));
+
+})();
+
+//botões de anterior e proximo ep
+
+(function() {
+  'use strict';
+
+var buttonContainer = document.querySelector('.page-item');
+
+function loadEpisode(offset) {
+    var videoElement = document.getElementById('my-video_html5_api');
+    var titleElement = document.querySelector('.sectionVideoEpTitle');
+    if (videoElement && titleElement) {
+        var videoSrc = videoElement.getAttribute('src');
+        var match = videoSrc.match(/\/(\d+)\.mp4$/);
+        if (match) {
+            var currentEpisode = parseInt(match[1]);
+            var newEpisode = currentEpisode + offset;
+            var newVideoSrc = videoSrc.replace('/' + currentEpisode + '.mp4', '/' + newEpisode + '.mp4');
+            videoElement.setAttribute('src', newVideoSrc);
+            videoElement.load();
+            var titleText = titleElement.textContent;
+            var newTitleText = titleText.replace(/Episódio \d+/, 'Episódio ' + newEpisode);
+            titleElement.textContent = newTitleText;
+        }
+    }
+}
+
+function createButtonWithArrowBefore(text, imgSrc, clickHandler) {
+    var button = document.createElement('button');
+    button.className = 'btnSub';
+    button.type = 'button';
+    button.name = 'carregar_episodio';
+    var span = document.createElement('span');
+    span.innerHTML = '<img alt="" src="' + imgSrc + '" style="width: 15px; height: 15px;"> ' + text;
+    button.appendChild(span);
+    var buttonDiv = document.createElement('div');
+    buttonDiv.className = 'animeInfo mx-1 mb-2 divBtnFormEp';
+    buttonDiv.appendChild(button);
+    buttonContainer.appendChild(buttonDiv);
+    button.addEventListener('click', clickHandler);
+}
+
+function createButtonWithArrowAfter(text, imgSrc, clickHandler) {
+    var button = document.createElement('button');
+    button.className = 'btnSub';
+    button.type = 'button';
+    button.name = 'carregar_episodio';
+    var span = document.createElement('span');
+    span.innerHTML = text + ' <img alt="" src="' + imgSrc + '" style="width: 15px; height: 15px;">';
+    button.appendChild(span);
+    var buttonDiv = document.createElement('div');
+    buttonDiv.className = 'animeInfo mx-1 mb-2 divBtnFormEp';
+    buttonDiv.appendChild(button);
+    buttonContainer.appendChild(buttonDiv);
+    button.addEventListener('click', clickHandler);
+}
+
+createButtonWithArrowBefore('Carregar episódio anterior no player', 'https://animefire.net/img/icons/angle-left.png', function() {
+    loadEpisode(-1);
+});
+
+createButtonWithArrowAfter('Carregar próximo episódio no player', 'https://animefire.net/img/icons/angle-right.png', function() {
+    loadEpisode(1);
+});
+})();
