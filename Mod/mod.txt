@@ -65,13 +65,14 @@ setInterval(function() {
 (function() {
   'use strict';
 
-window.addEventListener("load", function () {
-    var imageData = localStorage.getItem("imagemfundosite");
-    if (imageData) {
-      document.body.style.backgroundImage = `url('${imageData}')`;
-      document.body.style.backgroundSize = 'cover';
-    }
-  });
+var imagemFundo = localStorage.getItem('imagemfundosite');
+
+if (imagemFundo) {
+  document.body.style.backgroundImage = `url(${imagemFundo})`;
+  document.body.style.backgroundSize = 'cover';
+  document.body.style.backgroundRepeat = 'no-repeat';
+}
+
 })();
 
 (function() {
