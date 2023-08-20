@@ -1,8 +1,0 @@
-var divMSGsList = document.querySelectorAll(".divMSGs");
-if (divMSGsList.length > 0) {
-    divMSGsList.forEach(function(element) {
-        element.parentNode.removeChild(element);
-    });
-} else {
-    console.log("Divs não encontradas.");
-}
