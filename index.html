@@ -1,31 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Server</title>
+    <title>Página de Comandos</title>
 </head>
 <body>
     <script>
-        function handleRequest(request, response) {
-            const url = new URL(request.url, `http://${request.headers.host}`);
-            const action = url.searchParams.get("acao");
-            
-            if (action === "pegarcomandos") {
-                response.writeHead(200, { "Content-Type": "text/plain" });
-                response.end("Comandos disponiveis : arcoiris");
-            } else {
-                response.writeHead(404, { "Content-Type": "text/plain" });
-                response.end("Acao nao encontrada");
-            }
+        // Função para verificar o parâmetro 'acao' na URL
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
         }
 
-        const http = require("http");
-        const server = http.createServer((req, res) => {
-            handleRequest(req, res);
-        });
-
-        server.listen(8080, () => {
-            console.log("Servidor rodando na porta 8080");
-        });
+        // Verifica se o parâmetro 'acao' é igual a 'pegarcomandos'
+        var acaoParam = getParameterByName('acao');
+        if (acaoParam === 'pegarcomandos') {
+            alert("Comandos disponíveis: arcoiris");
+        }
     </script>
 </body>
 </html>
