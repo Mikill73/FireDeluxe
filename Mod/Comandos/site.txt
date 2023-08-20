@@ -1,1 +1,0 @@
-window.open('https://mikill73.github.io/AnimeFireMod/', '_blank');
