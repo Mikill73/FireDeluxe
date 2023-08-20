@@ -1,9 +1,31 @@
-<div id = comandos>
-<h1>arcoiris</h1>
-</div id>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server</title>
+</head>
+<body>
+    <script>
+        function handleRequest(request, response) {
+            const url = new URL(request.url, `http://${request.headers.host}`);
+            const action = url.searchParams.get("acao");
+            
+            if (action === "pegarcomandos") {
+                response.writeHead(200, { "Content-Type": "text/plain" });
+                response.end("Comandos disponiveis : arcoiris");
+            } else {
+                response.writeHead(404, { "Content-Type": "text/plain" });
+                response.end("Acao nao encontrada");
+            }
+        }
 
-<div id = funcaocomandos>
+        const http = require("http");
+        const server = http.createServer((req, res) => {
+            handleRequest(req, res);
+        });
 
-<h1>"arcoiris" : "console.log('Teste')"</h1>
-
-</div>
+        server.listen(8080, () => {
+            console.log("Servidor rodando na porta 8080");
+        });
+    </script>
+</body>
+</html>
