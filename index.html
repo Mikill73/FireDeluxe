@@ -1,26 +1,170 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Página de Comandos</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: black;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .neon-container {
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+
+  .neon-text {
+    font-size: 3em;
+    color: #FF4500;
+    text-shadow: 0 0 2px #FF4500, 0 0 5px #FF4500, 0 0 10px #FF4500, 0 0 15px #FF4500;
+    animation: neon-glow 1.5s ease-in-out infinite alternate;
+  }
+
+  .neon-text2 {
+    font-size: 1em;
+    color: #FF4500;
+    text-shadow: 0 0 2px #FF4500, 0 0 5px #FF4500, 0 0 10px #FF4500, 0 0 15px #FF4500;
+    animation: neon-glow 1.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes neon-glow {
+    from {
+      text-shadow:
+        0 0 2px #FF4500,
+
+        0 0 15px #FF4500;
+    }
+    to {
+      text-shadow:
+        0 0 2px #FF4500,
+        0 0 30px #FF4500,
+        0 0 50px #FF4500;
+    }
+  }
+</style>
 </head>
 <body>
-    <script>
-        // Função para verificar o parâmetro 'acao' na URL
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, "\\$&");
-            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, " "));
+  <div id="particles-js"></div>
+  <div class="neon-container">
+    <div class="neon-text">FIREDELUXE</div>
+    <p class="neon-text2">Um userscript para o animefire.net, adicionando novas funções ao site. Mantenha-se atualizado!</p>
+    <p class="neon-text2">Contate Mikill#9150 no Discord para baixar e saber mais.</p>
+  </div>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      particles: {
+        number: {
+          value: 200,
+          density: {
+            enable: true,
+            value_area: 800
+          }
+        },
+        color: {
+          value: "#FF4500"
+        },
+        shape: {
+          type: "circle",
+          stroke: {
+            width: 0,
+            color: "#000000"
+          },
+          polygon: {
+            nb_sides: 5
+          }
+        },
+        opacity: {
+          value: 1.0,
+          random: true,
+          anim: {
+            enable: false,
+            speed: 1,
+            opacity_min: 0.1,
+            sync: false
+          }
+        },
+        size: {
+          value: 10,
+          random: true,
+          anim: {
+            enable: false,
+            speed: 40,
+            size_min: 0.1,
+            sync: false
+          }
+        },
+        line_linked: {
+          enable: true
+        },
+        move: {
+          enable: true,
+          speed: 15,
+          direction: "bottom",
+          random: true,
+          straight: false,
+          out_mode: "out",
+          bounce: false,
+          attract: {
+            enable: false,
+            rotateX: 600,
+            rotateY: 1200
+          }
         }
-
-        // Verifica se o parâmetro 'acao' é igual a 'pegarcomandos'
-        var acaoParam = getParameterByName('acao');
-        if (acaoParam === 'pegarcomandos') {
-            alert("Comandos disponíveis: arcoiris");
+      },
+      interactivity: {
+        detect_on: "page",
+        events: {
+          onhover: {
+            enable: true,
+            mode: "repulse"
+          },
+          onclick: {
+            enable: true,
+            mode: "push"
+          },
+          resize: true
+        },
+        modes: {
+          grab: {
+            distance: 400,
+            line_linked: {
+              opacity: 1
+            }
+          },
+          bubble: {
+            distance: 400,
+            size: 40,
+            duration: 2,
+            opacity: 8,
+            speed: 3
+          },
+          repulse: {
+            distance: 100,
+            duration: 0.4
+          },
+          push: {
+            particles_nb: 4
+          },
+          remove: {
+            particles_nb: 2
+          }
         }
-    </script>
+      },
+      retina_detect: true
+    });
+  </script>
 </body>
 </html>
