@@ -1,77 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neon Glow Image with Particles</title>
-<style>
-  body {
-    margin: 0;
-    padding: 0;
-    background-color: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-  }
-  
-  #glow-container {
-    position: relative;
-  }
-  
-  #glow-image {
-    width: 300px;
-    height: auto;
-    animation: glowAnimation 1s ease-in-out infinite alternate;
-  }
-  
-  @keyframes glowAnimation {
-    0% {
-      filter: drop-shadow(0 0 5px #ff4550);
-    }
-    100% {
-      filter: drop-shadow(0 0 20px #ff4550);
-    }
-  }
-  
-  .particle {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background-color: #ff4550;
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    animation: particleAnimation 2s linear infinite;
-    opacity: 0;
-  }
-  
-  @keyframes particleAnimation {
-    0% {
-      transform: translateY(0) rotate(0);
-      opacity: 0;
-    }
-    100% {
-      transform: translateY(-200px) rotate(360deg);
-      opacity: 1;
-    }
-  }
-</style>
+    <title>Reproduzir Vídeo</title>
 </head>
 <body>
-<div id="glow-container">
-  <img id="glow-image" src="https://animefire.net/uploads/cmt/1207633_1692582582.webp" alt="Glowing Image">
+    <video controls width="640" height="360" id="videoPlayer">
+        <source src="https://download1075.mediafire.com/pchtu8cy7hpgJx2oC2NjNeewqiLT3cIllFAksgnMT-JyFoOnJzi72No27-4tIMAx4ixTxlCh8eVdAsxXWLthPvSUks93HiII4NJqFLDuyrNnVpdXd5HgwMUfqgcZOmq2ryDjR3wIruhQGE5opQMj9K6AGT8VryXNxBB_4y-9sJ0de54/s9eq652hpnzw82v/kuro-no-shoukanshi-dublado-ep-12-final.mp4" type="video/mp4">
+        Seu navegador não suporta a reprodução de vídeos HTML5.
+    </video>
 
-  <!-- You can add more particles as needed -->
-</div>
-<script>
-  // Add more particles dynamically
-  const container = document.getElementById("glow-container");
-  for (let i = 0; i < 20; i++) {
-    const particle = document.createElement("div");
-    particle.className = "particle";
-    container.appendChild(particle);
-    particle.style.left = Math.random() * container.offsetWidth + "px";
-    particle.style.animationDuration = (Math.random() + 10) + "s";
-  }
-</script>
+    <script>
+        var video = document.getElementById('videoPlayer');
+
+        window.onload = function() {
+            video.play();
+        };
+    </script>
 </body>
 </html>
