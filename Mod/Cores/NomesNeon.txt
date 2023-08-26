@@ -1,0 +1,17 @@
+const vermelho = `
+"Mikill"
+
+`;
+
+const ciano = `
+
+`;
+
+const verde = `
+
+`;
+
+const roxo = `
+"Ayumi"
+
+`;
