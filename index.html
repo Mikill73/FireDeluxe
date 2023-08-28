@@ -1,20 +1,210 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Reproduzir Vídeo</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Download FireDeluxe</title>
+<style>
+  body {
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+  }
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    display : none;
+  }
+  .radio-group {
+    display: flex;
+    align-items: center;
+  }
+  .radio-group input[type="radio"] {
+    margin-right: 10px;
+  }
+  .submit-button {
+    margin-top: 20px;
+  }
+  .aviso2 {
+    display: none;
+  }
+</style>
 </head>
 <body>
-    <video controls width="640" height="360" id="videoPlayer">
-        <source src="https://download1075.mediafire.com/pchtu8cy7hpgJx2oC2NjNeewqiLT3cIllFAksgnMT-JyFoOnJzi72No27-4tIMAx4ixTxlCh8eVdAsxXWLthPvSUks93HiII4NJqFLDuyrNnVpdXd5HgwMUfqgcZOmq2ryDjR3wIruhQGE5opQMj9K6AGT8VryXNxBB_4y-9sJ0de54/s9eq652hpnzw82v/kuro-no-shoukanshi-dublado-ep-12-final.mp4" type="video/mp4">
-        Seu navegador não suporta a reprodução de vídeos HTML5.
-    </video>
+<button onclick="btnpediracesso()">
+    Pedir Acesso
+</button>
+<button onclick="btnultimosupdates()">
+    Ultimos Updates
+</button>
+<div class="aviso2" id="divultimosupdatesmensagem">
+    
+<p>
+- Se você encontrar um comentário de uma lista de usuários o codigo faz você enviar uma resposta para esse comentário, se for uma pessoa da lista que não esteja na lista de bloqueados é uma mensagem amigavel tipo eae oi, se for da lista de bloqueados é tipo "nojento"
+<p/>
+<p>
+- Sistema de linxamento, se você encontrar um usuário bloqueado o codigo vai fazer você enviar um comentário zoando ele
+<p/>
+<p>
+- O bloqueador de perfis agora mostra porque o usuário está na lista de bloqueados zombando dele
+<p/>
+<p>
+- Bloqueador de perfis que bloqueia apenas imagens que ele posta, isso é util pra usuários que fazem macaquices com imagens mas não em mensagens
+<p/>
+<p>
+- Substituido o botão de yt por um botão de emoji, você pode sugerir novos emojis ou figurinhas em #sugestões 
+<p/>
+<p>
+- Agora existem 20 cores neon para você usar, o sistema de cores mudou, agora é mais facil mudar e alterar, mais rapido e facil.
+<p/>
+<p>
+- Tudo que era de animefire.net no codigo alterado para animefire.vip
+<p/>
+<p>
+- Agora se você manter seu dedo/mouse encima de um ep na lista de ultimos eps adicionados esse ep é carregado na imagem do episódio!
+</p>
+    
+</div>
+<div id="formula" class="container">
+  <hr>
+  <h2>Preencha as informações abaixo para baixar o FireDeluxe</h2>
+  <hr>
+  <form id="download-form">
+    <div class="radio-group">
+      <input type="radio" name="device" value="PC" id="device-pc" required>
+      <label for="device-pc">PC</label>
+      <input type="radio" name="device" value="MOBILE" id="device-mobile">
+      <label for="device-mobile">MOBILE</label>
+    </div>
+    <hr>
+    <label for="browser">Navegador</label>
+    <input type="text" id="browser" name="browser" required>
+    <hr>
+    <p id="mobile-warning" style="display: none; color: red;">O navegador que você inseriu não permite a instalação de extensões, o código do Fire Deluxe necessita de uma extensão chamada Violentmonkey para rodar, se ainda quiser instalar o mod recomendo que baixe um navegador que rode extensões, como o Kiwi Browser</p>
+    <label for="anime-profile-url">Url do perfil no animefire</label>
+    <input type="url" id="anime-profile-url" name="anime-profile-url" required>
+  </form>
+  <hr>
+  <label for="browser">Nome no discord</label>
+      <input type="text" id="discord" name="discord" required>
+  <hr>
+     <button type="button" class="submit-button" onclick="submitForm()">Enviar Pedido de Acesso</button>
 
-    <script>
-        var video = document.getElementById('videoPlayer');
+</div>
+<div id="mensagemposenvio">
+  <p id="success-message" style="display: none; color: green;">Pedido de Acesso Enviado! Aguarde!</p>
+    <p id="termmessage" style="display: none; color: white;">Agora que você enviou o pedido por favor leia os requisitos do mod</p>
+<p id="term2message" style="display: none; color: white;">
+    Primeiramente você precisa entrar em dois servidores, um é o servidor discord do Fire Deluxe e o outro é um servidor parceiro.
+</p>
+<p id="term3message" style="display: none; color: red;">
+    Você possuí uma dívida acumulada que deve ser paga a cada periodo de férias. O que isso significa? Que você a cada mês de férias têm que pagar um certo valor em sonhos. Os sonhos são uma moeda gratis então não se preocupe! O firedeluxe é totalmente gratis. Para obter sonhos você pode ir no canal de comandos no servidor firedeluxe e digitar +daily ou +bolsafamilia, clicar no primeiro link que o bot fornecer, completar o captcha no site e resgatar seus sonhos.
+</p>
+<p id="term4message" style="display: none; color: white;">
+    A dívida até primeiro de dezembro é de 61k sonhos, se acha o valor muito alto não se preocupe! Ainda é agosto e o daily pode ser resgatado a cada 12 horas, o daily varia em valor mas sempre é acima de 1500 sonhos ganhos, se você ganhar 3k todo dia já é mais do que suficiente pra passar de 61k no começo de dezembro.
+</p>
+<p id="term5message" style="display: none; color: white;">
+    Se parar de usar o firedeluxe têm que informar o motivo e se for um motivo que seja de minha responsabilidade ou que eu possa resolver você deve me informar sobre o motivo, desinstalar o firedeluxe significa nunca mais instalar novamente, não desinstale o mod se planeja usar ele futuramente, desinstalar significa que você nunca mais vai poder usar ele!
+</p>
+<p id="term6message" style="display: none; color: white;">
+    É de sua obrigação e de todos que utilizam do mod denunciar usuários que postem pornografia, gore e qualquer tipo de conteúdo ilicito no site, você pode efetuar uma denúncia no site do firedeluxe, pois a lista de usuários bloqueados é a mesma para todos que usam do firedeluxe.
+</p>
+<p id="term7message" style="display: none; color: white;">
+    O codigo do mod é completamente aberto, ou seja, é livre para editar e observar, mas se tentar editar o codigo e houver algum problema não espere que eu resolva! Foi de sua responsabilidade editar isso e eu não vou te ajudar.
+</p>
 
-        window.onload = function() {
-            video.play();
-        };
-    </script>
+<p id="term8message" style="display: none; color: red;">
+    Dúvidas são respondidas pelo discord
+</p>
+</div>
+<h1 class="aviso2" id="avisoenviado">Você já enviou um pedido de acesso</h1>
+<script>
+function submitForm() {
+  const device = document.querySelector('input[name="device"]:checked').value;
+  const browser = document.getElementById('browser').value.toLowerCase();
+  const animeProfileUrl = document.getElementById('anime-profile-url').value;
+  const discordName = document.getElementById('discord').value;
+
+  if (device === 'MOBILE' && (browser === 'google chrome' || browser === 'chrome' || browser === 'opera gx' || browser === 'brave' || browser === 'opera' || browser === 'brave')) {
+    document.getElementById('mobile-warning').style.display = 'block';
+  } else {
+    document.getElementById('mobile-warning').style.display = 'none';
+    const formData = {
+      device,
+      browser,
+      animeProfileUrl,
+      discordName
+    };
+
+    sendToDiscordWebhook(formData);
+
+    const successMessage = document.getElementById('success-message');
+    successMessage.style.display = 'block';
+    termmessage.style.display = 'block';
+    term2message.style.display = 'block';
+    term3message.style.display = 'block';
+    term4message.style.display = 'block';
+    term5message.style.display = 'block';
+    term6message.style.display = 'block';
+    term7message.style.display = 'block';
+    term8message.style.display = 'block';
+    formula.style.display = 'none';
+  }
+}
+
+function sendToDiscordWebhook(formData) {
+  const webhookUrl = "https://discord.com/api/webhooks/1144293975977631886/UtthQjQu7kqMeOuFtbZHjiTwuvVVcZJ9Zr5EJkAMx6Vd2UY4-fMHjaM4xHA2OWs0ykRu";
+
+  const data = {
+    content: `## Pedido de acesso\n- Enviado por : ${formData.discordName}\n- Dispositivo: ${formData.device}\n- Navegador: ${formData.browser}\n- URL do perfil no AnimeFire: ${formData.animeProfileUrl}`,
+  };
+
+  fetch(webhookUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => {
+      if (response.ok) {
+      } else {
+      }
+    })
+    .catch(error => {
+    });
+    
+    function criarCookie(nome, valor, diasParaExpirar) {
+  var dataExpiracao = new Date();
+  dataExpiracao.setTime(dataExpiracao.getTime() + (diasParaExpirar * 24 * 60 * 60 * 1000));
+  var expiracao = "expires=" + dataExpiracao.toUTCString();
+  document.cookie = nome + "=" + valor + ";" + expiracao + ";path=/";
+}
+
+criarCookie("enviado", "true", 365);
+
+}
+  
+function cookieExiste(nome) {
+  return document.cookie.split(';').some(cookie => cookie.trim().startsWith(nome + '='));
+}
+
+function btnpediracesso() {
+    divultimosupdatesmensagem.style.display = 'none';
+  if (!cookieExiste("enviado")) {
+    formula.style.display = 'block';
+    avisoenviado.style.display = 'none';
+  } else {
+    avisoenviado.style.display = 'block';
+  }
+}
+
+function btnultimosupdates() {
+    divultimosupdatesmensagem.style.display = 'block';
+    formula.style.display = 'none';
+    avisoenviado.style.display = 'none';
+}
+</script>
 </body>
 </html>
