@@ -29,6 +29,12 @@
   .aviso2 {
     display: none;
   }
+  .divdenunciar {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    display : none;
+  }
 </style>
 </head>
 <body>
@@ -37,6 +43,9 @@
 </button>
 <button onclick="btnultimosupdates()">
     Ultimos Updates
+</button>
+<button onclick="btndenunciar()">
+    Denunciar
 </button>
 <div class="aviso2" id="divultimosupdatesmensagem">
     
@@ -119,6 +128,24 @@
 </p>
 </div>
 <h1 class="aviso2" id="avisoenviado">Você já enviou um pedido de acesso</h1>
+<div class="divdenunciar">
+    <hr>
+    <h3 color='red'>Preencha as informações abaixo para denunciar alguêm, se tiver provas por favor coloque o link da imagem ou local onde ocorreu o acontecimento que resultou em você denunciar ele em motivo da denúncia.</h3>
+    <hr>
+    <label for="browser">Link de perfil</label>
+    <input type="text" placeholder='(Quem denunciar?)' required>
+    <hr>
+    <label for="browser">Motivo da denúncia</label>
+    <input type="text" placeholder='(O que ela fez?)' required>
+    <hr>
+    <label for="browser">Autor da denúncia</label>
+    <input type="text" placeholder='(Quem denuncia?)'>
+    <hr>
+    <button type="button" class="submit-button" onclick="enviardenuncia()">Enviar Denúncia</button>
+</div>
+
+<h1 id = 'enviado' style = "color:green; display:none">Enviado!</h1>
+<h1 id = 'enviadoerro' style = "color:red; display:none">Erro ao enviar, tente novamente</h1>
 <script>
 function submitForm() {
   const device = document.querySelector('input[name="device"]:checked').value;
@@ -194,6 +221,12 @@ function btnpediracesso() {
     divultimosupdatesmensagem.style.display = 'none';
   if (!cookieExiste("enviado")) {
     formula.style.display = 'block';
+    var divdenunciar = document.querySelector('.divdenunciar');
+    var enviadoerro = document.getElementById('enviadoerro');
+    enviadoerro.style.display = 'none';
+    var enviado = document.getElementById('enviado');
+    enviado.style.display = 'none';
+    divdenunciar.style.display = 'none';
     avisoenviado.style.display = 'none';
   } else {
     avisoenviado.style.display = 'block';
@@ -204,7 +237,58 @@ function btnultimosupdates() {
     divultimosupdatesmensagem.style.display = 'block';
     formula.style.display = 'none';
     avisoenviado.style.display = 'none';
+    var divdenunciar = document.querySelector('.divdenunciar');
+    divdenunciar.style.display = 'none';
+    var enviadoerro = document.getElementById('enviadoerro');
+    enviadoerro.style.display = 'none';
+    var enviado = document.getElementById('enviado');
+    enviado.style.display = 'none';
 }
+
+function btndenunciar() {
+    divultimosupdatesmensagem.style.display = 'none';
+    formula.style.display = 'none';
+    avisoenviado.style.display = 'none';
+    var divdenunciar = document.querySelector('.divdenunciar');
+    divdenunciar.style.display = 'block';
+    var enviadoerro = document.getElementById('enviadoerro');
+    enviadoerro.style.display = 'none';
+    var enviado = document.getElementById('enviado');
+    enviado.style.display = 'none';
+}
+
+function enviardenuncia() {
+    var linkPerfil = document.querySelector('input[placeholder="(Quem denunciar?)"]').value;
+    var motivo = document.querySelector('input[placeholder="(O que ela fez?)"]').value;
+    var autor = document.querySelector('input[placeholder="(Quem denuncia?)"]').value;
+    var webhookURL = "https://discord.com/api/webhooks/1149753094431842337/os6A-pbsjR_Q05J7hF1NPjxS8BqHLQeLND7-7B2HGrrPwTU0D_xmqenHQxPxXngo_JSc";
+    var requestBody = {
+        content: "# Denúncia\n\n**Link de perfil :** " + linkPerfil + "\n**Motivo :** " + motivo + "\n**Autor :** " + autor
+    };
+    
+    fetch(webhookURL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(requestBody)
+    }).then(function(response) {
+        if (response.status === 200 || response.status === 204) {
+            var divdenunciar = document.querySelector('.divdenunciar');
+            divdenunciar.style.display = 'none';
+            var enviado = document.getElementById('enviado');
+            enviado.style.display = 'block';
+        } else {
+            var enviadoerro = document.getElementById('enviadoerro');
+            enviadoerro.style.display = 'block';
+        }
+    }).catch(function(error) {
+        var enviadoerro = document.getElementById('enviadoerro');
+        enviadoerro.style.display = 'block';
+        console.error("Erro ao enviar a denúncia:", error);
+    });
+}
+
 </script>
 </body>
 </html>
