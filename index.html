@@ -218,15 +218,17 @@ function cookieExiste(nome) {
 }
 
 function btnpediracesso() {
-    divultimosupdatesmensagem.style.display = 'none';
-  if (!cookieExiste("enviado")) {
-    formula.style.display = 'block';
+      formula.style.display = 'none';
+    avisoenviado.style.display = 'none';
     var divdenunciar = document.querySelector('.divdenunciar');
+    divdenunciar.style.display = 'none';
     var enviadoerro = document.getElementById('enviadoerro');
     enviadoerro.style.display = 'none';
     var enviado = document.getElementById('enviado');
     enviado.style.display = 'none';
-    divdenunciar.style.display = 'none';
+    divultimosupdatesmensagem.style.display = 'none';
+  if (!cookieExiste("enviado")) {
+    formula.style.display = 'block';
     avisoenviado.style.display = 'none';
   } else {
     avisoenviado.style.display = 'block';
