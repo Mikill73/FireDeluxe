@@ -50,57 +50,12 @@
 </head>
 <body>
 <button class='neonbutton'onclick="btnpediracesso()">
-    Pedir Acesso
+    Instalar FireDeluxe
 </button>
 <button class='neonbutton' onclick="btndenunciar()">
-    Denunciar
+    Denunciar Usuários
 </button>
-<div class="aviso2" id="divultimosupdatesmensagem">
-    
-<p>
-- Se você encontrar um comentário de uma lista de usuários o codigo faz você enviar uma resposta para esse comentário, se for uma pessoa da lista que não esteja na lista de bloqueados é uma mensagem amigavel tipo eae oi, se for da lista de bloqueados é tipo "nojento"
-<p/>
-<p>
-- Sistema de linxamento, se você encontrar um usuário bloqueado o codigo vai fazer você enviar um comentário zoando ele
-<p/>
-<p>
-- O bloqueador de perfis agora mostra porque o usuário está na lista de bloqueados zombando dele
-<p/>
-<p>
-- Bloqueador de perfis que bloqueia apenas imagens que ele posta, isso é util pra usuários que fazem macaquices com imagens mas não em mensagens
-<p/>
-<p>
-- Substituido o botão de yt por um botão de emoji, você pode sugerir novos emojis ou figurinhas em #sugestões 
-<p/>
-<p>
-- Agora existem 20 cores neon para você usar, o sistema de cores mudou, agora é mais facil mudar e alterar, mais rapido e facil.
-<p/>
-<p>
-- Tudo que era de animefire.net no codigo alterado para animefire.vip
-<p/>
-<p>
-- Agora se você manter seu dedo/mouse encima de um ep na lista de ultimos eps adicionados esse ep é carregado na imagem do episódio!
-</p>
-<p>
-- Se você passar seu dedo ou mouse encima de um poster de anime o codigo te fornece informações sobre o mesmo.
-</p>
-<p>
-- Corrigido bug que carregava varias prévias no episódio.
-</p>
-<p>
-- Adicionado botão de registrar conta automatica, usa se confiar, você vai precisar de duas contas, uma alt e uma original. O botão abre um input pedindo o email e senha da sua alt, depois o email e senha da sua original. 
-Vai ser usado para varios sistemas interessantes que usam contas, você vai ter seu própio bot para automatizar certas coisas.
-</p>
-<p>
-- Primeira automação de conta : Tirar limites de mensagem automaticamente, o codigo loga na sua alt, envia uma mensagem no chat, loga na sua original e termina. Só funciona quando as ultimas 4 mensagens do chat forem enviadas pela mesma pessoa, assim tira o limite e a pessoa pode falar novamente.
-</p>
-<p>
-- Adicionado nova forma de acionar os codigos, agora em vez de intervalo é usado um ouvinte, um unico codigo aciona todos os codigos do firedeluxe.
-</p>
-<p>
-- Tag firedeluxe para usuários no chat
-</p>    
-</div>
+
 <div id="formula" class="container">
   <hr>
   <h2>Preencha as informações abaixo para baixar o FireDeluxe</h2>
@@ -116,7 +71,7 @@ Vai ser usado para varios sistemas interessantes que usam contas, você vai ter 
     <label for="browser">Navegador</label>
     <input type="text" id="browser" name="browser" required>
     <hr>
-    <p id="mobile-warning" style="display: none; color: red;">O navegador que você inseriu não permite a instalação de extensões, o código do Fire Deluxe necessita de uma extensão chamada Violentmonkey para rodar, se ainda quiser instalar o mod recomendo que baixe um navegador que rode extensões, como o Kiwi Browser</p>
+    <p id="mobile-warning" style="display: none; color: red;">O navegador que você inseriu não permite a instalação de extensões, o código do Fire Deluxe necessita de uma extensão chamada Violentmonkey para rodar, se ainda quiser instalar o mod recomendo que baixe um navegador que rode extensões, como o Kiwi Browser, se você tiver um PC você pode usar qualquer navegador para instalar o FireDeluxe, Chrome, Opera, Brave e etc...</p>
     <label for="anime-profile-url">Url do perfil no animefire</label>
     <input type="url" id="anime-profile-url" name="anime-profile-url" required>
   </form>
@@ -128,19 +83,20 @@ Vai ser usado para varios sistemas interessantes que usam contas, você vai ter 
 
 </div>
 <div id="mensagemposenvio">
-  <p id="success-message" style="display: none; color: green;">Pedido de Acesso Enviado! Aguarde!</p>
+  <p id="success-message" style="display: none; color: green;">Pedido de Acesso Enviado! Aguarde a aprovação, se você for aprovado você será avisado no discord!</p>
     <p id="termmessage" style="display: none; color: white;">Agora que você enviou o pedido por favor leia os requisitos do mod</p>
 <p id="term2message" style="display: none; color: white;">
-    Primeiramente você precisa entrar em dois servidores, um é o servidor discord do Fire Deluxe e o outro é um servidor parceiro.
-</p>
-<p id="term3message" style="display: none; color: red;">
-    Você possuí uma dívida acumulada que deve ser paga a cada periodo de férias. O que isso significa? Que você a cada mês de férias têm que pagar um certo valor em sonhos. Os sonhos são uma moeda gratis então não se preocupe! O firedeluxe é totalmente gratis. Para obter sonhos você pode ir no canal de comandos no servidor firedeluxe e digitar +daily ou +bolsafamilia, clicar no primeiro link que o bot fornecer, completar o captcha no site e resgatar seus sonhos.
-</p>
-<p id="term4message" style="display: none; color: white;">
-    A dívida até primeiro de dezembro é de 61k sonhos, se acha o valor muito alto não se preocupe! O daily pode ser resgatado a cada 12 horo daily varia em valor mas sempre é acima de 1500 sonhos ganhos, se você ganhar 3k todo dia já é mais do que suficiente pra passar de 61k no começo de dezembro.
-</p>
-<p id="term5message" style="display: none; color: white;">
-    Se parar de usar o firedeluxe têm que informar o motivo e se for um motivo que seja de minha responsabilidade ou que eu possa resolver você deve me informar sobre o motivo, desinstalar o firedeluxe significa nunca mais instalar novamente, não desinstale o mod se planeja usar ele futuramente, desinstalar significa que você nunca mais vai poder usar ele!
+    Primeiramente você precisa entrar em dois servidores, um é o servidor discord do Fire Deluxe e o outro é um servidor parceiro. Seu acesso só será aprovado se você entrar neles!
+<br>
+
+    Obs : Se você sair dos servidores você terá seu acesso revogado!
+    
+<br>
+    <a href="https://discord.gg/yM6XDHQrmh">Servidor do FireDeluxe</a>
+<br>
+    <a href="https://discord.gg/m5hUySKwYe">Servidor do Bairro AnimeFire</a>
+
+    
 </p>
 <p id="term6message" style="display: none; color: white;">
     É de sua obrigação e de todos que utilizam do mod denunciar usuários que postem pornografia, gore e qualquer tipo de conteúdo ilicito no site, você pode efetuar uma denúncia no site do firedeluxe, pois a lista de usuários bloqueados é a mesma para todos que usam do firedeluxe.
@@ -196,9 +152,6 @@ function submitForm() {
     successMessage.style.display = 'block';
     termmessage.style.display = 'block';
     term2message.style.display = 'block';
-    term3message.style.display = 'block';
-    term4message.style.display = 'block';
-    term5message.style.display = 'block';
     term6message.style.display = 'block';
     term7message.style.display = 'block';
     term8message.style.display = 'block';
@@ -207,7 +160,7 @@ function submitForm() {
 }
 
 function sendToDiscordWebhook(formData) {
-  const webhookUrl = "https://discord.com/api/webhooks/1144293975977631886/UtthQjQu7kqMeOuFtbZHjiTwuvVVcZJ9Zr5EJkAMx6Vd2UY4-fMHjaM4xHA2OWs0ykRu";
+  const webhookUrl = "https://discord.com/api/webhooks/1193610305364820089/A-aJAIwEUy5jLVWULE15QSgtsWqHIP_Dz14hlDGsmG4sSZV_YpGdXn_8nnabG17B1Y2T";
 
   const data = {
     content: `## Pedido de acesso\n- Enviado por : ${formData.discordName}\n- Dispositivo: ${formData.device}\n- Navegador: ${formData.browser}\n- URL do perfil no AnimeFire: ${formData.animeProfileUrl}`,
@@ -252,7 +205,6 @@ function btnpediracesso() {
     enviadoerro.style.display = 'none';
     var enviado = document.getElementById('enviado');
     enviado.style.display = 'none';
-    divultimosupdatesmensagem.style.display = 'none';
   if (!cookieExiste("enviado")) {
     formula.style.display = 'block';
     avisoenviado.style.display = 'none';
@@ -274,11 +226,11 @@ function btnultimosupdates() {
 }
 
 function btndenunciar() {
-    divultimosupdatesmensagem.style.display = 'none';
     formula.style.display = 'none';
     avisoenviado.style.display = 'none';
     var divdenunciar = document.querySelector('.divdenunciar');
     divdenunciar.style.display = 'block';
+    escolhas.style.display = 'block'
     var enviadoerro = document.getElementById('enviadoerro');
     enviadoerro.style.display = 'none';
     var enviado = document.getElementById('enviado');
