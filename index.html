@@ -16,6 +16,17 @@
     padding: 20px;
     display : none;
   }
+.neonbutton {
+    background-color: #FF4500;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #FF4500; /* Cor de fundo neon */
+     box-shadow: 0 0 10px #FF4500, 0 0 20px #FF4500, 0 0 30px #FF4500; /* Efeito de sombra neon */
+  }
   .radio-group {
     display: flex;
     align-items: center;
@@ -38,11 +49,10 @@
 </style>
 </head>
 <body>
-<button onclick="btnpediracesso()">
+<button class='neonbutton'onclick="btnpediracesso()">
     Pedir Acesso
 </button>
-
-<button onclick="btndenunciar()">
+<button class='neonbutton' onclick="btndenunciar()">
     Denunciar
 </button>
 <div class="aviso2" id="divultimosupdatesmensagem">
