@@ -113,7 +113,7 @@
     Dúvidas são respondidas pelo discord
 </p>
 </div>
-<h1 class="aviso2" id="avisoenviado">Você já enviou um pedido de acesso</h1>
+<h1 class="aviso2" id="avisoenviado">Você já enviou um pedido de acesso, aguarde 5 minutos e tente novamente</h1>
 <div class="divdenunciar">
     <hr>
     <h3 color='red'>Preencha as informações abaixo para denunciar alguêm, se tiver provas por favor coloque o link da imagem ou local onde ocorreu o acontecimento que resultou em você denunciar ele em motivo da denúncia.</h3>
@@ -221,9 +221,9 @@ function sendToDiscordWebhook(formData) {
     .catch(error => {
     });
     
-    function criarCookie(nome, valor, diasParaExpirar) {
+function criarCookie(nome, valor) {
   var dataExpiracao = new Date();
-  dataExpiracao.setTime(dataExpiracao.getTime() + (diasParaExpirar * 24 * 60 * 60 * 1000));
+  dataExpiracao.setTime(dataExpiracao.getTime() + (5 * 60 * 1000)); // 5 minutos em milissegundos
   var expiracao = "expires=" + dataExpiracao.toUTCString();
   document.cookie = nome + "=" + valor + ";" + expiracao + ";path=/";
 }
