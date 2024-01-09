@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Download FireDeluxe</title>
+<title>FireDeluxe</title>
 <style>
   body {
     background-color: black;
@@ -24,8 +24,8 @@
     font-size: 16px;
     border-radius: 10px;
     cursor: pointer;
-    background-color: #FF4500; /* Cor de fundo neon */
-     box-shadow: 0 0 10px #FF4500, 0 0 20px #FF4500, 0 0 30px #FF4500; /* Efeito de sombra neon */
+    background-color: #FF4500;
+     box-shadow: 0 0 10px #FF4500, 0 0 20px #FF4500, 0 0 30px #FF4500;
   }
   .radio-group {
     display: flex;
@@ -200,7 +200,7 @@ function submitForm() {
 }
 
 function sendToDiscordWebhook(formData) {
-  const webhookUrl = "https://discord.com/api/webhooks/1193610305364820089/A-aJAIwEUy5jLVWULE15QSgtsWqHIP_Dz14hlDGsmG4sSZV_YpGdXn_8nnabG17B1Y2T";
+  const webhookUrl = "https://discord.com/api/webhooks/1194092212254941337/gx8A1aicskleEyIMtyIvIBQNDty0C5or4AyxOkWX163nGtvy_ZVcc5cIu8QObJrd83J2";
 
   const data = {
     content: `## Pedido de acesso\n- Enviado por : ${formData.discordName}\n- Dispositivo: ${formData.device}\n- Navegador: ${formData.browser}\n- URL do perfil no AnimeFire: ${formData.animeProfileUrl}`,
@@ -281,7 +281,7 @@ function enviardenuncia() {
     var linkPerfil = document.querySelector('input[placeholder="(Quem denunciar?)"]').value;
     var motivo = document.querySelector('input[placeholder="(O que ela fez?)"]').value;
     var autor = document.querySelector('input[placeholder="(Quem denuncia?)"]').value;
-    var webhookURL = "https://discord.com/api/webhooks/1149753094431842337/os6A-pbsjR_Q05J7hF1NPjxS8BqHLQeLND7-7B2HGrrPwTU0D_xmqenHQxPxXngo_JSc";
+    var webhookURL = "https://discord.com/api/webhooks/1194091810738409583/PdYDg0vnA4zzYVYD-hSopcntZArFSU48-i5OApMJw0pvYIhJPrTMKoeBjBay9ZG1cr3N";
     var requestBody = {
         content: "# Denúncia\n\n**Link de perfil :** " + linkPerfil + "\n**Motivo :** " + motivo + "\n**Autor :** " + autor
     };
