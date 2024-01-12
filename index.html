@@ -225,7 +225,6 @@ function cookieExiste(nome) {
 function btnpediracesso() {
       formula.style.display = 'none';
     avisoenviado.style.display = 'none';
-    botaoapenvio.style.display =' none';
     var divdenunciar = document.querySelector('.divdenunciar');
     divdenunciar.style.display = 'none';
     var enviadoerro = document.getElementById('enviadoerro');
@@ -235,7 +234,6 @@ function btnpediracesso() {
   if (!cookieExiste("enviado")) {
     formula.style.display = 'block';
     avisoenviado.style.display = 'none';
-    botaoapenvio.style.display =' none';
   } else {
     avisoenviado.style.display = 'block';
     botaoapenvio.style.display =' block';
@@ -246,7 +244,6 @@ function btnultimosupdates() {
     divultimosupdatesmensagem.style.display = 'block';
     formula.style.display = 'none';
     avisoenviado.style.display = 'none';
-    botaoapenvio.style.display =' none';
     var divdenunciar = document.querySelector('.divdenunciar');
     divdenunciar.style.display = 'none';
     var enviadoerro = document.getElementById('enviadoerro');
@@ -258,7 +255,6 @@ function btnultimosupdates() {
 function btndenunciar() {
     formula.style.display = 'none';
     avisoenviado.style.display = 'none';
-    botaoapenvio.style.display =' none';
     var divdenunciar = document.querySelector('.divdenunciar');
     divdenunciar.style.display = 'block';
     escolhas.style.display = 'block'
