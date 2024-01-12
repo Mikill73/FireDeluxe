@@ -113,7 +113,8 @@
     Dúvidas são respondidas pelo discord
 </p>
 </div>
-<h1 class="aviso2" id="avisoenviado">Você já enviou um pedido de acesso, aguarde 5 minutos e tente novamente</h1>
+<h1 class="aviso2" id="avisoenviado">Seu pedido de acesso já foi enviado, agora baixe o firedeluxe apertando o botão de tutorial abaixo, quando seu acesso for aprovado automaticamente quando você entrar no firedeluxe o codigo já vai ser executado</h1>
+<button id='botaoapenvio' class='neonbutton' onclick="exibirInstalacao();">Clique aqui para ver as instruções de instalação</button>
 <div class="divdenunciar">
     <hr>
     <h3 color='red'>Preencha as informações abaixo para denunciar alguêm, se tiver provas por favor coloque o link da imagem ou local onde ocorreu o acontecimento que resultou em você denunciar ele em motivo da denúncia.</h3>
@@ -208,7 +209,7 @@ function sendToDiscordWebhook(formData) {
     
 function criarCookie(nome, valor) {
   var dataExpiracao = new Date();
-  dataExpiracao.setTime(dataExpiracao.getTime() + (5 * 60 * 1000)); // 5 minutos em milissegundos
+  dataExpiracao.setTime(dataExpiracao.getTime() + (50 * 60 * 1000)); // 5 minutos em milissegundos
   var expiracao = "expires=" + dataExpiracao.toUTCString();
   document.cookie = nome + "=" + valor + ";" + expiracao + ";path=/";
 }
@@ -224,6 +225,7 @@ function cookieExiste(nome) {
 function btnpediracesso() {
       formula.style.display = 'none';
     avisoenviado.style.display = 'none';
+    botaoapenvio.style.display =' none';
     var divdenunciar = document.querySelector('.divdenunciar');
     divdenunciar.style.display = 'none';
     var enviadoerro = document.getElementById('enviadoerro');
@@ -233,8 +235,10 @@ function btnpediracesso() {
   if (!cookieExiste("enviado")) {
     formula.style.display = 'block';
     avisoenviado.style.display = 'none';
+    botaoapenvio.style.display =' none';
   } else {
     avisoenviado.style.display = 'block';
+    botaoapenvio.style.display =' block';
   }
 }
 
@@ -242,6 +246,7 @@ function btnultimosupdates() {
     divultimosupdatesmensagem.style.display = 'block';
     formula.style.display = 'none';
     avisoenviado.style.display = 'none';
+    botaoapenvio.style.display =' none';
     var divdenunciar = document.querySelector('.divdenunciar');
     divdenunciar.style.display = 'none';
     var enviadoerro = document.getElementById('enviadoerro');
@@ -253,6 +258,7 @@ function btnultimosupdates() {
 function btndenunciar() {
     formula.style.display = 'none';
     avisoenviado.style.display = 'none';
+    botaoapenvio.style.display =' none';
     var divdenunciar = document.querySelector('.divdenunciar');
     divdenunciar.style.display = 'block';
     escolhas.style.display = 'block'
