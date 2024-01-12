@@ -50,15 +50,17 @@
 </head>
 <body>
 <button class='neonbutton'onclick="btnpediracesso()">
-    Instalar FireDeluxe
+    Pedir Acesso  
 </button>
 <button class='neonbutton' onclick="btndenunciar()">
-    Denunciar Usuários
+    Denunciar Usuários   
 </button>
+
+<button id='botaoapenvio' class='neonbutton' onclick="exibirInstalacao();">Tutorial Dowload</button>
 
 <div id="formula" class="container">
   <hr>
-  <h2>Preencha as informações abaixo para baixar o FireDeluxe</h2>
+  <h2>Preencha as informações abaixo para baixar o FireDeluxe   </h2>
   <hr>
   <form id="download-form">
     <div class="radio-group">
@@ -71,50 +73,49 @@
     <label for="browser">Navegador</label>
     <input type="text" id="browser" name="browser" required>
     <hr>
-    <p id="mobile-warning" style="display: none; color: red;">O navegador que você inseriu não permite a instalação de extensões, o código do Fire Deluxe necessita de uma extensão chamada Violentmonkey para rodar, se ainda quiser instalar o mod recomendo que baixe um navegador que rode extensões, como o Kiwi Browser, se você tiver um PC você pode usar qualquer navegador para instalar o FireDeluxe, Chrome, Opera, Brave e etc...</p>
-    <label for="anime-profile-url">Url do perfil no animefire</label>
+    <p id="mobile-warning" style="display: none; color: red;">O navegador que você inseriu não permite a instalação de extensões, o código do Fire Deluxe necessita de uma extensão chamada Violentmonkey para rodar, se ainda quiser instalar o mod recomendo que baixe um navegador que rode extensões, como o Kiwi Browser, se você tiver um PC você pode usar qualquer navegador para instalar o FireDeluxe, Chrome, Opera, Brave e etc...   </p>
+    <label for="anime-profile-url">Url do perfil no animefire   </label>
     <input type="url" id="anime-profile-url" name="anime-profile-url" required>
   </form>
   <hr>
   <label for="browser">Nome no discord</label>
       <input type="text" id="discord" name="discord" required>
   <hr>
-     <button type="button" class="submit-button" onclick="submitForm()">Enviar Pedido de Acesso</button>
+     <button type="button" class="submit-button" onclick="submitForm()">Enviar Pedido de Acesso   </button>
 
 </div>
 <div id="mensagemposenvio">
-  <p id="success-message" style="display: none; color: green;">Pedido de Acesso Enviado! Aguarde a aprovação, se você for aprovado você será avisado no discord!</p>
-    <p id="termmessage" style="display: none; color: white;">Agora que você enviou o pedido por favor leia os requisitos do mod</p>
+  <p id="success-message" style="display: none; color: green;">Pedido de Acesso Enviado! Aguarde a aprovação, se você for aprovado você será avisado no discord!   </p>
+    <p id="termmessage" style="display: none; color: white;">Agora que você enviou o pedido por favor leia os requisitos do mod   </p>
 <p id="term2message" style="display: none; color: white;">
-    Primeiramente você precisa entrar em dois servidores, um é o servidor discord do Fire Deluxe e o outro é um servidor parceiro. Seu acesso só será aprovado se você entrar neles!
+    Primeiramente você precisa entrar em dois servidores, um é o servidor discord do Fire Deluxe e o outro é um servidor parceiro. Seu acesso só será aprovado se você entrar neles!   
 <br>
 
-    Obs : Se você sair dos servidores você terá seu acesso revogado!
+    Obs : Se você sair dos servidores você terá seu acesso revogado!   
     
 <br>
-    <a href="https://discord.gg/yM6XDHQrmh">Servidor do FireDeluxe</a>
+    <a href="https://discord.gg/yM6XDHQrmh" >Servidor do FireDeluxe </a>
 <br>
-    <a href="https://discord.gg/m5hUySKwYe">Servidor do Bairro AnimeFire</a>
+    <a href="https://discord.gg/m5hUySKwYe" >Servidor do Bairro AnimeFire </a>
 
     
 </p>
 <p id="term6message" style="display: none; color: white;">
-    É de sua obrigação e de todos que utilizam do mod denunciar usuários que postem pornografia, gore e qualquer tipo de conteúdo ilicito no site, você pode efetuar uma denúncia no site do firedeluxe, pois a lista de usuários bloqueados é a mesma para todos que usam do firedeluxe.
+    É de sua obrigação e de todos que utilizam do mod denunciar usuários que postem pornografia, gore e qualquer tipo de conteúdo ilicito no site, você pode efetuar uma denúncia no site do firedeluxe, pois a lista de usuários bloqueados é a mesma para todos que usam do firedeluxe. 
 </p>
 <p id="term7message" style="display: none; color: white;">
-    O codigo do mod é completamente aberto, ou seja, é livre para editar e observar, mas se tentar editar o codigo e houver algum problema não espere que eu resolva! Foi de sua responsabilidade editar isso e eu não vou te ajudar.
+    O codigo do mod é completamente aberto, ou seja, é livre para editar e observar, mas se tentar editar o codigo e houver algum problema não espere que eu resolva! Foi de sua responsabilidade editar isso e eu não vou te ajudar. 
 <br>
 <br>
-<button class='neonbutton' onclick="exibirInstalacao();">Clique aqui para ver as instruções de instalação</button>
+<button class='neonbutton' onclick="exibirInstalacao();">Clique aqui para ver as instruções de instalação </button>
 <div id="conteudo"></div>
 </p>
 
 <p id="term8message" style="display: none; color: red;">
-    Dúvidas são respondidas pelo discord
+    Dúvidas são respondidas pelo discord 
 </p>
 </div>
-<h1 class="aviso2" id="avisoenviado">Seu pedido de acesso já foi enviado, agora baixe o firedeluxe apertando o botão de tutorial abaixo, quando seu acesso for aprovado automaticamente quando você entrar no firedeluxe o codigo já vai ser executado</h1>
-<button id='botaoapenvio' class='neonbutton' onclick="exibirInstalacao();">Clique aqui para ver as instruções de instalação</button>
+<h1 class="aviso2" id="avisoenviado">Seu pedido de acesso já foi enviado, agora baixe o firedeluxe apertando o botão de tutorial abaixo, quando seu acesso for aprovado automaticamente quando você entrar no firedeluxe o codigo já vai ser executado </h1>
 <div class="divdenunciar">
     <hr>
     <h3 color='red'>Preencha as informações abaixo para denunciar alguêm, se tiver provas por favor coloque o link da imagem ou local onde ocorreu o acontecimento que resultou em você denunciar ele em motivo da denúncia.</h3>
