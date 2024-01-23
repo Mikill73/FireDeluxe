@@ -57,7 +57,7 @@
 </button>
 
 <button id='botaoapenvio' class='neonbutton' onclick="exibirInstalacao();">Tutorial Dowload</button>
-
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
 <div id="formula" class="container">
   <hr>
   <h2>Preencha as informações abaixo para baixar o FireDeluxe   </h2>
@@ -136,6 +136,30 @@
 <h1 id = 'enviadoerro' style = "color:red; display:none">Erro ao enviar, tente novamente</h1>
 <script>
 
+  function obterParametroURL(nome) {
+    nome = nome.replace(/[[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + nome + "=([^&#]*)");
+    var resultados = regex.exec(location.search);
+    return resultados === null ? "" : decodeURIComponent(resultados[1].replace(/\+/g, " "));
+  }
+
+  // Função para salvar informações em um cookie
+  function salvarInformacoesEmCookie() {
+    // Obter código de autorização da URL
+    var codigoAutorizacao = obterParametroURL("code");
+
+    // Verificar se há um código de autorização
+    if (codigoAutorizacao) {
+      // Salvar o código de autorização em um cookie
+      Cookies.set("codigo_autorizacao", codigoAutorizacao);
+
+      // Exemplo: redirecionar para outra página após salvar o cookie
+      window.location.href = "https://mikill73.github.io/AnimeFireMod/outra-pagina.html";
+    }
+
+  // Chamar a função quando a página carregar
+  salvarInformacoesEmCookie();
+  }
     function exibirInstalacao() {
       document.open();
       document.write(`
