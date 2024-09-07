@@ -1,299 +1,216 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FireDeluxe</title>
-<style>
-  body {
-    background-color: black;
-    color: white;
-    font-family: Arial, sans-serif;
-  }
-  .container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    display : none;
-  }
-.neonbutton {
-    background-color: #FF4500;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 10px;
-    cursor: pointer;
-    background-color: #FF4500;
-     box-shadow: 0 0 10px #FF4500, 0 0 20px #FF4500, 0 0 30px #FF4500;
-  }
-  .radio-group {
-    display: flex;
-    align-items: center;
-  }
-  .radio-group input[type="radio"] {
-    margin-right: 10px;
-  }
-  .submit-button {
-    margin-top: 20px;
-  }
-  .aviso2 {
-    display: none;
-  }
-  .divdenunciar {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    display : none;
-  }
-</style>
-</head>
-<body>
-<button class='neonbutton'onclick="btnpediracesso()">
-    Pedir Acesso  
-</button>
-<button class='neonbutton' onclick="btndenunciar()">
-    Denunciar Usuários   
-</button>
-
-<button id='botaoapenvio' class='neonbutton' onclick="exibirInstalacao();">Tutorial Dowload</button>
-<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
-<div id="formula" class="container">
-  <hr>
-  <h2>Preencha as informações abaixo para baixar o FireDeluxe   </h2>
-  <hr>
-  <form id="download-form">
-    <div class="radio-group">
-      <input type="radio" name="device" value="PC" id="device-pc" required>
-      <label for="device-pc">PC</label>
-      <input type="radio" name="device" value="MOBILE" id="device-mobile">
-      <label for="device-mobile">MOBILE</label>
-    </div>
-    <hr>
-    <label for="browser">Navegador</label>
-    <input type="text" id="browser" name="browser" required>
-    <hr>
-    <p id="mobile-warning" style="display: none; color: red;">O navegador que você inseriu não permite a instalação de extensões, o código do Fire Deluxe necessita de uma extensão chamada Violentmonkey para rodar, se ainda quiser instalar o mod recomendo que baixe um navegador que rode extensões, como o Kiwi Browser, se você tiver um PC você pode usar qualquer navegador para instalar o FireDeluxe, Chrome, Opera, Brave e etc...   </p>
-    <label for="anime-profile-url">Url do perfil no animefire   </label>
-    <input type="url" id="anime-profile-url" name="anime-profile-url" required>
-  </form>
-  <hr>
-  <label for="browser">Nome no discord</label>
-      <input type="text" id="discord" name="discord" required>
-  <hr>
-     <button type="button" class="submit-button" onclick="submitForm()">Enviar Pedido de Acesso   </button>
-
-</div>
-<div id="mensagemposenvio">
-  <p id="success-message" style="display: none; color: green;">Pedido de Acesso Enviado! Aguarde a aprovação, se você for aprovado você será avisado no discord!   </p>
-    <p id="termmessage" style="display: none; color: white;">Agora que você enviou o pedido por favor leia os requisitos do mod   </p>
-<p id="term2message" style="display: none; color: white;">
-    Primeiramente você precisa entrar no servidor de discord do Fire Deluxe. Seu acesso só será aprovado se você entrar nele!
-<br>
-
-    Obs : Se você sair do servidor você terá seu acesso removido!   
-    
-<br>
-    <a href="https://discord.gg/nsrhDyyUjV" >Servidor do FireDeluxe </a>
-    
-</p>
-<p id="term6message" style="display: none; color: white;">
-    É de sua obrigação e de todos que utilizam do mod denunciar usuários que postem pornografia, gore e qualquer tipo de conteúdo ilicito no site, você pode efetuar uma denúncia no site do firedeluxe, pois a lista de usuários bloqueados é a mesma para todos que usam do firedeluxe. 
-</p>
-<p id="term7message" style="display: none; color: white;">
-    O codigo do mod é completamente aberto, ou seja, é livre para editar e observar, mas se tentar editar o codigo e houver algum problema não espere que eu resolva! Foi de sua responsabilidade editar isso e eu não vou te ajudar. 
-<br>
-<br>
-<button class='neonbutton' onclick="exibirInstalacao();">Clique aqui para ver as instruções de instalação </button>
-<div id="conteudo"></div>
-</p>
-
-<p id="term8message" style="display: none; color: red;">
-    Dúvidas são respondidas pelo discord 
-</p>
-</div>
-<h1 class="aviso2" id="avisoenviado">Seu pedido de acesso já foi enviado, agora baixe o firedeluxe apertando o botão de tutorial abaixo, quando seu acesso for aprovado automaticamente quando você entrar no firedeluxe o codigo já vai ser executado </h1>
-<div class="divdenunciar">
-    <hr>
-    <h3 color='red'>Preencha as informações abaixo para denunciar alguêm, se tiver provas por favor coloque o link da imagem ou local onde ocorreu o acontecimento que resultou em você denunciar ele em motivo da denúncia.</h3>
-    <hr>
-    <label for="browser">Link de perfil</label>
-    <input type="text" placeholder='(Quem denunciar?)' required>
-    <hr>
-    <label for="browser">Motivo da denúncia</label>
-    <input type="text" placeholder='(O que ela fez?)' required>
-    <hr>
-    <label for="browser">Autor da denúncia</label>
-    <input type="text" placeholder='(Quem denuncia?)'>
-    <hr>
-    <button type="button" class="submit-button" onclick="enviardenuncia()">Enviar Denúncia</button>
-</div>
-
-<h1 id = 'enviado' style = "color:green; display:none">Enviado!</h1>
-<h1 id = 'enviadoerro' style = "color:red; display:none">Erro ao enviar, tente novamente</h1>
-<script>
-  
-    function exibirInstalacao() {
-      document.open();
-      document.write(`
-        <h1>Instalação FireDeluxe</h1>
-        <br>
-        <hr>
-        <p>1 - Instale a extensão <a href="https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag?hl=en" target="_blank">Violentmonkey</a></p>
-        <hr>
-        <p><img src="https://animefire.plus/uploads/cmt/2592513_1704650691.webp" alt="Imagem 1"></p>
-        <hr>
-        <p>2 - Abra esse link <a href="https://greasyfork.org/scripts/470618-firedeluxe/code/FireDeluxe.user.js" target="_blank">https://greasyfork.org/scripts/470618-firedeluxe/code/FireDeluxe.user.js</a></p>
-        <hr>
-        <p>3 - Uma nova página será aberta, aperte Install</p>
-        <hr>
-        <p><img src="https://animefire.plus/uploads/cmt/205697_1704651340.webp" alt="Imagem 8"></p>
-        <hr>
-        <h1>Obrigado por instalar, espere seu acesso ser aprovado, você será avisado pelo Discord! No momento que você for aprovado automaticamente o mod será carregado no animefire</h1>
-      `);
-      document.close();
-}
-function submitForm() {
-  const device = document.querySelector('input[name="device"]:checked').value;
-  const browser = document.getElementById('browser').value.toLowerCase();
-  const animeProfileUrl = document.getElementById('anime-profile-url').value;
-  const discordName = document.getElementById('discord').value;
-
-  if (device === 'MOBILE' && (browser === 'google chrome' || browser === 'chrome' || browser === 'opera gx' || browser === 'brave' || browser === 'opera' || browser === 'brave')) {
-    document.getElementById('mobile-warning').style.display = 'block';
-  } else {
-    document.getElementById('mobile-warning').style.display = 'none';
-    const formData = {
-      device,
-      browser,
-      animeProfileUrl,
-      discordName
-    };
-
-    sendToDiscordWebhook(formData);
-
-    const successMessage = document.getElementById('success-message');
-    successMessage.style.display = 'block';
-    termmessage.style.display = 'block';
-    term2message.style.display = 'block';
-    term6message.style.display = 'block';
-    term7message.style.display = 'block';
-    term8message.style.display = 'block';
-    formula.style.display = 'none';
-  }
-}
-
-function sendToDiscordWebhook(formData) {
-  const webhookUrl = "https://discord.com/api/webhooks/1194092212254941337/gx8A1aicskleEyIMtyIvIBQNDty0C5or4AyxOkWX163nGtvy_ZVcc5cIu8QObJrd83J2";
-
-  const data = {
-    content: `## Pedido de acesso\n- Enviado por : ${formData.discordName}\n- Dispositivo: ${formData.device}\n- Navegador: ${formData.browser}\n- URL do perfil no AnimeFire: ${formData.animeProfileUrl}`,
-  };
-
-  fetch(webhookUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  })
-    .then(response => {
-      if (response.ok) {
-      } else {
-      }
-    })
-    .catch(error => {
-    });
-    
-function criarCookie(nome, valor) {
-  var dataExpiracao = new Date();
-  dataExpiracao.setTime(dataExpiracao.getTime() + (50 * 60 * 1000)); // 5 minutos em milissegundos
-  var expiracao = "expires=" + dataExpiracao.toUTCString();
-  document.cookie = nome + "=" + valor + ";" + expiracao + ";path=/";
-}
-
-criarCookie("enviado", "true", 365);
-
-}
-  
-function cookieExiste(nome) {
-  return document.cookie.split(';').some(cookie => cookie.trim().startsWith(nome + '='));
-}
-
-function btnpediracesso() {
-      formula.style.display = 'none';
-    avisoenviado.style.display = 'none';
-    var divdenunciar = document.querySelector('.divdenunciar');
-    divdenunciar.style.display = 'none';
-    var enviadoerro = document.getElementById('enviadoerro');
-    enviadoerro.style.display = 'none';
-    var enviado = document.getElementById('enviado');
-    enviado.style.display = 'none';
-  if (!cookieExiste("enviado")) {
-    formula.style.display = 'block';
-    avisoenviado.style.display = 'none';
-  } else {
-    avisoenviado.style.display = 'block';
-    botaoapenvio.style.display =' block';
-  }
-}
-
-function btnultimosupdates() {
-    divultimosupdatesmensagem.style.display = 'block';
-    formula.style.display = 'none';
-    avisoenviado.style.display = 'none';
-    var divdenunciar = document.querySelector('.divdenunciar');
-    divdenunciar.style.display = 'none';
-    var enviadoerro = document.getElementById('enviadoerro');
-    enviadoerro.style.display = 'none';
-    var enviado = document.getElementById('enviado');
-    enviado.style.display = 'none';
-}
-
-function btndenunciar() {
-    formula.style.display = 'none';
-    avisoenviado.style.display = 'none';
-    var divdenunciar = document.querySelector('.divdenunciar');
-    divdenunciar.style.display = 'block';
-    escolhas.style.display = 'block'
-    var enviadoerro = document.getElementById('enviadoerro');
-    enviadoerro.style.display = 'none';
-    var enviado = document.getElementById('enviado');
-    enviado.style.display = 'none';
-}
-
-function enviardenuncia() {
-    var linkPerfil = document.querySelector('input[placeholder="(Quem denunciar?)"]').value;
-    var motivo = document.querySelector('input[placeholder="(O que ela fez?)"]').value;
-    var autor = document.querySelector('input[placeholder="(Quem denuncia?)"]').value;
-    var webhookURL = "https://discord.com/api/webhooks/1194091810738409583/PdYDg0vnA4zzYVYD-hSopcntZArFSU48-i5OApMJw0pvYIhJPrTMKoeBjBay9ZG1cr3N";
-    var requestBody = {
-        content: "# Denúncia\n\n**Link de perfil :** " + linkPerfil + "\n**Motivo :** " + motivo + "\n**Autor :** " + autor
-    };
-    
-    fetch(webhookURL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(requestBody)
-    }).then(function(response) {
-        if (response.status === 200 || response.status === 204) {
-            var divdenunciar = document.querySelector('.divdenunciar');
-            divdenunciar.style.display = 'none';
-            var enviado = document.getElementById('enviado');
-            enviado.style.display = 'block';
-        } else {
-            var enviadoerro = document.getElementById('enviadoerro');
-            enviadoerro.style.display = 'block';
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <title>FireDeluxe</title>
+    <style>
+        body {
+            background-image: url('https://animefire.plus/img/lt/bgM.webp');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
-    }).catch(function(error) {
-        var enviadoerro = document.getElementById('enviadoerro');
-        enviadoerro.style.display = 'block';
-        console.error("Erro ao enviar a denúncia:", error);
-    });
-}
 
-</script>
+        .firedeluxe {
+            color: white;
+            font-size: 45px;
+            font-family: 'Georgia', serif;
+            text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500, 0 0 30px #ff4500, 0 0 40px #ff4500;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .buttonmain {
+            background-color: #ff4500;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-family: 'Georgia', serif;
+            padding: 10px;
+            box-shadow: 0 0 10px #ff4500;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+
+        .textarea {
+            border-radius: 8px;
+            resize: none;
+            width: 300px;
+            height: 40px;
+            margin-top: 10px;
+            opacity: 0.8;
+            font-size: 16px;
+        }
+
+        .container {
+            width: 50%;
+            padding: 20px;
+            background-color: transparent;
+            text-align: center;
+        }
+
+        .inputradio {
+            color: #ffffff;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+
+        .textotutorial {
+            color: white;
+            font-size: 15px;
+            font-family: 'Georgia', serif;
+            text-shadow: 0 0 10px #ff4500;
+        }
+        
+        .textominitutorial {
+            color: white;
+            font-size: 10px;
+            font-family: 'Georgia', serif;
+        }
+        
+        .href {
+            
+            color: red;
+            
+        }
+
+        #formularioAcesso {
+            display: none;
+        }
+
+        #tutorialDiv {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="firedeluxe">FireDeluxe</h1>
+
+    <button onclick="btnTutorial()" class="buttonmain">Instalação</button>
+
+    <button onclick="btnSolicitarAcesso()" class="buttonmain">Solicitar acesso</button>
+
+    <div class="container" id="tutorialDiv">
+
+        <label class='textotutorial'>
+            
+            <hr>
+        <h2 class='textominitutorial'>OBS 1 : O FireDeluxe precisa de uma extensão, se você usa um dispositivo Mobile seu navegador precisa ser o Kiwi Browser ou qualquer outro navegador que aceite extensões, a maioria não aceita no mobile</h2>
+        <hr>
+        
+                <h2 class='textominitutorial'>OBS 2 : Se você não tem total confiança no FireDeluxe ou precisa esclarecer dúvidas chame mikill9150 no discord, existe um PDF que explica como o FireDeluxe é confiável</h2>
+                <hr>
+                
+                                <h2 class='textominitutorial'>OBS 3 : Seu acesso será negado se você não tiver discord</h2>
+                     
+        
+        <hr>
+        
+        <h2>1 - Solicite o acesso</h2>
+        <h2>2 - Baixe a extensão Tampermonkey</h2>
+        <h2>3 - Baixe o script no Tampermonkey:</h2>
+       
+        <a class='href' href='https://greasyfork.org/scripts/470618-firedeluxe/code/FireDeluxe.user.js'>SCRIPT DO FIREDELUXE</a>
+        
+                <h2>4 - Espere seu acesso ser aprovado</h2>
+        </label>
+    </div>
+
+    <div class="container" id="formularioAcesso">
+        <textarea class="textarea" id="tagdc" placeholder="Tag do discord"></textarea>
+        <br>
+        <textarea id="perfil" class="textarea" placeholder="Link do seu perfil no animefire"></textarea>
+        <br>
+        <textarea id="navegador" class="textarea" placeholder="Nome do seu navegador"></textarea>
+        <br>
+        <form class="inputradio">
+            <label>
+                <input type="radio" name="dispos" value="PC">PC
+            </label>
+            <label>
+                <input type="radio" name="dispos" value="MOBILE">MOBILE
+            </label>
+        </form>
+
+        <button onclick="btnEnviar()" id='btnEnviar' class='buttonmain'>Enviar</button>
+    </div>
+
+    <script>
+        function btnTutorial() {
+            document.getElementById('formularioAcesso').style.display = 'none';
+            document.getElementById('tutorialDiv').style.display = 'block';
+        }
+
+        function setCookie(name, value, minutes) {
+            const d = new Date();
+            d.setTime(d.getTime() + (minutes * 60 * 1000));
+            document.cookie = name + "=" + value + ";expires=" + d.toUTCString() + ";path=/";
+        }
+
+        function getCookie(name) {
+            const value = "; " + document.cookie;
+            const parts = value.split("; " + name + "=");
+            if (parts.length === 2) return parts.pop().split(";").shift();
+        }
+
+        function btnSolicitarAcesso() {
+            if (getCookie('acs') === '1') {
+                alert('Você já enviou um pedido de acesso.');
+            } else {
+                document.getElementById('formularioAcesso').style.display = 'block';
+                document.getElementById('tutorialDiv').style.display = 'none';
+            }
+        }
+
+        function btnEnviar() {
+            const webhookURL = 'https://discord.com/api/webhooks/1194092212254941337/gx8A1aicskleEyIMtyIvIBQNDty0C5or4AyxOkWX163nGtvy_ZVcc5cIu8QObJrd83J2';
+            const tagdc = document.getElementById('tagdc').value;
+            const perfil = document.getElementById('perfil').value;
+            const navegador = document.getElementById('navegador').value;
+            const dispos = document.querySelector('input[name="dispos"]:checked') ? .value;
+
+            if (!tagdc || !perfil || !navegador || !dispos) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+
+            const data = {
+                content: `**Tag do Discord:** ${tagdc}\n**Perfil Animefire:** ${perfil}\n**Navegador:** ${navegador}\n**Dispositivo:** ${dispos}`
+            };
+
+            function tentarEnviar() {
+                fetch(webhookURL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            setCookie('acs', '1', 30);
+                            alert('Enviado, agora aperte o botão "Instalação" e instale o script enquanto espera o seu acesso ser aceito.');
+                        } else {
+                            setTimeout(tentarEnviar, 3000);
+                        }
+                    });
+            }
+
+            tentarEnviar();
+        }
+    </script>
 </body>
+
 </html>
