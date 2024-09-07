@@ -80,9 +80,7 @@
         }
         
         .href {
-            
             color: red;
-            
         }
 
         #formularioAcesso {
@@ -98,33 +96,24 @@
 <body>
     <h1 class="firedeluxe">FireDeluxe</h1>
 
-    <button onclick="btnTutorial()" class="buttonmain">Instalação</button>
+    <button onclick="mostrarTutorial()" class="buttonmain">Instalação</button>
 
-    <button onclick="btnSolicitarAcesso()" class="buttonmain">Solicitar acesso</button>
+    <button onclick="solicitarAcesso()" class="buttonmain">Solicitar acesso</button>
 
     <div class="container" id="tutorialDiv">
-
         <label class='textotutorial'>
-            
             <hr>
-        <h2 class='textominitutorial'>OBS 1 : O FireDeluxe precisa de uma extensão, se você usa um dispositivo Mobile seu navegador precisa ser o Kiwi Browser ou qualquer outro navegador que aceite extensões, a maioria não aceita no mobile</h2>
-        <hr>
-        
-                <h2 class='textominitutorial'>OBS 2 : Se você não tem total confiança no FireDeluxe ou precisa esclarecer dúvidas chame mikill9150 no discord, existe um PDF que explica como o FireDeluxe é confiável</h2>
-                <hr>
-                
-                                <h2 class='textominitutorial'>OBS 3 : Seu acesso será negado se você não tiver discord</h2>
-                     
-        
-        <hr>
-        
-        <h2>1 - Solicite o acesso</h2>
-        <h2>2 - Baixe a extensão Tampermonkey</h2>
-        <h2>3 - Baixe o script no Tampermonkey:</h2>
-       
-        <a class='href' href='https://greasyfork.org/scripts/470618-firedeluxe/code/FireDeluxe.user.js'>SCRIPT DO FIREDELUXE</a>
-        
-                <h2>4 - Espere seu acesso ser aprovado</h2>
+            <h2 class='textominitutorial'>OBS 1: O FireDeluxe precisa de uma extensão, se você usa um dispositivo Mobile seu navegador precisa ser o Kiwi Browser ou qualquer outro navegador que aceite extensões, a maioria não aceita no mobile.</h2>
+            <hr>
+            <h2 class='textominitutorial'>OBS 2: Se você não tem total confiança no FireDeluxe ou precisa esclarecer dúvidas, chame mikill9150 no discord. Existe um PDF que explica como o FireDeluxe é confiável.</h2>
+            <hr>
+            <h2 class='textominitutorial'>OBS 3: Seu acesso será negado se você não tiver discord.</h2>
+            <hr>
+            <h2>1 - Solicite o acesso</h2>
+            <h2>2 - Baixe a extensão Tampermonkey</h2>
+            <h2>3 - Baixe o script no Tampermonkey:</h2>
+            <a class='href' href='https://greasyfork.org/scripts/470618-firedeluxe/code/FireDeluxe.user.js'>SCRIPT DO FIREDELUXE</a>
+            <h2>4 - Espere seu acesso ser aprovado</h2>
         </label>
     </div>
 
@@ -143,12 +132,11 @@
                 <input type="radio" name="dispos" value="MOBILE">MOBILE
             </label>
         </form>
-
-        <button onclick="btnEnviar()" id='btnEnviar' class='buttonmain'>Enviar</button>
+        <button onclick="enviarFormulario()" id='btnEnviar' class='buttonmain'>Enviar</button>
     </div>
 
     <script>
-        function btnTutorial() {
+        function mostrarTutorial() {
             document.getElementById('formularioAcesso').style.display = 'none';
             document.getElementById('tutorialDiv').style.display = 'block';
         }
@@ -165,7 +153,7 @@
             if (parts.length === 2) return parts.pop().split(";").shift();
         }
 
-        function btnSolicitarAcesso() {
+        function solicitarAcesso() {
             if (getCookie('acs') === '1') {
                 alert('Você já enviou um pedido de acesso.');
             } else {
@@ -174,12 +162,12 @@
             }
         }
 
-        function btnEnviar() {
+        function enviarFormulario() {
             const webhookURL = 'https://discord.com/api/webhooks/1194092212254941337/gx8A1aicskleEyIMtyIvIBQNDty0C5or4AyxOkWX163nGtvy_ZVcc5cIu8QObJrd83J2';
             const tagdc = document.getElementById('tagdc').value;
             const perfil = document.getElementById('perfil').value;
             const navegador = document.getElementById('navegador').value;
-            const dispos = document.querySelector('input[name="dispos"]:checked') ? .value;
+            const dispos = document.querySelector('input[name="dispos"]:checked')?.value;
 
             if (!tagdc || !perfil || !navegador || !dispos) {
                 alert('Preencha todos os campos!');
