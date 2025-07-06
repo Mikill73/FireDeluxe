@@ -618,22 +618,22 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
 (function() {
     'use strict';
 
-const aplicarImagensFundo = () => {
-    const configuracoes = JSON.parse(localStorage.getItem('configuracoes'));
-    if (configuracoes) {
-        if (configuracoes.chatBgImage) {
-            const mainDivMSGs = document.querySelector('#mainDivMSGs');
-            if (mainDivMSGs) {
-                mainDivMSGs.style.background = `url(${configuracoes.chatBgImage}) center/cover no-repeat fixed`;
+    const aplicarImagensFundo = () => {
+        const configuracoes = JSON.parse(localStorage.getItem('configuracoes'));
+        if (configuracoes) {
+            if (configuracoes.chatBgImage) {
+                const mainDivMSGs = document.querySelector('#mainDivMSGs');
+                if (mainDivMSGs) {
+                    mainDivMSGs.style.background = `url(${configuracoes.chatBgImage}) center/cover`;
+                }
+            }
+            if (configuracoes.siteBgImage) {
+                document.body.style.background = `url(${configuracoes.siteBgImage}) center/cover no-repeat fixed`;
             }
         }
-        if (configuracoes.siteBgImage) {
-            document.body.style.background = `url(${configuracoes.siteBgImage}) center/cover no-repeat fixed`;
-        }
-    }
-};
+    };
 
-aplicarImagensFundo();
-window.addEventListener('resize', aplicarImagensFundo);
+    aplicarImagensFundo();
+    window.addEventListener('resize', aplicarImagensFundo);
 
 })();
