@@ -9,7 +9,7 @@
 // @grant        none
 // ==/UserScript==
 
-//Possível AdBlocker
+//AdBlocker
 (function() {
     'use strict';
 
