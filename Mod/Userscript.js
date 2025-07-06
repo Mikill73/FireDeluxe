@@ -584,7 +584,7 @@ document.getElementById('closeSettings').addEventListener('click', function() {
                 chatBgImage: chatBgDataUrl
             };
             localStorage.setItem('configuracoes', JSON.stringify(settings));
-            document.getElementById('settingsPanel').remove();
+            window.close();
         });
         
         document.getElementById('resetSettings').addEventListener('click', function() {
