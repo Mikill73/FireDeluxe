@@ -534,9 +534,9 @@ const configuracoesHTML = `
             }
         }
         
-        document.getElementById('closeSettings').addEventListener('click', function() {
-            document.getElementById('settingsPanel').remove();
-        });
+document.getElementById('closeSettings').addEventListener('click', function() {
+    window.close();
+});
         
         document.getElementById('siteBgImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
