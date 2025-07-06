@@ -9,6 +9,7 @@
 // @grant        none
 // ==/UserScript==
 
+//Botão Principal
 (function() {
     'use strict';
 
@@ -611,4 +612,28 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
     configuracoes: configuracoesHTML
 }));
     
+})();
+
+//Imagens de fundo Site e Chat
+(function() {
+    'use strict';
+
+const aplicarImagensFundo = () => {
+    const configuracoes = JSON.parse(localStorage.getItem('configuracoes'));
+    if (configuracoes) {
+        if (configuracoes.chatBgImage) {
+            const mainDivMSGs = document.querySelector('#mainDivMSGs');
+            if (mainDivMSGs) {
+                mainDivMSGs.style.background = `url(${configuracoes.chatBgImage}) center/cover no-repeat fixed`;
+            }
+        }
+        if (configuracoes.siteBgImage) {
+            document.body.style.background = `url(${configuracoes.siteBgImage}) center/cover no-repeat fixed`;
+        }
+    }
+};
+
+aplicarImagensFundo();
+window.addEventListener('resize', aplicarImagensFundo);
+
 })();
