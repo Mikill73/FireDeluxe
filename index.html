@@ -4,198 +4,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
     <title>FireDeluxe</title>
+    <link rel="icon" href="data:image/webp;base64,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" type="image/x-icon">
     <style>
+        :root {
+            --primary-color: #FFA500;
+            --secondary-color: #222;
+            --border-color: #444;
+            --text-color: #eee;
+            --bg-color: #222;
+        }
+
         body {
-            background-image: url('https://animefire.plus/img/lt/bgM.webp');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             margin: 0;
             padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
+            line-height: 1.6;
         }
 
-        .firedeluxe {
-            color: white;
-            font-size: 45px;
-            font-family: 'Georgia', serif;
-            text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500, 0 0 30px #ff4500, 0 0 40px #ff4500;
-            margin-top: 20px;
+        .header {
+            margin: 30px 0;
             text-align: center;
         }
 
-        .buttonmain {
-            background-color: #ff4500;
-            color: white;
+        .title {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #444, #555);
+            color: #fff;
             border: none;
-            border-radius: 10px;
-            font-size: 20px;
-            font-family: 'Georgia', serif;
-            padding: 10px;
-            box-shadow: 0 0 10px #ff4500;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            filter: drop-shadow(0 0 5px var(--primary-color));
+        }
+
+        .main-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-top: 25px;
+        }
+
+        .step {
             margin: 20px 0;
         }
 
-        .textarea {
+        .step-number {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .warning-box {
+            background-color: rgba(255, 0, 0, 0.1);
+            border-left: 4px solid #f00;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .link {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: filter 0.2s;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background-color: rgba(255, 165, 0, 0.1);
+            border-radius: 6px;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+            background-color: rgba(255, 165, 0, 0.2);
+        }
+
+        .history-text {
+            margin: 15px 0;
+            text-align: justify;
+        }
+
+        .discord-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #5865F2;
+            color: white;
             border-radius: 8px;
-            resize: none;
-            width: 300px;
-            height: 40px;
-            margin-top: 10px;
-            opacity: 0.8;
-            font-size: 16px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
 
-        .container {
-            width: 50%;
-            padding: 20px;
-            background-color: transparent;
-            text-align: center;
+        .discord-button:hover {
+            background-color: #4752C4;
+            transform: translateY(-2px);
         }
 
-        .inputradio {
-            color: #ffffff;
-            font-size: 20px;
-            margin-top: 10px;
-        }
-
-        .textotutorial {
-            color: white;
-            font-size: 15px;
-            font-family: 'Georgia', serif;
-            text-shadow: 0 0 10px #ff4500;
-        }
-        
-        .textominitutorial {
-            color: white;
-            font-size: 14px;
-            font-family: 'Georgia', serif;
-        }
-        
-        .href {
-            color: red;
-        }
-
-        #formularioAcesso {
-            display: none;
-        }
-
-        #tutorialDiv {
-            display: none;
+        @media (max-width: 768px) {
+            .main-container {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <h1 class="firedeluxe">FireDeluxe</h1>
+    <header class="header">
+        <h1 class="title">FireDeluxe</h1>
+        <div class="button-container">
+            <button class="nav-button" onclick="showGuide()">Guia de Instalação</button>
+            <button class="nav-button" onclick="showHistory()">História do FireDeluxe</button>
+        </div>
+    </header>
 
-    <button onclick="mostrarTutorial()" class="buttonmain">Instalação</button>
+    <main class="main-container">
+        <div id="guide-section">
+            <h2 class="section-title">Guia de Instalação Completo</h2>
+            
+            <div class="warning-box">
+                <p><strong>Importante para mobile:</strong> Você precisará usar um navegador que suporte extensões como o Kiwi Browser.</p>
+            </div>
 
-    <div class="container" id="tutorialDiv">
-        <label class='textotutorial'>
-            <hr>
-            <h2 class='textominitutorial'>OBS 1: O FireDeluxe precisa de uma extensão, se você usa um dispositivo Mobile seu navegador precisa ser o Kiwi Browser ou qualquer outro navegador que aceite extensões, a maioria não aceita no mobile.</h2>
-            <hr>
-            <h2 class='textominitutorial'>OBS 2: Se você não tem total confiança no FireDeluxe ou precisa esclarecer dúvidas, chame mikill9150 no discord. Existe um PDF que explica como o FireDeluxe é confiável.</h2>
-            <hr>
-            <h2 class='textominitutorial'>OBS 3: Seu acesso será negado se você não tiver discord.</h2>
-            <hr>
-            <h2>1 - Baixe a extensão Tampermonkey</h2>
-            <h2>2 - Vá em extensões e ative o modo desenvolvedor<h2>
-            <h2>3 - Baixe o script no Tampermonkey:</h2>
-            <a class='href' href='https://greasyfork.org/scripts/470618-firedeluxe/code/FireDeluxe.user.js'>SCRIPT DO FIREDELUXE</a>
-        </label>
-    </div>
+            <div class="step">
+                <p><span class="step-number">1.</span> Instale o Tampermonkey (gerenciador de userscripts):</p>
+                <a href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=pt-BR" 
+                   class="link" 
+                   target="_blank">
+                   Instalar Tampermonkey (Chrome Web Store)
+                </a>
+                <p>Alternativa: <a href="https://violentmonkey.github.io/" class="link" target="_blank">Violentmonkey</a></p>
+            </div>
 
-    <div class="container" id="formularioAcesso">
-        <textarea class="textarea" id="tagdc" placeholder="Tag do discord"></textarea>
-        <br>
-        <textarea id="perfil" class="textarea" placeholder="Link do seu perfil no animefire"></textarea>
-        <br>
-        <textarea id="navegador" class="textarea" placeholder="Nome do seu navegador"></textarea>
-        <br>
-        <form class="inputradio">
-            <label>
-                <input type="radio" name="dispos" value="PC">PC
-            </label>
-            <label>
-                <input type="radio" name="dispos" value="MOBILE">MOBILE
-            </label>
-        </form>
-        <button onclick="enviarFormulario()" id='btnEnviar' class='buttonmain'>Enviar</button>
-    </div>
+            <div class="step">
+                <p><span class="step-number">2.</span> Instale o script do FireDeluxe:</p>
+                <a href="https://greasyfork.org/scripts/470618-firedeluxe/code/FireDeluxe.user.js" 
+                   class="link" 
+                   target="_blank">
+                   Instalar FireDeluxe
+                </a>
+            </div>
+
+            <div class="step">
+                <p><span class="step-number">3.</span> Pronto! O FireDeluxe estará ativo automaticamente quando você acessar o Animefire.</p>
+            </div>
+
+            <div class="warning-box">
+                <p><strong>Dúvidas ou preocupações com segurança?</strong></p>
+                <p>Caso você ainda não confie totalmente no mod ou queira ver provas de sua segurança, entre em contato com <strong>mikill9150</strong> no Discord.</p>
+            </div>
+        </div>
+
+        <div id="history-section" style="display: none;">
+            <h2 class="section-title">A História do FireDeluxe</h2>
+            
+            <div class="history-text">
+                <p>O FireDeluxe surgiu em 2022 durante um período em que havia muitos pontos a se reclamar no Animefire: excesso de anúncios, usuários mal-intencionados postando conteúdo inadequado (como gore e pornografia infantil) e vários erros técnicos no site.</p>
+                
+                <p>O FireDeluxe começou como um userscript simples, com funções básicas como mudar o fundo do site e do chat. Com o tempo, evoluiu para incluir recursos avançados como automatização de mensagens, filtro de chat, bloqueio de usuários indesejados e muitas outras melhorias (você pode ver todas as atualizações no antigo canal do Discord do FireDeluxe).</p>
+                
+                <a href="https://discord.gg/ZtwHK3Aqrz" class="discord-button" target="_blank">Entrar no Discord</a>
+            </div>
+            
+            <div class="history-text">
+                <p>O FireDeluxe se juntou às grandes comunidades do Animefire, começando no servidor "Bairro Animefire" (até seu encerramento) e depois migrando para o servidor do MrKalangot (figura bastante reconhecida na comunidade), onde reside até hoje em uma relação de apoio mútuo. Muitos usuários do FireDeluxe fazem parte desse servidor e vice-versa.</p>
+            </div>
+            
+            <div class="history-text">
+                <p>Depois de anos de atualizações constantes, o desenvolvimento foi pausado devido ao alto consumo de tempo necessário. Mesmo sendo um projeto sem fins lucrativos, o criador precisou parar para focar em outros compromissos.</p>
+                
+                <p>No entanto, em 2025, o FireDeluxe ressurgiu com o avanço das inteligências artificiais, que permitem gerar códigos de forma rápida (mesmo que às vezes com erros que precisam ser corrigidos manualmente). Combinando as habilidades do criador com a agilidade das IAs, o FireDeluxe ganhou nova vida, permitindo seu desenvolvimento sem consumir todo o tempo do criador, que pode assim focar em outros projetos enquanto mantém o userscript atualizado.</p>
+            </div>
+        </div>
+    </main>
 
     <script>
-        function mostrarTutorial() {
-            document.getElementById('formularioAcesso').style.display = 'none';
-            document.getElementById('tutorialDiv').style.display = 'block';
+        function showGuide() {
+            document.getElementById('guide-section').style.display = 'block';
+            document.getElementById('history-section').style.display = 'none';
         }
 
-        function setCookie(name, value, minutes) {
-            const d = new Date();
-            d.setTime(d.getTime() + (minutes * 60 * 1000));
-            document.cookie = name + "=" + value + ";expires=" + d.toUTCString() + ";path=/";
+        function showHistory() {
+            document.getElementById('guide-section').style.display = 'none';
+            document.getElementById('history-section').style.display = 'block';
         }
 
-        function getCookie(name) {
-            const value = "; " + document.cookie;
-            const parts = value.split("; " + name + "=");
-            if (parts.length === 2) return parts.pop().split(";").shift();
-        }
-
-        function solicitarAcesso() {
-            if (getCookie('acs') === '1') {
-                alert('Você já enviou um pedido de acesso.');
-            } else {
-                document.getElementById('formularioAcesso').style.display = 'block';
-                document.getElementById('tutorialDiv').style.display = 'none';
-            }
-        }
-
-        function enviarFormulario() {
-            document.getElementById('formularioAcesso').style.display = 'none';
-            const webhookURL = 'https://discord.com/api/webhooks/1194092212254941337/gx8A1aicskleEyIMtyIvIBQNDty0C5or4AyxOkWX163nGtvy_ZVcc5cIu8QObJrd83J2';
-            const tagdc = document.getElementById('tagdc').value;
-            const perfil = document.getElementById('perfil').value;
-            const navegador = document.getElementById('navegador').value;
-            const dispos = document.querySelector('input[name="dispos"]:checked')?.value;
-
-            if (!tagdc || !perfil || !navegador || !dispos) {
-                alert('Você precisa preencher tudo');
-                return;
-            }
-
-            const data = {
-                content: `**Tag do Discord:** ${tagdc}\n**Perfil Animefire:** ${perfil}\n**Navegador:** ${navegador}\n**Dispositivo:** ${dispos}`
-            };
-
-            function tentarEnviar() {
-                fetch(webhookURL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(data),
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            setCookie('acs', '1', 30);
-                            alert('Enviado, agora aperte o botão "Instalação" e instale o script enquanto espera o seu acesso ser aceito.');
-                        } else {
-                            setTimeout(tentarEnviar, 3000);
-                        }
-                    });
-            }
-
-            tentarEnviar();
-        }
+        window.onload = showGuide;
     </script>
 </body>
 
