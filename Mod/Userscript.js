@@ -510,9 +510,6 @@ const configuracoesHTML = `
 </head>
 <body>
     <div class="settings-panel" id="settingsPanel">
-        <div class="settings-header">
-            <h2 class="settings-title">Configurações de Fundo</h2>
-        </div>
 
         <div class="settings-section">
             <h3 class="section-title">Tema do Site</h3>
@@ -520,7 +517,6 @@ const configuracoesHTML = `
                 <label class="settings-label">Cor do Tema:</label>
                 <div class="color-picker-container">
                     <input type="color" class="settings-input" id="themeColor" value="#FFA500" style="width: 70px; height: 40px; padding: 0;">
-                    <div class="color-preview" id="colorPreview" style="background-color: #FFA500;"></div>
                     <div class="theme-actions">
                         <button class="primary-button" id="removeThemeColor">Remover</button>
                     </div>
