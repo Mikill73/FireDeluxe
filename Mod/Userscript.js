@@ -609,14 +609,12 @@ const configuracoesHTML = `
 
         document.getElementById('themeColor').addEventListener('input', function(e) {
             themeColor = e.target.value;
-            document.getElementById('colorPreview').style.backgroundColor = themeColor;
             updateThemeSample(themeColor);
         });
 
         document.getElementById('removeThemeColor').addEventListener('click', function() {
             themeColor = '#FFA500'; 
             document.getElementById('themeColor').value = themeColor;
-            document.getElementById('colorPreview').style.backgroundColor = themeColor;
             updateThemeSample(themeColor);
         });
 
