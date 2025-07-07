@@ -588,7 +588,6 @@ const configuracoesHTML = `
                 if (settings.themeColor) {
                     themeColor = settings.themeColor;
                     document.getElementById('themeColor').value = themeColor;
-                    document.getElementById('colorPreview').style.backgroundColor = themeColor;
                     updateThemeSample(themeColor);
                 }
             }
