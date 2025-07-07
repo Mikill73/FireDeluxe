@@ -739,24 +739,15 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
 
     async function checkVersion() {
         try {
-            const scripts = [...document.querySelectorAll('script')];
-            const script = scripts.find(s => 
-                (s.src && s.src.includes('FireDeluxe')) || 
-                s.textContent.includes('FireDeluxe'));
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('firedeluxe_versao='))
+                ?.split('=')[1];
             
-            if (!script) return;
-
-            const scriptContent = script.src ? 
-                (await fetch(script.src).then(r => r.text())) : 
-                script.textContent;
-            
-            if (!scriptContent.includes('// ==UserScript==')) return;
-
-            const versionLine = scriptContent.split('\n')
-                .find(line => line.trim().startsWith('// @version'));
-            
-            if (!versionLine) return;
-            const currentVersion = versionLine.split('// @version')[1].trim();
+            if (!cookieValue) {
+                showUpdateAlert();
+                return;
+            }
 
             const response = await fetch('https://greasyfork.org/pt-BR/scripts/470618-firedeluxe');
             const html = await response.text();
@@ -765,12 +756,12 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
             const versionElements = [...doc.querySelectorAll('.script-show-version span')];
             const latestVersion = versionElements.find(el => /\d/.test(el.textContent))?.textContent.trim();
 
-            if (latestVersion && currentVersion !== latestVersion) {
+            if (latestVersion && cookieValue !== latestVersion) {
                 showModal(
                     'Atualização Disponível', 
                     `<div class="update-message">Uma nova versão está disponível:</div>
                     <div class="version-container">
-                        <strong>Sua versão:</strong> <span class="version-text">${currentVersion}</span><br>
+                        <strong>Sua versão:</strong> <span class="version-text">${cookieValue}</span><br>
                         <strong>Nova versão:</strong> <span class="version-text">${latestVersion}</span>
                     </div>`,
                     'https://greasyfork.org/pt-BR/scripts/470618-firedeluxe'
@@ -780,6 +771,14 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
             console.error('Erro ao verificar versão:', error);
             showModal('Erro', '<div class="error-message">Ocorreu um erro ao verificar a versão atual.</div>');
         }
+    }
+
+    function showUpdateAlert() {
+        showModal(
+            'Atualização Recomendada', 
+            '<div class="update-message">Uma atualização do FireDeluxe está disponível.</div>',
+            'https://greasyfork.org/pt-BR/scripts/470618-firedeluxe'
+        );
     }
 
     function showModal(title, content, actionUrl = null) {
