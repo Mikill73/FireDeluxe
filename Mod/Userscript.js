@@ -937,115 +937,104 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
     'use strict';
 
 function trocarTema() {
-  const coresOriginais = [
-    {hex: '#21d3ff', rgb: 'rgb(33, 211, 255)'},
-    {hex: '#29DFFF', rgb: 'rgb(41, 223, 255)'},
-    {hex: '#4CDCF4', rgb: 'rgb(76, 220, 244)'},
-    {hex: '#17a2b8', rgb: 'rgb(23, 162, 184)'}
+
+  const coresParaTrocar = [
+    { original: '#21d3ff', nova: '#FFA500' },
+    { original: '#29DFFF', nova: '#FFA500' },
+    { original: '#4CDCF4', nova: '#FFA500' },
+    { original: '#17a2b8', nova: '#FFA500' },
+    { original: 'rgb(33, 211, 255)', nova: 'rgb(255, 165, 0)' },
+    { original: 'rgb(41, 223, 255)', nova: 'rgb(255, 165, 0)' },
+    { original: 'rgb(76, 220, 244)', nova: 'rgb(255, 165, 0)' },
+    { original: 'rgb(23, 162, 184)', nova: 'rgb(255, 165, 0)' }
   ];
-  const novaCor = {hex: '#FFA500', rgb: 'rgb(255, 165, 0)'};
 
-  const elementos = document.querySelectorAll('*');
-  elementos.forEach(elemento => {
-    const estilo = window.getComputedStyle(elemento);
-
-    coresOriginais.forEach(cor => {
-      if (estilo.color === cor.rgb) {
-        elemento.style.color = novaCor.hex;
-      }
-
-      if (estilo.backgroundColor === cor.rgb) {
-        elemento.style.backgroundColor = novaCor.hex;
-      }
-
-      if (estilo.borderColor === cor.rgb) {
-        elemento.style.borderColor = novaCor.hex;
-      }
-    });
-  });
-
-  Array.from(document.styleSheets).forEach(sheet => {
-    try {
-      Array.from(sheet.cssRules || []).forEach(regra => {
-        if (regra.style) {
-          let cssText = regra.style.cssText;
-          coresOriginais.forEach(cor => {
-            if (cssText.includes(cor.hex) || cssText.includes(cor.rgb)) {
-              cssText = cssText.replace(new RegExp(cor.hex, 'gi'), novaCor.hex)
-                              .replace(new RegExp(cor.rgb.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'gi'), novaCor.rgb);
-            }
-          });
-          regra.style.cssText = cssText;
-        }
-      });
-    } catch (e) {}
-  });
-
-  const imagens = document.querySelectorAll('img');
-  imagens.forEach(img => {
-    if (img.dataset.processed || img.naturalWidth === 0 || img.naturalHeight === 0) return;
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-
-    ctx.drawImage(img, 0, 0);
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-
-      coresOriginais.forEach(cor => {
-        const [origR, origG, origB] = cor.rgb.match(/\d+/g).map(Number);
-        if (Math.abs(r - origR) < 30 && Math.abs(g - origG) < 30 && Math.abs(b - origB) < 30) {
-          data[i] = 255;
-          data[i + 1] = 165;
-          data[i + 2] = 0;
-        }
-      });
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-    img.src = canvas.toDataURL('image/png');
-    img.dataset.processed = 'true';
-  });
-
-  const botoesComImagens = [
+  const elementosComImagem = [
     '#PCimgShare',
     '#PCytShare',
     '#btnEnviarPchat'
   ];
 
-  botoesComImagens.forEach(seletor => {
-    const el = document.querySelector(seletor);
-    if (!el) return;
+  function processarImagemDeFundo(elemento) {
+    const estilo = getComputedStyle(elemento);
+    const bgImage = estilo.backgroundImage;
 
-    const bgImage = getComputedStyle(el).backgroundImage;
-    if (bgImage && bgImage !== 'none') {
-      const url = bgImage.slice(5, -2);
-      fetch(url)
-        .then(r => r.blob())
-        .then(b => {
-          const img = new Image();
-          img.src = URL.createObjectURL(b);
-          img.onload = () => {
-            const c = document.createElement('canvas');
-            c.width = img.width;
-            c.height = img.height;
-            const ctx = c.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            ctx.globalCompositeOperation = 'source-in';
-            ctx.fillStyle = novaCor.hex;
-            ctx.fillRect(0, 0, c.width, c.height);
-            el.style.backgroundImage = `url(${c.toDataURL()})`;
-          };
-        })
-        .catch(e => {});
+    if (!bgImage || bgImage === 'none') return;
+
+    const url = bgImage.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+
+    fetch(url)
+      .then(response => response.blob())
+      .then(blob => {
+        const img = new Image();
+        img.src = URL.createObjectURL(blob);
+
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+
+          ctx.drawImage(img, 0, 0);
+          ctx.globalCompositeOperation = 'source-in';
+          ctx.fillStyle = '#FFA500';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          elemento.style.backgroundImage = `url(${canvas.toDataURL()})`;
+        };
+
+        img.onerror = function() {
+          console.warn('Falha ao carregar imagem de fundo para:', elemento.id || elemento.className);
+        };
+      })
+      .catch(error => {
+        console.warn('Erro ao processar imagem de fundo:', error);
+      });
+  }
+
+  document.querySelectorAll('*').forEach(elemento => {
+    const estilo = getComputedStyle(elemento);
+
+    if (coresParaTrocar.some(cor => estilo.color === cor.original)) {
+      const novaCor = coresParaTrocar.find(cor => estilo.color === cor.original).nova;
+      elemento.style.color = novaCor;
+    }
+
+    if (coresParaTrocar.some(cor => estilo.backgroundColor === cor.original)) {
+      const novaCor = coresParaTrocar.find(cor => estilo.backgroundColor === cor.original).nova;
+      elemento.style.backgroundColor = novaCor;
+    }
+
+    if (coresParaTrocar.some(cor => estilo.borderColor === cor.original)) {
+      const novaCor = coresParaTrocar.find(cor => estilo.borderColor === cor.original).nova;
+      elemento.style.borderColor = novaCor;
+    }
+  });
+
+  elementosComImagem.forEach(seletor => {
+    const elemento = document.querySelector(seletor);
+    if (elemento) {
+      processarImagemDeFundo(elemento);
+    }
+  });
+
+  Array.from(document.styleSheets).forEach(stylesheet => {
+    try {
+      Array.from(stylesheet.cssRules || []).forEach(regra => {
+        if (regra.style) {
+          let cssText = regra.style.cssText;
+          coresParaTrocar.forEach(cor => {
+            const padraoHex = new RegExp(cor.original.replace('#', '#'), 'gi');
+            const padraoRgb = new RegExp(cor.original.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'gi');
+
+            cssText = cssText.replace(padraoHex, cor.nova)
+                           .replace(padraoRgb, cor.nova);
+          });
+          regra.style.cssText = cssText;
+        }
+      });
+    } catch (e) {
+
     }
   });
 }
