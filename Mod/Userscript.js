@@ -512,7 +512,6 @@ const configuracoesHTML = `
     <div class="settings-panel" id="settingsPanel">
         <div class="settings-header">
             <h2 class="settings-title">Configurações de Fundo</h2>
-            <button class="close-button" id="closeSettings">&times;</button>
         </div>
 
         <div class="settings-section">
@@ -612,10 +611,6 @@ const configuracoesHTML = `
             const b = parseInt(hex.slice(5, 7), 16);
             return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
         }
-
-        document.getElementById('closeSettings').addEventListener('click', function() {
-            window.location.reload();
-        });
 
         document.getElementById('themeColor').addEventListener('input', function(e) {
             themeColor = e.target.value;
