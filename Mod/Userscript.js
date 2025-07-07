@@ -542,7 +542,7 @@ const configuracoesHTML = `
         }
         
 document.getElementById('closeSettings').addEventListener('click', function() {
-    window.close();
+    window.location.reload();
 });
         
         document.getElementById('siteBgImage').addEventListener('change', function(e) {
@@ -591,7 +591,7 @@ document.getElementById('closeSettings').addEventListener('click', function() {
                 chatBgImage: chatBgDataUrl
             };
             localStorage.setItem('configuracoes', JSON.stringify(settings));
-            window.close();
+            window.location.reload();
         });
         
         document.getElementById('resetSettings').addEventListener('click', function() {
