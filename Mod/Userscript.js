@@ -689,6 +689,7 @@ const configuracoesHTML = `
                 document.getElementById('chatBgPreview').src = '';
                 document.getElementById('chatBgPreviewContainer').style.display = 'none';
                 chatBgDataUrl = '';
+                window.location.reload();
             }
         });
 
