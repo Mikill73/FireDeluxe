@@ -570,7 +570,7 @@ const configuracoesHTML = `
         let themeColor = '#FFA500';
 
         function loadSettings() {
-            const savedSettings = localStorage.getItem('configuracoes');
+            const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
             if (savedSettings) {
                 const settings = JSON.parse(savedSettings);
 
@@ -664,13 +664,13 @@ const configuracoesHTML = `
                 siteBgImage: siteBgDataUrl,
                 chatBgImage: chatBgDataUrl
             };
-            localStorage.setItem('configuracoes', JSON.stringify(settings));
+            localStorage.setItem('firedeluxe_configuracoes', JSON.stringify(settings));
             window.location.reload();
         });
 
         document.getElementById('resetSettings').addEventListener('click', function() {
             if (confirm('Tem certeza que deseja redefinir todas as configurações para os valores padrão?')) {
-                localStorage.removeItem('configuracoes');
+                localStorage.removeItem('firedeluxe_configuracoes');
 
                 themeColor = '#FFA500';
                 document.getElementById('themeColor').value = themeColor;
@@ -706,7 +706,7 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
     'use strict';
 
     const aplicarImagensFundo = () => {
-        const configuracoes = JSON.parse(localStorage.getItem('configuracoes'));
+        const configuracoes = JSON.parse(localStorage.getItem('firedeluxe_configuracoes'));
         if (configuracoes) {
             if (configuracoes.chatBgImage) {
                 const mainDivMSGs = document.querySelector('#mainDivMSGs');
