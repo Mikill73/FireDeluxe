@@ -676,7 +676,6 @@ const configuracoesHTML = `
 
                 themeColor = '#FFA500';
                 document.getElementById('themeColor').value = themeColor;
-                document.getElementById('colorPreview').style.backgroundColor = themeColor;
                 updateThemeSample(themeColor);
 
                 document.getElementById('siteBgImage').value = '';
