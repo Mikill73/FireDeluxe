@@ -5,7 +5,7 @@
 // @description  Userscript para o site https://animefire.plus/
 // @author       Mikill (discord: mikill9150)
 // @match        https://animefire.plus/*
-// @icon         https://animefire.plus/
+// @icon         data:image/webp;base64,UklGRlQHAABXRUJQVlA4WAoAAAAwAAAANgAAOAAASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZBTFBIdgEAAAF3oKBtG6Y7Hn/GoxERkZ/FDGdBWrVNjlR9Rc7US87BweAg/+egYJGAA5CAA3DAlbAScHDR0lXVsw4i+j8BKg9/miU22tO8YCT/nJPARvFXqZmO4R+KGOEZZdbH+gz8TYV/XaxU6HE0Ayz5auZqPyj1ZqG29zYLLDto5kvOYkY716EOlSk4HHSZpEniHR64STqBnXHuJIGBdSw1SA4LtWcdouSA6QAqDqsky7dgzkdFm5kdghwrWQaYYEWSRVfJSSOBJBEpATD95y+wESTHmn1qE+BG2o2chZIDqxKZdan0mi1Le2A1MpPouIgmBRWugHVJ3oWkXcCCQ2gs+ZaT7Jn3pA1yWM52IgsG9A6WebQWOBKQKZgqOLJgbjfxZiHCJAdzrgM5SN44ChBE4U5DI8B2a8CyY80uMLBacECw0HwB5jcFgB2mCgEWX7Jd4BcscoD5xImVNliwS2yZN3AtiipGZasMXXcqe8evOr2m7vfCp8Y8iExFVlA4IOgDAADQFACdASo3ADkAPmkokUWkIiGYCwd8QAaEtgBdnMb/AOZ2rH1rzNqe/efwVvQ0X/3L0TvE/yj/Y/0r8lu0p5gH6pdIDzAfst+zvvGf2b9QPcB6AH9E/t3q3f4D2AP2k9gD9a/VO/1f7d/Al+0P7afAn+wn//6wB7m1oqsWxTPQhr2wpF/U0SxX5x68q5+ewIpQbtKmS5+FepjIhdMPrmkhC/zHB5DBmqATM0c2e39AAP7q+//97I//vH5//3pUAKaYunzAic3RS5F/460MgGcE6jeznCJQTu9/+QIE+dWW1z4Z99mHxeDOcV5nzikhJcIfUOU2hfCH/+kGXcj1Oahy7HURktDrQWHbxOj4dKP38/LsE68yo3JpA9TeRoY5kopsJ/PVBvGhoQiDWnW2o9LGP/RX//+cBW/teN50bHrE8EJbkVHy6T1X/l0E+MSWT8kc6SYbUanjcYJQxOPXzi2V+A+FfgM8MH89aVbioycdatYJ9UsEwqNc5cLrfTovqoRXyt43PucA2BFvdUVQT797KDBjNTgzhO0XkDbJH85T2TbvYBgIYuHLsY4vGFtDyAhokYfCZg85pgTzIt5eZeCPz3+SUyNeN6mJ9cudu7SMZpcl/m2xwFgDzhVbfkaLJfXSJoqvQuObFT1pCVcmRzEVAyi8pKVqd50xPgr1XOcTKCcnByEOSEG3KqhM6/fVZnXsgVboH/xI4TvIJHkBnUs+hq/Tn+cn/CrUPyMuL0PPnEOGrDgjQNLiVCgCK3UrZyKvIv/JPNMYEXkPfiFwo/7FmsHp4K8TSAefxEECBaAss5g6eOK+ZxZgOBmr/qLgWcwaFIiINk7na8H3//BjtvUbv+Bznk/1zXzq6K2JqFyN8YlbAfHJUG1L2if0+Vf2tssmZSR8d33oI9yqzQf4zqJeilBBE2h34RGrsekalIxh7UD+NapH7Iil+xz7FpLWJr24MxVxLrX7Yhx5Q2Hr4SySthwwSl1ErzlIcgLzvW5vOz6M01kC79vtFxOrPk3U2+QAJqnjnjlNGLxU2GWoumtGX7gcP4RkUeXQFmhm0m0htnYru+Ytjqnez5LXtr+nu/nRSSmw5B1LIbH3dG7Ui8yRJp5eZ4/o7UohcYVYWlPN1EWgrybcYFP+xEH/KyUSKTAkf1vYJVg141QQfHa4Wzw2xEpg8kNFySx9GtPiA7Ki+uZvsct+lJnxstQlBLXSUbw4IfQtmvfTkjW3kBk3bVB1S2o+Ayg/9ZPZFxox7bUjrwWmG3txPCepke7SLiP90/+ysfqmjjPPhIym+56Ir65LC9rsIq784kjIV9U//6WrDohz7XJbAAAA
 // @grant        none
 // ==/UserScript==
 
@@ -467,6 +467,33 @@ const configuracoesHTML = `
             margin: 0 auto;
             border-radius: 4px;
         }
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #555;
+            cursor: pointer;
+        }
+        .theme-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .theme-sample {
+            width: 100%;
+            height: 40px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 1px solid #444;
+        }
         @media (max-width: 768px) {
             .settings-row {
                 flex-direction: column;
@@ -487,6 +514,26 @@ const configuracoesHTML = `
             <h2 class="settings-title">Configurações de Fundo</h2>
             <button class="close-button" id="closeSettings">&times;</button>
         </div>
+
+        <div class="settings-section">
+            <h3 class="section-title">Tema do Site</h3>
+            <div class="settings-row">
+                <label class="settings-label">Cor do Tema:</label>
+                <div class="color-picker-container">
+                    <input type="color" class="settings-input" id="themeColor" value="#FFA500" style="width: 70px; height: 40px; padding: 0;">
+                    <div class="color-preview" id="colorPreview" style="background-color: #FFA500;"></div>
+                    <div class="theme-actions">
+                        <button class="primary-button" id="removeThemeColor">Remover</button>
+                    </div>
+                </div>
+            </div>
+            <div class="preview-container">
+                <div class="theme-sample" id="themeSample" style="background-color: rgba(255, 165, 0, 0.2); color: #FFA500;">
+                    Exemplo do Tema Aplicado
+                </div>
+            </div>
+        </div>
+
         <div class="settings-section">
             <h3 class="section-title">Fundo do Site</h3>
             <div class="settings-row">
@@ -501,6 +548,7 @@ const configuracoesHTML = `
                 <img src="" class="preview-image" id="siteBgPreview">
             </div>
         </div>
+
         <div class="settings-section">
             <h3 class="section-title">Fundo do Chat</h3>
             <div class="settings-row">
@@ -515,6 +563,7 @@ const configuracoesHTML = `
                 <img src="" class="preview-image" id="chatBgPreview">
             </div>
         </div>
+
         <div class="settings-button-group" style="justify-content: flex-end; margin-top: 20px;">
             <button class="secondary-button" id="saveSettings">Salvar e Fechar</button>
             <button class="primary-button" id="resetSettings">Redefinir Padrões</button>
@@ -523,11 +572,13 @@ const configuracoesHTML = `
     <script>
         let siteBgDataUrl = '';
         let chatBgDataUrl = '';
+        let themeColor = '#FFA500';
 
         function loadSettings() {
             const savedSettings = localStorage.getItem('configuracoes');
             if (savedSettings) {
                 const settings = JSON.parse(savedSettings);
+
                 if (settings.siteBgImage) {
                     siteBgDataUrl = settings.siteBgImage;
                     document.getElementById('siteBgPreview').src = siteBgDataUrl;
@@ -538,13 +589,47 @@ const configuracoesHTML = `
                     document.getElementById('chatBgPreview').src = chatBgDataUrl;
                     document.getElementById('chatBgPreviewContainer').style.display = 'block';
                 }
+
+                if (settings.themeColor) {
+                    themeColor = settings.themeColor;
+                    document.getElementById('themeColor').value = themeColor;
+                    document.getElementById('colorPreview').style.backgroundColor = themeColor;
+                    updateThemeSample(themeColor);
+                }
             }
         }
-        
-document.getElementById('closeSettings').addEventListener('click', function() {
-    window.location.reload();
-});
-        
+
+        function updateThemeSample(color) {
+            const sample = document.getElementById('themeSample');
+            sample.style.backgroundColor = hexToRgba(color, 0.2);
+            sample.style.color = color;
+            sample.style.borderColor = color;
+        }
+
+        function hexToRgba(hex, alpha) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        document.getElementById('closeSettings').addEventListener('click', function() {
+            window.location.reload();
+        });
+
+        document.getElementById('themeColor').addEventListener('input', function(e) {
+            themeColor = e.target.value;
+            document.getElementById('colorPreview').style.backgroundColor = themeColor;
+            updateThemeSample(themeColor);
+        });
+
+        document.getElementById('removeThemeColor').addEventListener('click', function() {
+            themeColor = '#FFA500'; 
+            document.getElementById('themeColor').value = themeColor;
+            document.getElementById('colorPreview').style.backgroundColor = themeColor;
+            updateThemeSample(themeColor);
+        });
+
         document.getElementById('siteBgImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -557,14 +642,14 @@ document.getElementById('closeSettings').addEventListener('click', function() {
                 reader.readAsDataURL(file);
             }
         });
-        
+
         document.getElementById('removeSiteBg').addEventListener('click', function() {
             document.getElementById('siteBgImage').value = '';
             document.getElementById('siteBgPreview').src = '';
             document.getElementById('siteBgPreviewContainer').style.display = 'none';
             siteBgDataUrl = '';
         });
-        
+
         document.getElementById('chatBgImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -577,37 +662,45 @@ document.getElementById('closeSettings').addEventListener('click', function() {
                 reader.readAsDataURL(file);
             }
         });
-        
+
         document.getElementById('removeChatBg').addEventListener('click', function() {
             document.getElementById('chatBgImage').value = '';
             document.getElementById('chatBgPreview').src = '';
             document.getElementById('chatBgPreviewContainer').style.display = 'none';
             chatBgDataUrl = '';
         });
-        
+
         document.getElementById('saveSettings').addEventListener('click', function() {
             const settings = {
+                themeColor: themeColor,
                 siteBgImage: siteBgDataUrl,
                 chatBgImage: chatBgDataUrl
             };
             localStorage.setItem('configuracoes', JSON.stringify(settings));
             window.location.reload();
         });
-        
+
         document.getElementById('resetSettings').addEventListener('click', function() {
             if (confirm('Tem certeza que deseja redefinir todas as configurações para os valores padrão?')) {
                 localStorage.removeItem('configuracoes');
+
+                themeColor = '#FFA500';
+                document.getElementById('themeColor').value = themeColor;
+                document.getElementById('colorPreview').style.backgroundColor = themeColor;
+                updateThemeSample(themeColor);
+
                 document.getElementById('siteBgImage').value = '';
                 document.getElementById('siteBgPreview').src = '';
                 document.getElementById('siteBgPreviewContainer').style.display = 'none';
                 siteBgDataUrl = '';
+
                 document.getElementById('chatBgImage').value = '';
                 document.getElementById('chatBgPreview').src = '';
                 document.getElementById('chatBgPreviewContainer').style.display = 'none';
                 chatBgDataUrl = '';
             }
         });
-        
+
         loadSettings();
     </script>
 </body>
@@ -617,7 +710,7 @@ document.getElementById('closeSettings').addEventListener('click', function() {
 localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
     configuracoes: configuracoesHTML
 }));
-    
+
 })();
 
 //Imagens de fundo Site e Chat
