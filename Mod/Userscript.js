@@ -918,3 +918,16 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
 
     checkVersion();
 })();
+
+//Impedir aviso de Adblock detectado
+(function() {
+    'use strict';
+
+document.querySelectorAll('script').forEach(s => {
+  if (s.textContent.includes('showAdAlert') || s.src.includes('adsbygoogle')) s.remove();
+});
+window.showAdAlert = function() {};
+document.querySelectorAll('div[style*="Adblock detectado"]').forEach(el => el.remove());
+window.chromeadblocked = false;
+
+})();
