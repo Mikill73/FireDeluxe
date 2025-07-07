@@ -733,3 +733,189 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
 
 })();
 
+//Verificar versão
+(function() {
+    'use strict';
+
+    async function checkVersion() {
+        try {
+            const scripts = [...document.querySelectorAll('script')];
+            const script = scripts.find(s => 
+                (s.src && s.src.includes('FireDeluxe')) || 
+                s.textContent.includes('FireDeluxe'));
+            
+            if (!script) return;
+
+            const scriptContent = script.src ? 
+                (await fetch(script.src).then(r => r.text())) : 
+                script.textContent;
+            
+            if (!scriptContent.includes('// ==UserScript==')) return;
+
+            const versionLine = scriptContent.split('\n')
+                .find(line => line.trim().startsWith('// @version'));
+            
+            if (!versionLine) return;
+            const currentVersion = versionLine.split('// @version')[1].trim();
+
+            const response = await fetch('https://greasyfork.org/pt-BR/scripts/470618-firedeluxe');
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const versionElements = [...doc.querySelectorAll('.script-show-version span')];
+            const latestVersion = versionElements.find(el => /\d/.test(el.textContent))?.textContent.trim();
+
+            if (latestVersion && currentVersion !== latestVersion) {
+                showModal(
+                    'Atualização Disponível', 
+                    `<div class="update-message">Uma nova versão está disponível:</div>
+                    <div class="version-container">
+                        <strong>Sua versão:</strong> <span class="version-text">${currentVersion}</span><br>
+                        <strong>Nova versão:</strong> <span class="version-text">${latestVersion}</span>
+                    </div>`,
+                    'https://greasyfork.org/pt-BR/scripts/470618-firedeluxe'
+                );
+            }
+        } catch (error) {
+            console.error('Erro ao verificar versão:', error);
+            showModal('Erro', '<div class="error-message">Ocorreu um erro ao verificar a versão atual.</div>');
+        }
+    }
+
+    function showModal(title, content, actionUrl = null) {
+        const existingModal = document.querySelector('.modal-overlay');
+        if (existingModal) existingModal.remove();
+
+        const modal = document.createElement('div');
+        modal.className = 'modal-panel';
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        
+        modal.innerHTML = `
+            <div class="modal-header">
+                <h3>${title}</h3>
+            </div>
+            <div class="modal-content">
+                ${content}
+            </div>
+            <div class="modal-buttons">
+                ${actionUrl ? `
+                    <a href="${actionUrl}" target="_blank" class="update-button">
+                        Atualizar
+                    </a>` : ''}
+                <button class="close-button">
+                    Fechar
+                </button>
+            </div>
+        `;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            }
+            .modal-panel {
+                background-color: #222;
+                border: 1px solid #FFA500;
+                border-radius: 8px;
+                width: 90%;
+                max-width: 400px;
+                color: #EEE;
+            }
+            .modal-header {
+                padding: 15px;
+                border-bottom: 1px solid #333;
+            }
+            .modal-header h3 {
+                margin: 0;
+                color: #FFA500;
+                text-align: center;
+                font-size: 1.2em;
+            }
+            .modal-content {
+                padding: 20px;
+                text-align: center;
+                line-height: 1.6;
+            }
+            .update-message {
+                color: #EEE !important;
+                margin-bottom: 15px;
+                font-size: 1em;
+            }
+            .error-message {
+                color: #EEE !important;
+            }
+            .version-container {
+                background: rgba(0,0,0,0.3);
+                padding: 15px;
+                border-radius: 6px;
+                margin-top: 10px;
+            }
+            .version-container strong {
+                color: #FFA500;
+            }
+            .version-text {
+                color: #FFF !important;
+                background-color: #333;
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-family: monospace;
+                display: inline-block;
+                margin: 3px 0;
+            }
+            .modal-buttons {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                padding: 15px;
+                border-top: 1px solid #333;
+            }
+            .update-button, .close-button {
+                padding: 10px 20px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: bold;
+                border: none;
+                transition: all 0.2s;
+                font-size: 0.9em;
+            }
+            .update-button {
+                background-color: #FFA500;
+                color: #000 !important;
+                text-decoration: none;
+            }
+            .update-button:hover {
+                background-color: #FFB733;
+            }
+            .close-button {
+                background-color: #444;
+                color: #FFF !important;
+            }
+            .close-button:hover {
+                background-color: #555;
+            }
+        `;
+
+        overlay.appendChild(modal);
+        document.body.appendChild(style);
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay || e.target.classList.contains('close-button')) {
+                overlay.remove();
+            }
+        });
+    }
+
+    checkVersion();
+})();
