@@ -170,18 +170,24 @@
         return buttonContainer;
     }
 
-    function executeButton(btnData) {
-        try {
-            if (btnData.type === 'html') {
-                const win = window.open('', '_blank');
-                win.document.write(btnData.content);
-            } else {
-                new Function(btnData.content)();
-            }
-        } catch (e) {
-            console.error('Erro ao executar botão:', e);
+function executeButton(btnData) {
+    try {
+        if (btnData.type === 'html') {
+            const cleanedContent = btnData.content.trim();
+            const fullHTML = cleanedContent.startsWith("<html")
+                ? cleanedContent
+                : `<html><head><meta charset="UTF-8"></head><body>${cleanedContent}</body></html>`;
+            
+            document.open();
+            document.write(fullHTML);
+            document.close();
+        } else {
+            new Function(btnData.content)();
         }
+    } catch (e) {
+        console.error('Erro ao executar botão:', e);
     }
+}
 
     function loadColumns() {
         columnsContainer.innerHTML = '';
