@@ -936,115 +936,142 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
 (function() {
     'use strict';
 
-function trocarTema() {
-  const coresOriginais = [
-    {hex: '#21d3ff', rgb: 'rgb(33, 211, 255)'},
-    {hex: '#29DFFF', rgb: 'rgb(41, 223, 255)'},
-    {hex: '#4CDCF4', rgb: 'rgb(76, 220, 244)'},
-    {hex: '#17a2b8', rgb: 'rgb(23, 162, 184)'}
-  ];
-  const novaCor = {hex: '#FFA500', rgb: 'rgb(255, 165, 0)'};
+    const MAX_TENTATIVAS = 30;
+    const INTERVALO_VERIFICACAO = 100;
+    const coresOriginais = [
+        {hex: '#21d3ff', rgb: 'rgb(33, 211, 255)'},
+        {hex: '#29DFFF', rgb: 'rgb(41, 223, 255)'},
+        {hex: '#4CDCF4', rgb: 'rgb(76, 220, 244)'},
+        {hex: '#17a2b8', rgb: 'rgb(23, 162, 184)'}
+    ];
+    const novaCor = {hex: '#FFA500', rgb: 'rgb(255, 165, 0)'};
 
-  const elementos = document.querySelectorAll('*');
-  elementos.forEach(elemento => {
-    const estilo = window.getComputedStyle(elemento);
-    
-    coresOriginais.forEach(cor => {
-      if (estilo.color === cor.rgb) {
-        elemento.style.color = novaCor.hex;
-      }
-      
-      if (estilo.backgroundColor === cor.rgb) {
-        elemento.style.backgroundColor = novaCor.hex;
-      }
-      
-      if (estilo.borderColor === cor.rgb) {
-        elemento.style.borderColor = novaCor.hex;
-      }
-    });
-  });
+    let tentativas = 0;
+    let emExecucao = false;
+    let observer = null;
 
-  Array.from(document.styleSheets).forEach(sheet => {
-    try {
-      Array.from(sheet.cssRules || []).forEach(regra => {
-        if (regra.style) {
-          let cssText = regra.style.cssText;
-          coresOriginais.forEach(cor => {
-            cssText = cssText.replace(new RegExp(cor.hex, 'gi'), novaCor.hex)
-                            .replace(new RegExp(cor.rgb.replace(/\(/g, '\\(').replace(/\)/g, '\\)'), 'gi'), novaCor.rgb);
-          });
-          regra.style.cssText = cssText;
-        }
-      });
-    } catch (e) {}
-  });
+    async function trocarTema() {
+        if (emExecucao) return;
+        emExecucao = true;
 
-  const imagens = document.querySelectorAll('img');
-  imagens.forEach(img => {
-    if (img.dataset.processed || img.naturalWidth === 0 || img.naturalHeight === 0) return;
-    
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    
-    ctx.drawImage(img, 0, 0);
-    
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-    
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-      
-      coresOriginais.forEach(cor => {
-        const [origR, origG, origB] = cor.rgb.match(/\d+/g).map(Number);
-        if (Math.abs(r - origR) < 30 && Math.abs(g - origG) < 30 && Math.abs(b - origB) < 30) {
-          data[i] = 255;
-          data[i + 1] = 165;
-          data[i + 2] = 0;
-        }
-      });
+        await processarElementos();
+
+        configurarObservador();
+
+        emExecucao = false;
     }
-    
-    ctx.putImageData(imageData, 0, 0);
-    img.src = canvas.toDataURL('image/png');
-    img.dataset.processed = 'true';
-  });
 
-  const botoes = ['#PCimgShare', '#PCytShare', '#btnEnviarPchat'];
-  botoes.forEach(id => {
-    const el = document.querySelector(id);
-    if (!el) return;
-    
-    const bgImage = getComputedStyle(el).backgroundImage;
-    if (!bgImage || bgImage === 'none') return;
-    
-    const url = bgImage.slice(5, -2);
-    if (!url) return;
-    
-    fetch(url)
-      .then(r => r.blob())
-      .then(b => {
-        const img = new Image();
-        img.src = URL.createObjectURL(b);
-        img.onload = () => {
-          const c = document.createElement('canvas');
-          c.width = img.width;
-          c.height = img.height;
-          const ctx = c.getContext('2d');
-          ctx.drawImage(img, 0, 0);
-          ctx.globalCompositeOperation = 'source-in';
-          ctx.fillStyle = novaCor.hex;
-          ctx.fillRect(0, 0, c.width, c.height);
-          el.style.backgroundImage = `url(${c.toDataURL()})`;
-        };
-      })
-      .catch(e => {});
-  });
-}
+    async function processarElementos() {
+        let elementosProcessados = 0;
 
-trocarTema();
+        do {
+            const encontrados = await verificarLote();
+            elementosProcessados += encontrados;
+
+            if (encontrados === 0) {
+                tentativas++;
+            } else {
+                tentativas = 0; 
+            }
+
+            if (tentativas >= MAX_TENTATIVAS) {
+                console.log('Mudando para modo observador (MutationObserver)');
+                return;
+            }
+
+            await aguardar(INTERVALO_VERIFICACAO);
+        } while (true);
+    }
+
+    async function verificarLote() {
+        return new Promise(resolve => {
+            requestAnimationFrame(() => {
+
+                const elementos = document.querySelectorAll(`
+                    *:not([data-tema-processado]):not(script):not(style)
+                `);
+
+                let processados = 0;
+                const batchSize = 50;
+                const totalBatches = Math.ceil(elementos.length / batchSize);
+
+                if (elementos.length === 0) {
+                    resolve(0);
+                    return;
+                }
+
+                const processarBatch = (batchIndex) => {
+                    const start = batchIndex * batchSize;
+                    const end = start + batchSize;
+                    const batch = Array.from(elementos).slice(start, end);
+
+                    batch.forEach(elemento => {
+                        processarElemento(elemento);
+                        processados++;
+                    });
+
+                    if (batchIndex < totalBatches - 1) {
+                        requestAnimationFrame(() => processarBatch(batchIndex + 1));
+                    } else {
+                        resolve(processados);
+                    }
+                };
+
+                processarBatch(0);
+            });
+        });
+    }
+
+    function processarElemento(elemento) {
+        const estilo = window.getComputedStyle(elemento);
+
+        coresOriginais.forEach(cor => {
+            if (estilo.color === cor.rgb) {
+                elemento.style.color = novaCor.hex;
+            }
+
+            if (estilo.backgroundColor === cor.rgb) {
+                elemento.style.backgroundColor = novaCor.hex;
+            }
+
+            if (estilo.borderColor === cor.rgb) {
+                elemento.style.borderColor = novaCor.hex;
+            }
+        });
+
+        elemento.setAttribute('data-tema-processado', 'true');
+    }
+
+    function configurarObservador() {
+        if (observer) observer.disconnect();
+
+        observer = new MutationObserver(mutations => {
+            if (emExecucao) return;
+
+            mutations.forEach(mutation => {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        if (!node.hasAttribute('data-tema-processado')) {
+                            processarElemento(node);
+                        }
+
+                        const elementos = node.querySelectorAll(':not([data-tema-processado])');
+                        elementos.forEach(el => processarElemento(el));
+                    }
+                });
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    function aguardar(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    trocarTema();
 
 })();
