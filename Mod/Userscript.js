@@ -154,67 +154,67 @@
         button.style.textAlign = 'left';
         button.style.fontSize = '14px';
         button.style.transition = 'all 0.2s ease';
-
+        
         button.onmouseenter = () => {
             button.style.backgroundColor = THEME_COLOR + '30';
         };
-
+        
         button.onmouseleave = () => {
             button.style.backgroundColor = ACCENT_COLOR;
         };
-
+        
         button.onclick = () => {
             const content = btnData.content || getCodeFromStorage(btnData.type, btnData.storageKey);
             executeButton({...btnData, content});
         };
 
-        if (btnData.info) {
-            const infoIcon = document.createElement('div');
-            infoIcon.innerHTML = 'ℹ️';
-            infoIcon.style.cursor = 'help';
-            infoIcon.style.position = 'relative';
-            infoIcon.style.fontSize = '12px';
-            infoIcon.style.width = '20px';
-            infoIcon.style.height = '20px';
-            infoIcon.style.display = 'flex';
-            infoIcon.style.alignItems = 'center';
-            infoIcon.style.justifyContent = 'center';
+        buttonContainer.appendChild(button);
 
-            const tooltip = document.createElement('div');
-            tooltip.textContent = btnData.info;
-            tooltip.style.position = 'absolute';
-            tooltip.style.bottom = '100%';
-            tooltip.style.left = '50%';
-            tooltip.style.transform = 'translateX(-50%)';
-            tooltip.style.backgroundColor = DARK_BG;
-            tooltip.style.color = LIGHT_TEXT;
-            tooltip.style.padding = '8px 12px';
-            tooltip.style.borderRadius = '4px';
-            tooltip.style.border = `1px solid ${THEME_COLOR}`;
-            tooltip.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
-            tooltip.style.whiteSpace = 'nowrap';
-            tooltip.style.zIndex = '1000';
-            tooltip.style.display = 'none';
-            tooltip.style.fontSize = '12px';
-            tooltip.style.maxWidth = '250px';
-            tooltip.style.width = 'max-content';
+if (btnData.info) {
+    const infoIcon = document.createElement('span');
+    infoIcon.textContent = 'i';
+    infoIcon.style.color = THEME_COLOR;
+    infoIcon.style.cursor = 'help';
+    infoIcon.style.fontWeight = 'bold';
+    infoIcon.style.marginLeft = '5px';
+    infoIcon.style.display = 'inline-block';
+    infoIcon.style.width = '16px';
+    infoIcon.style.height = '16px';
+    infoIcon.style.textAlign = 'center';
+    infoIcon.style.lineHeight = '16px';
 
-            infoIcon.appendChild(tooltip);
+    const tooltip = document.createElement('div');
+    tooltip.textContent = btnData.info;
+    tooltip.style.position = 'fixed';
+    tooltip.style.display = 'none';
+    tooltip.style.background = DARK_BG;
+    tooltip.style.color = LIGHT_TEXT;
+    tooltip.style.padding = '5px 10px';
+    tooltip.style.borderRadius = '3px';
+    tooltip.style.zIndex = '99999';
+    document.body.appendChild(tooltip);
 
-            infoIcon.onmouseenter = () => {
-                tooltip.style.display = 'block';
-            };
+    infoIcon.addEventListener('mouseover', (e) => {
+        tooltip.style.display = 'block';
+        requestAnimationFrame(() => {
+            const left = e.clientX - tooltip.offsetWidth - 10;
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${e.clientY + 10}px`;
+        });
+    });
 
-            infoIcon.onmouseleave = () => {
-                tooltip.style.display = 'none';
-            };
+    infoIcon.addEventListener('mouseout', () => {
+        tooltip.style.display = 'none';
+    });
 
-            buttonContainer.appendChild(button);
-            buttonContainer.appendChild(infoIcon);
-        } else {
-            buttonContainer.appendChild(button);
-        }
+    infoIcon.addEventListener('mousemove', (e) => {
+        const left = e.clientX - tooltip.offsetWidth - 10;
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${e.clientY + 10}px`;
+    });
 
+    buttonContainer.appendChild(infoIcon);
+}
         return buttonContainer;
     }
 
@@ -225,7 +225,7 @@
                 const fullHTML = cleanedContent.startsWith("<html")
                     ? cleanedContent
                     : `<html><head><meta charset="UTF-8"></head><body>${cleanedContent}</body></html>`;
-
+                
                 document.open();
                 document.write(fullHTML);
                 document.close();
