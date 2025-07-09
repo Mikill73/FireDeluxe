@@ -626,17 +626,10 @@ const configuracoesHTML = `
         });
 
 document.getElementById('removeThemeColor').addEventListener('click', function() {
-
     themeColor = '#FFA500';
-
+    
     document.getElementById('themeColor').value = themeColor;
-
     updateThemeSample(themeColor);
-
-    const currentSettings = JSON.parse(localStorage.getItem('firedeluxe_configuracoes')) || {};
-    currentSettings.themeColor = themeColor;
-    localStorage.setItem('firedeluxe_configuracoes', JSON.stringify(currentSettings));
-
 });
 
         document.getElementById('siteBgImage').addEventListener('change', function(e) {
