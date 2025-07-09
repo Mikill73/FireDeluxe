@@ -281,27 +281,17 @@ window.chromeadblocked = false;
 
     const configStr = localStorage.getItem('firedeluxe_configuracoes');
     if (!configStr) return;
+
     let config;
     try {
         config = JSON.parse(configStr);
     } catch {
         return;
     }
+
     if (config.adblock !== 'on') return;
 
-    function shouldAllowAds() {
-        const cookieValue = document.cookie.split('; ').find(row => row.startsWith('firedeluxe_adsdiarios='));
-        if (!cookieValue) return false;
-        const adsDiarios = parseInt(cookieValue.split('=')[1]);
-        if (isNaN(adsDiarios)) return false;
-        if (adsDiarios <= 0) return false;
-
-        return true;
-    }
-
     function removeUnwantedElements() {
-        if (shouldAllowAds()) return;
-
         const patterns = [
             {
                 selector: 'script[referrerpolicy="unsafe-url"]',
