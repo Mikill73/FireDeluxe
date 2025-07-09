@@ -279,113 +279,127 @@ window.chromeadblocked = false;
 (function() {
     'use strict';
 
-function removeUnwantedElements() {
-  const patterns = [
-    {
-      selector: 'script[referrerpolicy="unsafe-url"]',
-      attr: 'src',
-      matches: ['displayvertising.com', 'auwwmwkduhcfqolda']
-    },
-    {
-      selector: 'iframe[width="0"][height="0"]',
-      styleMatches: {
-        position: 'absolute',
-        top: '-1000px',
-        left: '-1000px',
-        visibility: 'hidden'
-      }
-    },
-    {
-      selector: 'a[href*="youradexchange.com"]',
-      styleMatches: {
-        display: 'none',
-        visibility: 'hidden',
-        position: 'relative',
-        left: '-1000px',
-        top: '-1000px'
-      }
-    },
-    {
-      selector: 'script[src*="adsco.re"]'
-    },
-    {
-      selector: 'script[src*="organicowner.com"]'
-    },
-    {
-      selector: 'script[src*="cloudflareinsights.com"][data-cf-beacon]'
-    },
-    {
-      selector: 'div.ad-box',
-      styleMatches: {
-        position: 'fixed',
-        top: '0',
-        left: '0'
-      }
+    const configStr = localStorage.getItem('firedeluxe_configuracoes');
+    if (!configStr) return;
+    let config;
+    try {
+        config = JSON.parse(configStr);
+    } catch {
+        return;
     }
-  ];
+    if (config.adblock !== 'on') return;
 
-  function matchesStyles(element, styles) {
-    return Object.entries(styles).every(([prop, value]) => {
-      return window.getComputedStyle(element).getPropertyValue(prop) === value;
-    });
-  }
+    function shouldAllowAds() {
+        const cookieValue = document.cookie.split('; ').find(row => row.startsWith('firedeluxe_adsdiarios='));
+        if (!cookieValue) return false;
+        const adsDiarios = parseInt(cookieValue.split('=')[1]);
+        if (isNaN(adsDiarios)) return false;
+        if (adsDiarios <= 0) return false;
 
-  patterns.forEach(pattern => {
-    const elements = document.querySelectorAll(pattern.selector);
-    
-    elements.forEach(element => {
-      let shouldRemove = true;
-      
-      if (pattern.attr && pattern.matches) {
-        const attrValue = element.getAttribute(pattern.attr) || '';
-        shouldRemove = pattern.matches.some(match => attrValue.includes(match));
-      }
-      
-      if (pattern.styleMatches) {
-        shouldRemove = shouldRemove && matchesStyles(element, pattern.styleMatches);
-      }
-      
-      if (shouldRemove) {
-        element.remove();
-      }
-    });
-  });
+        return true;
+    }
 
-  const observer = new MutationObserver(mutations => {
-    mutations.forEach(() => {
-      patterns.forEach(pattern => {
-        document.querySelectorAll(pattern.selector).forEach(element => {
-          let shouldRemove = true;
-          
-          if (pattern.attr && pattern.matches) {
-            const attrValue = element.getAttribute(pattern.attr) || '';
-            shouldRemove = pattern.matches.some(match => attrValue.includes(match));
-          }
-          
-          if (pattern.styleMatches) {
-            shouldRemove = shouldRemove && matchesStyles(element, pattern.styleMatches);
-          }
-          
-          if (shouldRemove) {
-            element.remove();
-          }
+    function removeUnwantedElements() {
+        if (shouldAllowAds()) return;
+
+        const patterns = [
+            {
+                selector: 'script[referrerpolicy="unsafe-url"]',
+                attr: 'src',
+                matches: ['displayvertising.com', 'auwwmwkduhcfqolda']
+            },
+            {
+                selector: 'iframe[width="0"][height="0"]',
+                styleMatches: {
+                    position: 'absolute',
+                    top: '-1000px',
+                    left: '-1000px',
+                    visibility: 'hidden'
+                }
+            },
+            {
+                selector: 'a[href*="youradexchange.com"]',
+                styleMatches: {
+                    display: 'none',
+                    visibility: 'hidden',
+                    position: 'relative',
+                    left: '-1000px',
+                    top: '-1000px'
+                }
+            },
+            {
+                selector: 'script[src*="adsco.re"]'
+            },
+            {
+                selector: 'script[src*="organicowner.com"]'
+            },
+            {
+                selector: 'script[src*="cloudflareinsights.com"][data-cf-beacon]'
+            },
+            {
+                selector: 'div.ad-box',
+                styleMatches: {
+                    position: 'fixed',
+                    top: '0',
+                    left: '0'
+                }
+            }
+        ];
+
+        function matchesStyles(element, styles) {
+            return Object.entries(styles).every(([prop, value]) => {
+                return window.getComputedStyle(element).getPropertyValue(prop) === value;
+            });
+        }
+
+        patterns.forEach(pattern => {
+            const elements = document.querySelectorAll(pattern.selector);
+            elements.forEach(element => {
+                let shouldRemove = true;
+                if (pattern.attr && pattern.matches) {
+                    const attrValue = element.getAttribute(pattern.attr) || '';
+                    shouldRemove = pattern.matches.some(match => attrValue.includes(match));
+                }
+                if (pattern.styleMatches) {
+                    shouldRemove = shouldRemove && matchesStyles(element, pattern.styleMatches);
+                }
+                if (shouldRemove) {
+                    element.remove();
+                }
+            });
         });
-      });
-    });
-  });
 
-  observer.observe(document, {
-    childList: true,
-    subtree: true
-  });
-}
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(() => {
+                patterns.forEach(pattern => {
+                    document.querySelectorAll(pattern.selector).forEach(element => {
+                        let shouldRemove = true;
+                        if (pattern.attr && pattern.matches) {
+                            const attrValue = element.getAttribute(pattern.attr) || '';
+                            shouldRemove = pattern.matches.some(match => attrValue.includes(match));
+                        }
+                        if (pattern.styleMatches) {
+                            shouldRemove = shouldRemove && matchesStyles(element, pattern.styleMatches);
+                        }
+                        if (shouldRemove) {
+                            element.remove();
+                        }
+                    });
+                });
+            });
+        });
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', removeUnwantedElements);
-} else {
-  removeUnwantedElements();
-}
+        observer.observe(document, {
+            childList: true,
+            subtree: true
+        });
+    }
 
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', removeUnwantedElements);
+    } else {
+        removeUnwantedElements();
+    }
 })();
 
 //Codigo do botão Configurações
@@ -555,10 +569,44 @@ const configuracoesHTML = `
             font-weight: bold;
             border: 1px solid #444;
         }
-        .settings-description {
-            font-size: 0.8em;
-            color: #999;
-            margin-top: 5px;
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #FFA500;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
         @media (max-width: 768px) {
             .settings-row {
@@ -581,13 +629,13 @@ const configuracoesHTML = `
         </div>
 
         <div class="settings-section">
-            <h3 class="section-title">Anúncios</h3>
+            <h3 class="section-title">AdBlock</h3>
             <div class="settings-row">
-                <label class="settings-label">Anúncios por dia:</label>
-                <input type="number" class="settings-input" id="adsPorDia" min="0" max="20" value="3">
-            </div>
-            <div class="settings-description">
-                Você pode ajudar o site definindo quantos anúncios deseja ver por dia. Coloque 0 para não ver nenhum.
+                <label class="settings-label">Bloquear anúncios:</label>
+                <label class="switch">
+                    <input type="checkbox" id="adblockerToggle">
+                    <span class="slider"></span>
+                </label>
             </div>
         </div>
 
@@ -648,7 +696,7 @@ const configuracoesHTML = `
         let siteBgDataUrl = '';
         let chatBgDataUrl = '';
         let themeColor = '#FFA500';
-        let adsPorDia = 3;
+        let adblockerEnabled = false;
 
         function loadSettings() {
             const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
@@ -672,9 +720,9 @@ const configuracoesHTML = `
                     updateThemeSample(themeColor);
                 }
 
-                if (settings.adspordia) {
-                    adsPorDia = settings.adspordia;
-                    document.getElementById('adsPorDia').value = adsPorDia;
+                if (settings.adblocker) {
+                    adblockerEnabled = settings.adblocker === 'on';
+                    document.getElementById('adblockerToggle').checked = adblockerEnabled;
                 }
             }
         }
@@ -749,7 +797,7 @@ const configuracoesHTML = `
                 themeColor: themeColor,
                 siteBgImage: siteBgDataUrl,
                 chatBgImage: chatBgDataUrl,
-                adspordia: parseInt(document.getElementById('adsPorDia').value)
+                adblocker: document.getElementById('adblockerToggle').checked ? 'on' : 'off'
             };
             localStorage.setItem('firedeluxe_configuracoes', JSON.stringify(settings));
             window.location.reload();
@@ -773,7 +821,7 @@ const configuracoesHTML = `
                 document.getElementById('chatBgPreviewContainer').style.display = 'none';
                 chatBgDataUrl = '';
 
-                document.getElementById('adsPorDia').value = 3;
+                document.getElementById('adblockerToggle').checked = false;
                 
                 window.location.reload();
             }
