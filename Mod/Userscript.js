@@ -76,7 +76,8 @@
                 {
                     name: 'Configurações',
                     storageKey: 'configuracoes',
-                    type: 'html'
+                    type: 'html',
+                    info: 'Configura diversas funções do FireDeluxe, incluindo aparência, comportamentos e preferências.'
                 }
             ]
         }
@@ -139,6 +140,7 @@
         buttonContainer.style.display = 'flex';
         buttonContainer.style.marginBottom = '8px';
         buttonContainer.style.gap = '5px';
+        buttonContainer.style.alignItems = 'center';
 
         const button = document.createElement('button');
         button.textContent = btnData.name;
@@ -152,42 +154,88 @@
         button.style.textAlign = 'left';
         button.style.fontSize = '14px';
         button.style.transition = 'all 0.2s ease';
-        
+
         button.onmouseenter = () => {
             button.style.backgroundColor = THEME_COLOR + '30';
         };
-        
+
         button.onmouseleave = () => {
             button.style.backgroundColor = ACCENT_COLOR;
         };
-        
+
         button.onclick = () => {
             const content = btnData.content || getCodeFromStorage(btnData.type, btnData.storageKey);
             executeButton({...btnData, content});
         };
 
-        buttonContainer.appendChild(button);
+        if (btnData.info) {
+            const infoIcon = document.createElement('div');
+            infoIcon.innerHTML = 'ℹ️';
+            infoIcon.style.cursor = 'help';
+            infoIcon.style.position = 'relative';
+            infoIcon.style.fontSize = '12px';
+            infoIcon.style.width = '20px';
+            infoIcon.style.height = '20px';
+            infoIcon.style.display = 'flex';
+            infoIcon.style.alignItems = 'center';
+            infoIcon.style.justifyContent = 'center';
+
+            const tooltip = document.createElement('div');
+            tooltip.textContent = btnData.info;
+            tooltip.style.position = 'absolute';
+            tooltip.style.bottom = '100%';
+            tooltip.style.left = '50%';
+            tooltip.style.transform = 'translateX(-50%)';
+            tooltip.style.backgroundColor = DARK_BG;
+            tooltip.style.color = LIGHT_TEXT;
+            tooltip.style.padding = '8px 12px';
+            tooltip.style.borderRadius = '4px';
+            tooltip.style.border = `1px solid ${THEME_COLOR}`;
+            tooltip.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+            tooltip.style.whiteSpace = 'nowrap';
+            tooltip.style.zIndex = '1000';
+            tooltip.style.display = 'none';
+            tooltip.style.fontSize = '12px';
+            tooltip.style.maxWidth = '250px';
+            tooltip.style.width = 'max-content';
+
+            infoIcon.appendChild(tooltip);
+
+            infoIcon.onmouseenter = () => {
+                tooltip.style.display = 'block';
+            };
+
+            infoIcon.onmouseleave = () => {
+                tooltip.style.display = 'none';
+            };
+
+            buttonContainer.appendChild(button);
+            buttonContainer.appendChild(infoIcon);
+        } else {
+            buttonContainer.appendChild(button);
+        }
+
         return buttonContainer;
     }
 
-function executeButton(btnData) {
-    try {
-        if (btnData.type === 'html') {
-            const cleanedContent = btnData.content.trim();
-            const fullHTML = cleanedContent.startsWith("<html")
-                ? cleanedContent
-                : `<html><head><meta charset="UTF-8"></head><body>${cleanedContent}</body></html>`;
-            
-            document.open();
-            document.write(fullHTML);
-            document.close();
-        } else {
-            new Function(btnData.content)();
+    function executeButton(btnData) {
+        try {
+            if (btnData.type === 'html') {
+                const cleanedContent = btnData.content.trim();
+                const fullHTML = cleanedContent.startsWith("<html")
+                    ? cleanedContent
+                    : `<html><head><meta charset="UTF-8"></head><body>${cleanedContent}</body></html>`;
+
+                document.open();
+                document.write(fullHTML);
+                document.close();
+            } else {
+                new Function(btnData.content)();
+            }
+        } catch (e) {
+            console.error('Erro ao executar botão:', e);
         }
-    } catch (e) {
-        console.error('Erro ao executar botão:', e);
     }
-}
 
     function loadColumns() {
         columnsContainer.innerHTML = '';
@@ -507,6 +555,11 @@ const configuracoesHTML = `
             font-weight: bold;
             border: 1px solid #444;
         }
+        .settings-description {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 5px;
+        }
         @media (max-width: 768px) {
             .settings-row {
                 flex-direction: column;
@@ -523,6 +576,20 @@ const configuracoesHTML = `
 </head>
 <body>
     <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h2 class="settings-title">Configurações</h2>
+        </div>
+
+        <div class="settings-section">
+            <h3 class="section-title">Anúncios</h3>
+            <div class="settings-row">
+                <label class="settings-label">Anúncios por dia:</label>
+                <input type="number" class="settings-input" id="adsPorDia" min="0" max="20" value="3">
+            </div>
+            <div class="settings-description">
+                Você pode ajudar o site definindo quantos anúncios deseja ver por dia. Coloque 0 para não ver nenhum.
+            </div>
+        </div>
 
         <div class="settings-section">
             <h3 class="section-title">Tema do Site</h3>
@@ -581,6 +648,7 @@ const configuracoesHTML = `
         let siteBgDataUrl = '';
         let chatBgDataUrl = '';
         let themeColor = '#FFA500';
+        let adsPorDia = 3;
 
         function loadSettings() {
             const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
@@ -602,6 +670,11 @@ const configuracoesHTML = `
                     themeColor = settings.themeColor;
                     document.getElementById('themeColor').value = themeColor;
                     updateThemeSample(themeColor);
+                }
+
+                if (settings.adspordia) {
+                    adsPorDia = settings.adspordia;
+                    document.getElementById('adsPorDia').value = adsPorDia;
                 }
             }
         }
@@ -625,12 +698,11 @@ const configuracoesHTML = `
             updateThemeSample(themeColor);
         });
 
-document.getElementById('removeThemeColor').addEventListener('click', function() {
-    themeColor = '#FFA500';
-    
-    document.getElementById('themeColor').value = themeColor;
-    updateThemeSample(themeColor);
-});
+        document.getElementById('removeThemeColor').addEventListener('click', function() {
+            themeColor = '#FFA500';
+            document.getElementById('themeColor').value = themeColor;
+            updateThemeSample(themeColor);
+        });
 
         document.getElementById('siteBgImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -676,7 +748,8 @@ document.getElementById('removeThemeColor').addEventListener('click', function()
             const settings = {
                 themeColor: themeColor,
                 siteBgImage: siteBgDataUrl,
-                chatBgImage: chatBgDataUrl
+                chatBgImage: chatBgDataUrl,
+                adspordia: parseInt(document.getElementById('adsPorDia').value)
             };
             localStorage.setItem('firedeluxe_configuracoes', JSON.stringify(settings));
             window.location.reload();
@@ -699,6 +772,9 @@ document.getElementById('removeThemeColor').addEventListener('click', function()
                 document.getElementById('chatBgPreview').src = '';
                 document.getElementById('chatBgPreviewContainer').style.display = 'none';
                 chatBgDataUrl = '';
+
+                document.getElementById('adsPorDia').value = 3;
+                
                 window.location.reload();
             }
         });
