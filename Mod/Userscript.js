@@ -289,7 +289,7 @@ window.chromeadblocked = false;
         return;
     }
 
-    if (config.adblock !== 'on') return;
+    if (config.adblocker !== 'on') return;
 
     function removeUnwantedElements() {
         const patterns = [
