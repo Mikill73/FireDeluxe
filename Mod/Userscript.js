@@ -650,6 +650,18 @@ const configuracoesHTML = `
         input:checked + .slider:before {
             transform: translateX(26px);
         }
+        .info-text {
+            font-size: 0.85em;
+            color: #aaa;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+        .warning-text {
+            font-size: 0.85em;
+            color: #FFA500;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
         @media (max-width: 768px) {
             .settings-row {
                 flex-direction: column;
@@ -668,6 +680,26 @@ const configuracoesHTML = `
     <div class="settings-panel" id="settingsPanel">
         <div class="settings-header">
             <h2 class="settings-title">Configurações</h2>
+        </div>
+
+        <!-- New section for automation credentials -->
+        <div class="settings-section">
+            <h3 class="section-title">Configurações de Automação</h3>
+            <div class="settings-row">
+                <label class="settings-label">Email da conta principal:</label>
+                <input type="email" class="settings-input" id="automationEmail" placeholder="Seu email no AnimeFire">
+            </div>
+            <div class="settings-row">
+                <label class="settings-label">Senha da conta principal:</label>
+                <input type="password" class="settings-input" id="automationPassword" placeholder="Sua senha no AnimeFire">
+            </div>
+            <div class="warning-text">
+                <strong>Atenção:</strong> Estas credenciais são necessárias apenas para funções avançadas de automação do FireDeluxe. 
+                Se você não confia totalmente no FireDeluxe, pode deixar em branco.
+            </div>
+            <div class="info-text">
+                Sua experiência normal no FireDeluxe não será afetada se você não preencher estes campos.
+            </div>
         </div>
 
         <div class="settings-section">
@@ -766,6 +798,14 @@ const configuracoesHTML = `
                     adblockerEnabled = settings.adblocker === 'on';
                     document.getElementById('adblockerToggle').checked = adblockerEnabled;
                 }
+
+                if (settings.email) {
+                    document.getElementById('automationEmail').value = settings.email;
+                }
+
+                if (settings.senha) {
+                    document.getElementById('automationPassword').value = settings.senha;
+                }
             }
         }
 
@@ -839,7 +879,9 @@ const configuracoesHTML = `
                 themeColor: themeColor,
                 siteBgImage: siteBgDataUrl,
                 chatBgImage: chatBgDataUrl,
-                adblocker: document.getElementById('adblockerToggle').checked ? 'on' : 'off'
+                adblocker: document.getElementById('adblockerToggle').checked ? 'on' : 'off',
+                email: document.getElementById('automationEmail').value,
+                senha: document.getElementById('automationPassword').value
             };
             localStorage.setItem('firedeluxe_configuracoes', JSON.stringify(settings));
             window.location.reload();
@@ -864,6 +906,8 @@ const configuracoesHTML = `
                 chatBgDataUrl = '';
 
                 document.getElementById('adblockerToggle').checked = false;
+                document.getElementById('automationEmail').value = '';
+                document.getElementById('automationPassword').value = '';
                 
                 window.location.reload();
             }
