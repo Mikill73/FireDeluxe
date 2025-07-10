@@ -1286,7 +1286,7 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
 
 })();
 
-//Entrar automaticamente
+//Login Rápido
 (function() {
     'use strict';
 
@@ -1386,7 +1386,7 @@ function showWarningModal(message) {
 const originalBtn = document.querySelector('button[name="login"]');
 if (originalBtn) {
   const autoBtn = originalBtn.cloneNode(true);
-  autoBtn.textContent = 'Entrar Automaticamente';
+  autoBtn.textContent = 'Login Rápido';
   autoBtn.style.marginTop = '10px';
   autoBtn.style.fontSize = '22px';
 
