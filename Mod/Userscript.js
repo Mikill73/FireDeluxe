@@ -1388,7 +1388,7 @@ if (originalBtn) {
   const autoBtn = originalBtn.cloneNode(true);
   autoBtn.textContent = 'Login Rápido';
   autoBtn.style.marginTop = '10px';
-  autoBtn.style.fontSize = '22px';
+  autoBtn.style.fontSize = '30px';
 
   autoBtn.addEventListener('click', async () => {
     let loginAttempted = false;
