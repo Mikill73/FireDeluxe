@@ -291,7 +291,14 @@ window.chromeadblocked = false;
 
     if (config.adblocker !== 'on') return;
 
+    function deleteCookie(name) {
+        document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname + ';';
+    }
+
     function removeUnwantedElements() {
+        // Deleta os cookies especificados
+        ['_spop_popfired', '_spop_popfired_expires', '_spoplastOpenAt'].forEach(deleteCookie);
+
         const patterns = [
             {
                 selector: 'script[referrerpolicy="unsafe-url"]',
