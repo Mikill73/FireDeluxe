@@ -275,6 +275,16 @@ window.chromeadblocked = false;
 
 })();
 
+//Remoção de localstorages relacionados a anúncios
+(function() {
+  'use strict';
+
+localStorage.removeItem('_spop_popfired');
+localStorage.removeItem('_spop_popfired_expires');
+localStorage.removeItem('_spoplastOpenAt');
+
+})();
+
 //AdBlocker
 (function() {
     'use strict';
@@ -291,14 +301,7 @@ window.chromeadblocked = false;
 
     if (config.adblocker !== 'on') return;
 
-    function deleteCookie(name) {
-        document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname + ';';
-    }
-
     function removeUnwantedElements() {
-        // Deleta os cookies especificados
-        ['_spop_popfired', '_spop_popfired_expires', '_spoplastOpenAt'].forEach(deleteCookie);
-
         const patterns = [
             {
                 selector: 'script[referrerpolicy="unsafe-url"]',
@@ -340,6 +343,13 @@ window.chromeadblocked = false;
                     top: '0',
                     left: '0'
                 }
+            },
+
+            {
+                selector: 'script[src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"][integrity="sha512-LCNYs7jH7Odmoc6adflrhgpq0cJmq8fwQJq3ICCBuk8BKFwA0PL6pVgVcKFnfNc0dJ+UmFp5sYvjG+jjlh7nXA=="][crossorigin="anonymous"][referrerpolicy="no-referrer"][type="text/javascript"]'
+            },
+            {
+                selector: 'div[style="text-align: center; padding-top: 48vh; font-size: 4vw; position: fixed; display: block; width: 100%; height: 100%; inset: 0px; background-color: rgba(0, 0, 0, 0); z-index: 300000;"]'
             }
         ];
 
