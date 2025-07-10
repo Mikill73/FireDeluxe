@@ -278,30 +278,35 @@ window.chromeadblocked = false;
 (function() {
   'use strict';
 
-const originalOpen = window.open;
-window.open = function(url, ...args) {
+  const originalOpen = window.open;
+  window.open = function(url, ...args) {
     if (typeof url === 'string' && url.includes('displayvertising')) return null;
     return originalOpen.call(window, url, ...args);
-};
+  };
 
-const originalAssign = window.location.assign;
-window.location.assign = function(url) {
-    if (url.includes('displayvertising')) return;
-    originalAssign.call(window.location, url);
-};
-
-const originalReplace = window.location.replace;
-window.location.replace = function(url) {
-    if (url.includes('displayvertising')) return;
-    originalReplace.call(window.location, url);
-};
-
-const observer = new MutationObserver(() => {
+  const observer = new MutationObserver(() => {
     document.querySelectorAll('iframe').forEach(iframe => {
-        if (iframe.src.includes('displayvertising')) iframe.remove();
+      if (iframe.src.includes('displayvertising')) iframe.remove();
     });
-});
-observer.observe(document.documentElement, { childList: true, subtree: true });
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  const blockURL = (url) => {
+    if (typeof url === 'string' && url.includes('displayvertising')) return true;
+    return false;
+  };
+
+  const originalPushState = history.pushState;
+  history.pushState = function(state, title, url) {
+    if (blockURL(url)) return;
+    return originalPushState.apply(history, arguments);
+  };
+
+  const originalReplaceState = history.replaceState;
+  history.replaceState = function(state, title, url) {
+    if (blockURL(url)) return;
+    return originalReplaceState.apply(history, arguments);
+  };
 
 })();
 
