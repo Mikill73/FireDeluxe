@@ -831,25 +831,32 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
 
 //Imagens de fundo Site e Chat
 (function() {
-    'use strict';
+  'use strict';
 
-    const aplicarImagensFundo = () => {
-        const configuracoes = JSON.parse(localStorage.getItem('firedeluxe_configuracoes'));
-        if (configuracoes) {
-            if (configuracoes.chatBgImage) {
-                const mainDivMSGs = document.querySelector('#mainDivMSGs');
-                if (mainDivMSGs) {
-                    mainDivMSGs.style.background = `url(${configuracoes.chatBgImage}) center/cover`;
-                }
-            }
-            if (configuracoes.siteBgImage) {
-                document.body.style.background = `url(${configuracoes.siteBgImage}) center/cover no-repeat fixed`;
-            }
+  const aplicarImagensFundo = () => {
+    const configuracoes = JSON.parse(localStorage.getItem('firedeluxe_configuracoes'));
+    if (configuracoes) {
+      if (configuracoes.chatBgImage) {
+        const mainDivMSGs = document.querySelector('#mainDivMSGs');
+        if (mainDivMSGs) {
+          mainDivMSGs.style.backgroundImage = `url(${configuracoes.chatBgImage})`;
+          mainDivMSGs.style.backgroundSize = 'cover';
+          mainDivMSGs.style.backgroundPosition = 'center';
+          mainDivMSGs.style.backgroundRepeat = 'no-repeat';
         }
-    };
+      }
+      if (configuracoes.siteBgImage) {
+        document.body.style.backgroundImage = `url(${configuracoes.siteBgImage})`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+        document.body.style.backgroundAttachment = 'fixed';
+      }
+    }
+  };
 
-    aplicarImagensFundo();
-    window.addEventListener('resize', aplicarImagensFundo);
+  aplicarImagensFundo();
+  window.addEventListener('resize', aplicarImagensFundo);
 
 })();
 
