@@ -1285,3 +1285,152 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
     trocarTema();
 
 })();
+
+//Entrar automaticamente
+(function() {
+    'use strict';
+
+function showWarningModal(message) {
+  const existing = document.querySelector('.modal-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+
+  const panel = document.createElement('div');
+  panel.className = 'modal-panel';
+
+  panel.innerHTML = `
+    <div class="modal-header">
+      <h3>Aviso</h3>
+    </div>
+    <div class="modal-content">
+      <p class="error-message">${message}</p>
+    </div>
+    <div class="modal-buttons">
+      <button class="close-button">Fechar</button>
+    </div>
+  `;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    .modal-panel {
+      background-color: #222;
+      border: 1px solid #FFA500;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      color: #EEE;
+    }
+    .modal-header {
+      padding: 15px;
+      border-bottom: 1px solid #333;
+    }
+    .modal-header h3 {
+      margin: 0;
+      color: #FFA500;
+      text-align: center;
+      font-size: 1.2em;
+    }
+    .modal-content {
+      padding: 20px;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .error-message {
+      color: #EEE !important;
+      margin: 0;
+    }
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px;
+      border-top: 1px solid #333;
+    }
+    .close-button {
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      border: none;
+      transition: all 0.2s;
+      font-size: 0.9em;
+      background-color: #444;
+      color: #FFF !important;
+    }
+    .close-button:hover {
+      background-color: #555;
+    }
+  `;
+
+  overlay.appendChild(panel);
+  document.head.appendChild(style);
+  document.body.appendChild(overlay);
+
+  panel.querySelector('.close-button').onclick = () => overlay.remove();
+}
+
+const originalBtn = document.querySelector('button[name="login"]');
+if (originalBtn) {
+  const autoBtn = originalBtn.cloneNode(true);
+  autoBtn.textContent = 'Entrar Automaticamente';
+  autoBtn.style.marginTop = '10px';
+  autoBtn.style.fontSize = '22px';
+
+  autoBtn.addEventListener('click', async () => {
+    let loginAttempted = false;
+    try {
+      const res = await fetch('https://animefire.plus/verify/index');
+      const html = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const tokenInput = doc.querySelector('input[name="csrf_token"]');
+      if (!tokenInput) {
+        location.href = 'https://animefire.plus/';
+        return;
+      }
+
+      const csrfToken = tokenInput.value;
+      const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes') || '{}');
+
+      if (!config.email || !config.senha) {
+        showWarningModal('Você precisa ter o email e senha da conta principal registrados na configuração para usar essa função.');
+        return;
+      }
+
+      loginAttempted = true;
+      const formData = new FormData();
+      formData.append('email', config.email);
+      formData.append('senha', config.senha);
+      formData.append('csrf_token', csrfToken);
+      formData.append('login', '');
+
+      await fetch('https://animefire.plus/auth/entrar', {
+        method: 'POST',
+        body: formData,
+        redirect: 'manual'
+      });
+    } catch {
+      // ignora erro
+    } finally {
+      if (loginAttempted) location.href = 'https://animefire.plus/';
+    }
+  });
+
+  originalBtn.parentElement.appendChild(autoBtn);
+}
+
+})();
