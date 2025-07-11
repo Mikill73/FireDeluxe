@@ -662,6 +662,27 @@ const configuracoesHTML = `
             margin-top: 5px;
             line-height: 1.4;
         }
+        .random-color-btn, .remove-btn {
+            padding: 8px 12px;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .random-color-btn:hover, .remove-btn:hover {
+            background-color: #444;
+            border-color: #FFA500;
+        }
+        .error-text {
+            font-size: 0.85em;
+            color: #ff6b6b;
+            margin-top: 5px;
+            line-height: 1.4;
+            display: none;
+        }
         @media (max-width: 768px) {
             .settings-row {
                 flex-direction: column;
@@ -719,9 +740,8 @@ const configuracoesHTML = `
                 <label class="settings-label">Cor do Tema:</label>
                 <div class="color-picker-container">
                     <input type="color" class="settings-input" id="themeColor" value="#FFA500" style="width: 70px; height: 40px; padding: 0;">
-                    <div class="theme-actions">
-                        <button class="primary-button" id="removeThemeColor">Remover</button>
-                    </div>
+                    <button class="random-color-btn" id="randomColorBtn">Aleatório</button>
+                    <button class="remove-btn" id="removeThemeColor">Remover</button>
                 </div>
             </div>
             <div class="preview-container">
@@ -737,8 +757,16 @@ const configuracoesHTML = `
                 <label class="settings-label">Imagem de Fundo:</label>
                 <input type="file" class="settings-input" id="siteBgImage" accept="image/*">
             </div>
+            <div class="info-text">
+                Formatos aceitos: JPG, PNG, WEBP e GIF. A imagem será convertida para Data URL.
+                Prefira imagens PNG com tamanho inferior a 2MB para melhor desempenho.
+            </div>
+            <div class="error-text" id="siteBgError">
+                Não foi possível carregar a imagem. O arquivo pode ser muito grande (>5MB). 
+                Tente usar uma imagem menor ou em formato PNG.
+            </div>
             <div class="settings-button-group">
-                <button class="primary-button" id="removeSiteBg">Remover Imagem</button>
+                <button class="remove-btn" id="removeSiteBg">Remover Imagem</button>
             </div>
             <div class="preview-container" id="siteBgPreviewContainer" style="display: none;">
                 <h4 class="preview-title">Prévia do Fundo do Site:</h4>
@@ -752,8 +780,16 @@ const configuracoesHTML = `
                 <label class="settings-label">Imagem de Fundo:</label>
                 <input type="file" class="settings-input" id="chatBgImage" accept="image/*">
             </div>
+            <div class="info-text">
+                Formatos aceitos: JPG, PNG, WEBP e GIF. A imagem será convertida para Data URL.
+                Prefira imagens PNG com tamanho inferior a 2MB para melhor desempenho.
+            </div>
+            <div class="error-text" id="chatBgError">
+                Não foi possível carregar a imagem. O arquivo pode ser muito grande (>5MB). 
+                Tente usar uma imagem menor ou em formato PNG.
+            </div>
             <div class="settings-button-group">
-                <button class="primary-button" id="removeChatBg">Remover Imagem</button>
+                <button class="remove-btn" id="removeChatBg">Remover Imagem</button>
             </div>
             <div class="preview-container" id="chatBgPreviewContainer" style="display: none;">
                 <h4 class="preview-title">Prévia do Fundo do Chat:</h4>
@@ -823,6 +859,22 @@ const configuracoesHTML = `
             return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
         }
 
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        document.getElementById('randomColorBtn').addEventListener('click', function() {
+            const randomColor = getRandomColor();
+            themeColor = randomColor;
+            document.getElementById('themeColor').value = randomColor;
+            updateThemeSample(randomColor);
+        });
+
         document.getElementById('themeColor').addEventListener('input', function(e) {
             themeColor = e.target.value;
             updateThemeSample(themeColor);
@@ -836,12 +888,25 @@ const configuracoesHTML = `
 
         document.getElementById('siteBgImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
+            const errorElement = document.getElementById('siteBgError');
+            errorElement.style.display = 'none';
+            
             if (file) {
+                // Verifica se o arquivo é muito grande (>5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    errorElement.style.display = 'block';
+                    document.getElementById('siteBgImage').value = '';
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     siteBgDataUrl = event.target.result;
                     document.getElementById('siteBgPreview').src = siteBgDataUrl;
                     document.getElementById('siteBgPreviewContainer').style.display = 'block';
+                };
+                reader.onerror = function() {
+                    errorElement.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             }
@@ -852,16 +917,30 @@ const configuracoesHTML = `
             document.getElementById('siteBgPreview').src = '';
             document.getElementById('siteBgPreviewContainer').style.display = 'none';
             siteBgDataUrl = '';
+            document.getElementById('siteBgError').style.display = 'none';
         });
 
         document.getElementById('chatBgImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
+            const errorElement = document.getElementById('chatBgError');
+            errorElement.style.display = 'none';
+            
             if (file) {
+                // Verifica se o arquivo é muito grande (>5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    errorElement.style.display = 'block';
+                    document.getElementById('chatBgImage').value = '';
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     chatBgDataUrl = event.target.result;
                     document.getElementById('chatBgPreview').src = chatBgDataUrl;
                     document.getElementById('chatBgPreviewContainer').style.display = 'block';
+                };
+                reader.onerror = function() {
+                    errorElement.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             }
@@ -872,6 +951,7 @@ const configuracoesHTML = `
             document.getElementById('chatBgPreview').src = '';
             document.getElementById('chatBgPreviewContainer').style.display = 'none';
             chatBgDataUrl = '';
+            document.getElementById('chatBgError').style.display = 'none';
         });
 
         document.getElementById('saveSettings').addEventListener('click', function() {
@@ -899,11 +979,13 @@ const configuracoesHTML = `
                 document.getElementById('siteBgPreview').src = '';
                 document.getElementById('siteBgPreviewContainer').style.display = 'none';
                 siteBgDataUrl = '';
+                document.getElementById('siteBgError').style.display = 'none';
 
                 document.getElementById('chatBgImage').value = '';
                 document.getElementById('chatBgPreview').src = '';
                 document.getElementById('chatBgPreviewContainer').style.display = 'none';
                 chatBgDataUrl = '';
+                document.getElementById('chatBgError').style.display = 'none';
 
                 document.getElementById('adblockerToggle').checked = false;
                 document.getElementById('automationEmail').value = '';
