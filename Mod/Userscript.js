@@ -1788,3 +1788,54 @@ Tem certeza de que deseja apagar todo o histórico? (Obs.: o site apaga todas as
 });
     
 })();
+
+//Curtir comentários de divulgação do FireDeluxe (para destacar o comentário)
+(function() {
+    'use strict';
+
+if (window.location.href.includes('/animes/')) {
+    const targetProfile = 'https://animefire.plus/users/988233449';
+    let checkCount = 0;
+    const maxChecks = 30;
+    const processedComments = new Set();
+
+    const checkAndLikeComments = () => {
+        if (checkCount >= maxChecks) return;
+
+        document.querySelectorAll(`a.usr_name_cmt[href="${targetProfile}"]`).forEach(userLink => {
+            const comment = userLink.closest('.cmt');
+            if (!comment || processedComments.has(comment.id)) return;
+
+            const commentId = comment.id.replace('cmt-', '');
+            const likeImg = comment.querySelector('.curtir_cmt.mr-1');
+            
+            if (likeImg && likeImg.src.includes('/like.png')) {
+                processedComments.add(comment.id);
+                
+                fetch('https://animefire.plus/proc/cmt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        cmt_ct_lk: commentId,
+                        type: 'cmt',
+                        action: 'like'
+                    })
+                })
+                .then(res => res.text())
+                .then(console.log)
+                .catch(console.error);
+            }
+        });
+
+        checkCount++;
+        if (checkCount < maxChecks) {
+            setTimeout(checkAndLikeComments, 1000);
+        }
+    };
+
+    checkAndLikeComments();
+}
+
+})();
