@@ -734,20 +734,6 @@ const configuracoesHTML = `
         </div>
 
         <div class="settings-section">
-            <h3 class="section-title">Preview de Animes</h3>
-            <div class="settings-row">
-                <label class="settings-label">Preview de animes:</label>
-                <label class="switch">
-                    <input type="checkbox" id="previewToggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="info-text">
-                Quando ativado, passar o mouse sobre a capa de um anime na página inicial exibirá informações sobre o anime.
-            </div>
-        </div>
-
-        <div class="settings-section">
             <h3 class="section-title">Tema do Site</h3>
             <div class="settings-row">
                 <label class="settings-label">Cor do Tema:</label>
@@ -849,11 +835,6 @@ const configuracoesHTML = `
                     document.getElementById('adblockerToggle').checked = adblockerEnabled;
                 }
 
-                if (settings.preview) {
-                    previewEnabled = settings.preview === 'on';
-                    document.getElementById('previewToggle').checked = previewEnabled;
-                }
-
                 if (settings.email) {
                     document.getElementById('automationEmail').value = settings.email;
                 }
@@ -911,7 +892,6 @@ const configuracoesHTML = `
             errorElement.style.display = 'none';
             
             if (file) {
-                // Verifica se o arquivo é muito grande (>5MB)
                 if (file.size > 5 * 1024 * 1024) {
                     errorElement.style.display = 'block';
                     document.getElementById('siteBgImage').value = '';
@@ -945,7 +925,6 @@ const configuracoesHTML = `
             errorElement.style.display = 'none';
             
             if (file) {
-                // Verifica se o arquivo é muito grande (>5MB)
                 if (file.size > 5 * 1024 * 1024) {
                     errorElement.style.display = 'block';
                     document.getElementById('chatBgImage').value = '';
@@ -979,7 +958,6 @@ const configuracoesHTML = `
                 siteBgImage: siteBgDataUrl,
                 chatBgImage: chatBgDataUrl,
                 adblocker: document.getElementById('adblockerToggle').checked ? 'on' : 'off',
-                preview: document.getElementById('previewToggle').checked ? 'on' : 'off',
                 email: document.getElementById('automationEmail').value,
                 senha: document.getElementById('automationPassword').value
             };
@@ -1008,7 +986,6 @@ const configuracoesHTML = `
                 document.getElementById('chatBgError').style.display = 'none';
 
                 document.getElementById('adblockerToggle').checked = false;
-                document.getElementById('previewToggle').checked = false;
                 document.getElementById('automationEmail').value = '';
                 document.getElementById('automationPassword').value = '';
                 
@@ -1538,103 +1515,214 @@ if (originalBtn) {
 
 })();
 
-//Préview de animes
+//Préview das informações dos animes
 (function() {
     'use strict';
 
 let currentOverlay = null;
+let observer = null;
 
 function initAnimePreview() {
     const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes') || '{}');
-    if (config.preview !== 'on') return;
 
-    document.querySelectorAll('.owl-item').forEach(item => {
-        item.addEventListener('mouseenter', async function() {
-            if (currentOverlay) currentOverlay.remove();
+    const cleanUp = () => {
+        document.querySelectorAll('[data-preview-overlay]').forEach(el => el.remove());
+        currentOverlay = null;
+    };
 
-            const animeLink = this.querySelector('a.item').href;
-            const response = await fetch(animeLink);
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
+    cleanUp();
 
-            const getInfo = (label) => {
-                const el = [...doc.querySelectorAll('.animeInfo')].find(el => 
-                    el.textContent.includes(label));
-                return el ? el.querySelector('.spanAnimeInfo').textContent.trim() : 'N/A';
-            };
+    const applyPreviewToItems = (items) => {
+        items.forEach(item => {
+            if (item.hasAttribute('data-preview-enabled')) return;
+            
+            item.setAttribute('data-preview-enabled', 'true');
+            
+            const animeContainer = item.querySelector('.divArticleLancamentos');
+            if (!animeContainer) return;
 
-            const generos = [...doc.querySelectorAll('.spanGeneros')].map(el => el.textContent.trim()).join(', ') || 'N/A';
-            const temporada = getInfo('Temporada:');
-            const estudio = getInfo('Estúdios:');
-            const audio = getInfo('Áudio:');
-            let episodios = getInfo('Episódios:');
-            const status = getInfo('Status do Anime:');
-            const diaLancamento = getInfo('Dia de Lançamento:');
-            const ano = getInfo('Ano:');
-
-            if (episodios === '??') {
-                const eps = doc.querySelectorAll('.div_video_list .lEp');
-                episodios = eps.length > 0 ? eps.length.toString() : 'N/A';
-            }
-
-            const animeContainer = this.querySelector('.divArticleLancamentos');
             animeContainer.style.position = 'relative';
 
-            const overlay = document.createElement('div');
-            overlay.style.position = 'absolute';
-            overlay.style.top = '0';
-            overlay.style.left = '0';
-            overlay.style.right = '0';
-            overlay.style.bottom = '0';
-            overlay.style.backdropFilter = 'blur(5px)';
-            overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
-            overlay.style.color = 'white';
-            overlay.style.padding = '15px';
-            overlay.style.display = 'flex';
-            overlay.style.flexDirection = 'column';
-            overlay.style.justifyContent = 'center';
-            overlay.style.alignItems = 'center';
-            overlay.style.textAlign = 'center';
-            overlay.style.borderRadius = '5px';
-            overlay.style.zIndex = '1000';
-            overlay.style.cursor = 'pointer';
-            overlay.style.transition = 'all 0.3s ease';
-
-            const infoHTML = `
-                <div style="margin-bottom:10px;font-size:14px;font-weight:bold;text-shadow:1px 1px 2px #000">${this.querySelector('.animeTitle').textContent}</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px 15px;text-align:left;font-size:12px">
-                    <div><strong>Gêneros:</strong> ${generos}</div>
-                    <div><strong>Episódios:</strong> ${episodios}</div>
-                    <div><strong>Temporada:</strong> ${temporada}</div>
-                    <div><strong>Status:</strong> ${status}</div>
-                    <div><strong>Estúdio:</strong> ${estudio}</div>
-                    <div><strong>Lançamento:</strong> ${diaLancamento}</div>
-                    <div><strong>Áudio:</strong> ${audio}</div>
-                    <div><strong>Ano:</strong> ${ano}</div>
-                </div>
-            `;
-
-            overlay.innerHTML = infoHTML;
-            animeContainer.appendChild(overlay);
-            currentOverlay = overlay;
-
-            overlay.addEventListener('click', (e) => {
-                e.stopPropagation();
-                window.location.href = animeLink;
+            const toggleBtn = document.createElement('button');
+            Object.assign(toggleBtn.style, {
+                position: 'absolute',
+                top: '8px',
+                left: '8px',
+                zIndex: '1001',
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                background: 'rgba(0,0,0,0.8)',
+                border: '1px solid #e36722',
+                color: '#e36722',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                padding: '0',
+                margin: '0',
+                lineHeight: '1',
+                outline: 'none',
+                boxShadow: '0 0 5px rgba(0,0,0,0.5)'
             });
 
-            item.addEventListener('mouseleave', () => {
-                if (currentOverlay === overlay) {
-                    overlay.remove();
-                    currentOverlay = null;
+            toggleBtn.innerHTML = 'i';
+            animeContainer.prepend(toggleBtn);
+
+            const toggleOverlay = async (e) => {
+                if (e) e.stopPropagation();
+                
+                const existingOverlay = animeContainer.querySelector('[data-preview-overlay]');
+                if (existingOverlay) {
+                    existingOverlay.remove();
+                    if (currentOverlay === existingOverlay) currentOverlay = null;
+                    return;
                 }
-            });
+
+                cleanUp();
+
+                const animeLink = item.querySelector('a.item')?.href;
+                if (!animeLink) return;
+
+                if (animeContainer.dataset.preview) {
+                    createOverlay(animeContainer, JSON.parse(animeContainer.dataset.preview), item.querySelector('.animeTitle')?.textContent);
+                    return;
+                }
+
+                try {
+                    const response = await fetch(animeLink);
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    const getInfo = (label) => {
+                        const el = [...doc.querySelectorAll('.animeInfo')].find(el => 
+                            el.textContent.includes(label));
+                        return el ? el.querySelector('.spanAnimeInfo')?.textContent.trim() || 'N/A' : 'N/A';
+                    };
+
+                    const animeData = {
+                        generos: [...doc.querySelectorAll('.spanGeneros')].map(el => el.textContent.trim()).join(', ') || 'N/A',
+                        temporada: getInfo('Temporada:'),
+                        estudio: getInfo('Estúdios:'),
+                        audio: getInfo('Áudio:'),
+                        episodios: getInfo('Episódios:'),
+                        status: getInfo('Status do Anime:'),
+                        diaLancamento: getInfo('Dia de Lançamento:'),
+                        ano: getInfo('Ano:')
+                    };
+
+                    if (animeData.episodios === '??') {
+                        const eps = doc.querySelectorAll('.div_video_list .lEp');
+                        animeData.episodios = eps.length > 0 ? eps.length.toString() : 'N/A';
+                    }
+
+                    animeContainer.dataset.preview = JSON.stringify(animeData);
+                    createOverlay(animeContainer, animeData, item.querySelector('.animeTitle')?.textContent);
+
+                } catch (error) {
+                    console.error('Erro ao carregar preview:', error);
+                }
+            };
+
+            toggleBtn.addEventListener('click', toggleOverlay);
         });
+    };
+
+    const processElements = () => {
+        const existingItems = document.querySelectorAll('.owl-item:not([data-preview-enabled])');
+        applyPreviewToItems(existingItems);
+    };
+
+    processElements();
+
+    if (!observer) {
+        observer = new MutationObserver((mutations) => {
+            let needsUpdate = false;
+            mutations.forEach((mutation) => {
+                if (mutation.addedNodes.length > 0) needsUpdate = true;
+            });
+            if (needsUpdate) processElements();
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+}
+
+function createOverlay(container, animeData, title) {
+    const overlay = document.createElement('div');
+    overlay.setAttribute('data-preview-overlay', 'true');
+    Object.assign(overlay.style, {
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        right: '0',
+        bottom: '0',
+        backdropFilter: 'blur(5px)',
+        backgroundColor: 'rgba(0,0,0,0.85)',
+        color: 'white',
+        padding: '20px 15px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        textAlign: 'center',
+        borderRadius: '5px',
+        zIndex: '1000',
+        cursor: 'default',
+        overflowY: 'auto',
+        boxSizing: 'border-box'
     });
+
+    overlay.innerHTML = `
+        <div style="margin-bottom:15px;font-size:15px;font-weight:bold;color:#e36722">${title || ''}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;text-align:left;font-size:13px;width:100%;max-height:200px;overflow-y:auto;padding-right:5px">
+            <div><strong style="color:#e36722">Gêneros:</strong> ${animeData.generos}</div>
+            <div><strong style="color:#e36722">Episódios:</strong> ${animeData.episodios}</div>
+            <div><strong style="color:#e36722">Temporada:</strong> ${animeData.temporada}</div>
+            <div><strong style="color:#e36722">Status:</strong> ${animeData.status}</div>
+            <div><strong style="color:#e36722">Estúdio:</strong> ${animeData.estudio}</div>
+            <div><strong style="color:#e36722">Lançamento:</strong> ${animeData.diaLancamento}</div>
+            <div><strong style="color:#e36722">Áudio:</strong> ${animeData.audio}</div>
+            <div><strong style="color:#e36722">Ano:</strong> ${animeData.ano}</div>
+        </div>
+    `;
+
+    container.appendChild(overlay);
+    currentOverlay = overlay;
+
+    overlay.addEventListener('click', (e) => e.stopPropagation());
+}
+
+function observeConfigChanges() {
+    let lastConfig = localStorage.getItem('firedeluxe_configuracoes');
+    
+    const checkConfig = () => {
+        const currentConfig = localStorage.getItem('firedeluxe_configuracoes');
+        if (currentConfig !== lastConfig) {
+            lastConfig = currentConfig;
+            if (observer) observer.disconnect();
+            observer = null;
+            initAnimePreview();
+        }
+    };
+    
+    const intervalId = setInterval(checkConfig, 1000);
+    return () => clearInterval(intervalId);
 }
 
 initAnimePreview();
+const clearConfigObserver = observeConfigChanges();
+
+window.addEventListener('beforeunload', () => {
+    if (observer) observer.disconnect();
+    clearConfigObserver();
+});
 
 })();
 
