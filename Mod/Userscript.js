@@ -703,7 +703,6 @@ const configuracoesHTML = `
             <h2 class="settings-title">Configurações</h2>
         </div>
 
-        <!-- New section for automation credentials -->
         <div class="settings-section">
             <h3 class="section-title">Configurações de Automação</h3>
             <div class="settings-row">
@@ -731,6 +730,20 @@ const configuracoesHTML = `
                     <input type="checkbox" id="adblockerToggle">
                     <span class="slider"></span>
                 </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3 class="section-title">Preview de Animes</h3>
+            <div class="settings-row">
+                <label class="settings-label">Preview de animes:</label>
+                <label class="switch">
+                    <input type="checkbox" id="previewToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="info-text">
+                Quando ativado, passar o mouse sobre a capa de um anime na página inicial exibirá informações sobre o anime.
             </div>
         </div>
 
@@ -807,6 +820,7 @@ const configuracoesHTML = `
         let chatBgDataUrl = '';
         let themeColor = '#FFA500';
         let adblockerEnabled = false;
+        let previewEnabled = false;
 
         function loadSettings() {
             const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
@@ -833,6 +847,11 @@ const configuracoesHTML = `
                 if (settings.adblocker) {
                     adblockerEnabled = settings.adblocker === 'on';
                     document.getElementById('adblockerToggle').checked = adblockerEnabled;
+                }
+
+                if (settings.preview) {
+                    previewEnabled = settings.preview === 'on';
+                    document.getElementById('previewToggle').checked = previewEnabled;
                 }
 
                 if (settings.email) {
@@ -960,6 +979,7 @@ const configuracoesHTML = `
                 siteBgImage: siteBgDataUrl,
                 chatBgImage: chatBgDataUrl,
                 adblocker: document.getElementById('adblockerToggle').checked ? 'on' : 'off',
+                preview: document.getElementById('previewToggle').checked ? 'on' : 'off',
                 email: document.getElementById('automationEmail').value,
                 senha: document.getElementById('automationPassword').value
             };
@@ -988,6 +1008,7 @@ const configuracoesHTML = `
                 document.getElementById('chatBgError').style.display = 'none';
 
                 document.getElementById('adblockerToggle').checked = false;
+                document.getElementById('previewToggle').checked = false;
                 document.getElementById('automationEmail').value = '';
                 document.getElementById('automationPassword').value = '';
                 
@@ -1507,7 +1528,6 @@ if (originalBtn) {
         redirect: 'manual'
       });
     } catch {
-      // ignora erro
     } finally {
       if (loginAttempted) location.href = 'https://animefire.plus/';
     }
@@ -1515,5 +1535,105 @@ if (originalBtn) {
 
   originalBtn.parentElement.appendChild(autoBtn);
 }
+
+})();
+
+//Préview de animes
+(function() {
+    'use strict';
+
+let currentOverlay = null;
+
+function initAnimePreview() {
+    const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes') || '{}');
+    if (config.preview !== 'on') return;
+
+    document.querySelectorAll('.owl-item').forEach(item => {
+        item.addEventListener('mouseenter', async function() {
+            if (currentOverlay) currentOverlay.remove();
+
+            const animeLink = this.querySelector('a.item').href;
+            const response = await fetch(animeLink);
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const getInfo = (label) => {
+                const el = [...doc.querySelectorAll('.animeInfo')].find(el => 
+                    el.textContent.includes(label));
+                return el ? el.querySelector('.spanAnimeInfo').textContent.trim() : 'N/A';
+            };
+
+            const generos = [...doc.querySelectorAll('.spanGeneros')].map(el => el.textContent.trim()).join(', ') || 'N/A';
+            const temporada = getInfo('Temporada:');
+            const estudio = getInfo('Estúdios:');
+            const audio = getInfo('Áudio:');
+            let episodios = getInfo('Episódios:');
+            const status = getInfo('Status do Anime:');
+            const diaLancamento = getInfo('Dia de Lançamento:');
+            const ano = getInfo('Ano:');
+
+            if (episodios === '??') {
+                const eps = doc.querySelectorAll('.div_video_list .lEp');
+                episodios = eps.length > 0 ? eps.length.toString() : 'N/A';
+            }
+
+            const animeContainer = this.querySelector('.divArticleLancamentos');
+            animeContainer.style.position = 'relative';
+
+            const overlay = document.createElement('div');
+            overlay.style.position = 'absolute';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.right = '0';
+            overlay.style.bottom = '0';
+            overlay.style.backdropFilter = 'blur(5px)';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            overlay.style.color = 'white';
+            overlay.style.padding = '15px';
+            overlay.style.display = 'flex';
+            overlay.style.flexDirection = 'column';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            overlay.style.textAlign = 'center';
+            overlay.style.borderRadius = '5px';
+            overlay.style.zIndex = '1000';
+            overlay.style.cursor = 'pointer';
+            overlay.style.transition = 'all 0.3s ease';
+
+            const infoHTML = `
+                <div style="margin-bottom:10px;font-size:14px;font-weight:bold;text-shadow:1px 1px 2px #000">${this.querySelector('.animeTitle').textContent}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px 15px;text-align:left;font-size:12px">
+                    <div><strong>Gêneros:</strong> ${generos}</div>
+                    <div><strong>Episódios:</strong> ${episodios}</div>
+                    <div><strong>Temporada:</strong> ${temporada}</div>
+                    <div><strong>Status:</strong> ${status}</div>
+                    <div><strong>Estúdio:</strong> ${estudio}</div>
+                    <div><strong>Lançamento:</strong> ${diaLancamento}</div>
+                    <div><strong>Áudio:</strong> ${audio}</div>
+                    <div><strong>Ano:</strong> ${ano}</div>
+                </div>
+            `;
+
+            overlay.innerHTML = infoHTML;
+            animeContainer.appendChild(overlay);
+            currentOverlay = overlay;
+
+            overlay.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.location.href = animeLink;
+            });
+
+            item.addEventListener('mouseleave', () => {
+                if (currentOverlay === overlay) {
+                    overlay.remove();
+                    currentOverlay = null;
+                }
+            });
+        });
+    });
+}
+
+initAnimePreview();
 
 })();
