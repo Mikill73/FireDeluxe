@@ -1637,3 +1637,66 @@ function initAnimePreview() {
 initAnimePreview();
 
 })();
+
+//Confirmação de exclusão do histórico (pedido de um usuário)
+(function() {
+    'use strict';
+    
+document.querySelector('form[action="https://animefire.plus/proc/delete_historic"] button[type="submit"]').addEventListener('click', function(e) {
+    e.preventDefault();
+
+    const form = this.closest('form');
+    const themeColor = localStorage.getItem('firedeluxe_configuracoes') ? 
+        JSON.parse(localStorage.getItem('firedeluxe_configuracoes')).themeColor || '#FFA500' : '#FFA500';
+
+    const existingModal = document.querySelector('.modal-overlay');
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-panel" style="border-color: ${themeColor}">
+            <div class="modal-header">
+                <h3 style="color: ${themeColor}">Confirmar ação</h3>
+            </div>
+            <div class="modal-content">
+Tem certeza de que deseja apagar todo o histórico? (Obs.: o site apaga todas as informações ao limpar o histórico, incluindo as configurações do FireDeluxe salvas. Então, revise as configurações do FireDeluxe após apagar o histórico.)
+            </div>
+            <div class="modal-buttons">
+                <button class="confirm-button" style="background-color: ${themeColor}">Confirmar</button>
+                <button class="close-button">Cancelar</button>
+            </div>
+        </div>
+    `;
+
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .modal-panel { background-color: #222; border: 1px solid; border-radius: 8px; width: 90%; max-width: 400px; color: #EEE; }
+        .modal-header { padding: 15px; border-bottom: 1px solid #333; }
+        .modal-header h3 { margin: 0; text-align: center; font-size: 1.2em; }
+        .modal-content { padding: 20px; text-align: center; line-height: 1.6; }
+        .modal-buttons { display: flex; justify-content: center; gap: 10px; padding: 15px; border-top: 1px solid #333; }
+        .confirm-button, .close-button { padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; border: none; transition: all 0.2s; font-size: 0.9em; }
+        .confirm-button { color: #000 !important; text-decoration: none; }
+        .confirm-button:hover { opacity: 0.9; }
+        .close-button { background-color: #444; color: #FFF !important; }
+        .close-button:hover { background-color: #555; }
+    `;
+
+    document.head.appendChild(styleElement);
+    document.body.appendChild(modal);
+
+    modal.querySelector('.confirm-button').addEventListener('click', function() {
+        const oldData = JSON.stringify(localStorage); 
+        form.submit();
+        setTimeout(() => { for (const key in JSON.parse(oldData)) localStorage.setItem(key, JSON.parse(oldData)[key]); }, 100);
+    });
+
+    modal.querySelector('.close-button').addEventListener('click', function() {
+        modal.remove();
+        styleElement.remove();
+    });
+});
+    
+})();
