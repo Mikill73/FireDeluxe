@@ -1840,16 +1840,17 @@ if (window.location.href.includes('/animes/')) {
 
 })();
 
+//Botão de baixar todos os episódios
 (function() {
     'use strict';
 
 const checkAndAddDownloadButton = () => {
   const themeColor = localStorage.getItem('firedeluxe_configuracoes') ? JSON.parse(localStorage.getItem('firedeluxe_configuracoes')).themeColor : '#FFA500';
   const episodesSection = document.querySelector('section.mt-3.mb-2[style*="background-color:#161616"] h2.tEp');
-  if (!episodesSection || episodesSection.textContent !== "Episódios") return;
+  if (!episodesSection || episodesSection.textContent !== "Episódios") return false;
 
   const episodesContainer = episodesSection.closest('section').querySelector('.div_video_list');
-  if (!episodesContainer) return;
+  if (!episodesContainer) return false;
 
   const currentUrl = window.location.href;
   const animeSlug = currentUrl.match(/\/animes\/(.*?)-todos-os-episodios/)?.[1] || currentUrl.match(/\/animes\/([^\/]+)/)?.[1];
@@ -2018,9 +2019,22 @@ const checkAndAddDownloadButton = () => {
     const style = document.querySelector('style');
     if (style) style.remove();
   }
+  
+  return true;
 };
 
-checkAndAddDownloadButton();
+let checkCount = 0;
+const maxChecks = 30;
+const checkInterval = 1000;
+
+const checkIntervalId = setInterval(() => {
+  if (checkAndAddDownloadButton()) {
+    clearInterval(checkIntervalId);
+  } else if (checkCount >= maxChecks) {
+    clearInterval(checkIntervalId);
+  }
+  checkCount++;
+}, checkInterval);
 
 })();
 
