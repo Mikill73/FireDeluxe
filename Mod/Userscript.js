@@ -1839,3 +1839,196 @@ if (window.location.href.includes('/animes/')) {
 }
 
 })();
+
+(function() {
+    'use strict';
+
+const checkAndAddDownloadButton = () => {
+  const themeColor = localStorage.getItem('firedeluxe_configuracoes') ? JSON.parse(localStorage.getItem('firedeluxe_configuracoes')).themeColor : '#FFA500';
+  const episodesSection = document.querySelector('section.mt-3.mb-2[style*="background-color:#161616"] h2.tEp');
+  if (!episodesSection || episodesSection.textContent !== "Episódios") return;
+
+  const episodesContainer = episodesSection.closest('section').querySelector('.div_video_list');
+  if (!episodesContainer) return;
+
+  const currentUrl = window.location.href;
+  const animeSlug = currentUrl.match(/\/animes\/(.*?)-todos-os-episodios/)?.[1] || currentUrl.match(/\/animes\/([^\/]+)/)?.[1];
+
+  const downloadAllBtn = document.createElement('button');
+  downloadAllBtn.textContent = 'Baixar Todos Episódios';
+  downloadAllBtn.style.cssText = `padding:10px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;margin:10px auto;display:block;font-weight:bold;`;
+  
+  episodesSection.closest('section').insertBefore(downloadAllBtn, episodesContainer);
+
+  downloadAllBtn.addEventListener('click', () => {
+    showQualityModal();
+  });
+
+  function showQualityModal() {
+    const modalContent = `
+      <div style="text-align:center;margin-bottom:15px;position:relative;">
+        <button id="close-modal" style="position:absolute;right:0;top:0;background:none;border:none;color:${themeColor};font-size:1.5em;cursor:pointer;">×</button>
+        <p style="margin-bottom:20px;">Selecione a qualidade desejada:</p>
+        <p style="font-size:12px;color:#aaa;margin:-15px 0 20px 0;">Se a página for redirecionada para um "404 not found" é porque o episódio tem algum erro e não pode ser baixado</p>
+        <div style="display:flex;justify-content:center;gap:15px;">
+          <button id="quality-sd" style="padding:10px 20px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;">SD (480p)</button>
+          <button id="quality-hd" style="padding:10px 20px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;">HD (720p)</button>
+        </div>
+      </div>
+      <div id="results-container" style="max-height:300px;overflow-y:auto;margin-top:15px;border-top:1px solid #333;padding-top:15px;">
+        <p style="text-align:center;color:#aaa;">Preparando downloads...</p>
+      </div>
+    `;
+
+    showModal('Selecionar Qualidade', modalContent, null, true);
+
+    document.getElementById('quality-sd').addEventListener('click', () => startDownloads('SD'));
+    document.getElementById('quality-hd').addEventListener('click', () => startDownloads('HD'));
+    document.getElementById('close-modal').addEventListener('click', closeModal);
+  }
+
+  async function startDownloads(quality) {
+    const resultsContainer = document.querySelector('#results-container');
+    resultsContainer.innerHTML = '<div style="text-align:center;padding:10px;"><div class="spinner"></div><p>Iniciando downloads...</p></div>';
+    
+    const episodeLinks = Array.from(episodesContainer.querySelectorAll('a.lEp'));
+    if (episodeLinks.length === 0) return;
+
+    for (const [index, episodeLink] of episodeLinks.entries()) {
+      const episodeNum = episodeLink.href.split('/').pop();
+      const episodeTitle = episodeLink.textContent.trim();
+      const downloadPageUrl = `https://animefire.plus/download/${animeSlug}/${episodeNum}`;
+      
+      try {
+        const response = await fetch(downloadPageUrl);
+        
+        if (response.redirected && response.url.includes('404')) {
+          addResultToModal(episodeTitle, 'failed', 'Erro: Página não encontrada (404)');
+          continue;
+        }
+
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        const qualityContainer = doc.querySelector('.d-flex[style="flex-direction:column"]');
+        if (!qualityContainer) {
+          addResultToModal(episodeTitle, 'failed', 'Estrutura de download não encontrada');
+          continue;
+        }
+
+        const qualityButtons = qualityContainer.querySelectorAll('a');
+        const selectedButton = Array.from(qualityButtons).find(btn => 
+          btn.textContent.trim() === quality
+        );
+
+        if (selectedButton && selectedButton.href) {
+          const downloadUrl = selectedButton.href;
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+          a.download = `${animeSlug}-ep${episodeNum}-${quality.toLowerCase()}.mp4`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          addResultToModal(episodeTitle, 'success', `Download iniciado (${quality})`);
+        } else {
+          addResultToModal(episodeTitle, 'failed', `Qualidade ${quality} não disponível`);
+        }
+      } catch (error) {
+        console.error('Erro ao processar episódio:', error);
+        addResultToModal(episodeTitle, 'failed', 'Erro ao processar');
+      }
+
+      if (index < episodeLinks.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+  }
+
+  function addResultToModal(episodeName, status, message) {
+    const resultsContainer = document.querySelector('#results-container');
+    if (resultsContainer.innerHTML.includes('Preparando downloads') || resultsContainer.innerHTML.includes('Iniciando downloads')) {
+      resultsContainer.innerHTML = '';
+    }
+
+    const color = status === 'success' ? '#4CAF50' : '#F44336';
+    const icon = status === 'success' ? '✓' : '✗';
+
+    const resultItem = `
+      <div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #333;">
+        <div style="width:30px;text-align:center;font-weight:bold;color:${color};">${icon}</div>
+        <div style="flex:1;">
+          <div style="font-weight:bold;">${episodeName}</div>
+          <div style="font-size:0.9em;color:#aaa;">${message}</div>
+        </div>
+      </div>
+    `;
+    
+    resultsContainer.insertAdjacentHTML('beforeend', resultItem);
+    resultsContainer.scrollTop = resultsContainer.scrollHeight;
+  }
+
+  function showModal(title, content, actionUrl = null, keepOpen = false) {
+    const existingModal = document.querySelector('.modal-overlay');
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-panel';
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    
+    modal.innerHTML = `
+      <div class="modal-header">
+        <h3>${title}</h3>
+      </div>
+      <div class="modal-content">
+        ${content}
+      </div>
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      .modal-overlay {position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:10000;}
+      .modal-panel {background-color:#222;border:2px solid ${themeColor};border-radius:8px;width:90%;max-width:500px;color:#EEE;box-shadow:0 0 20px rgba(${hexToRgb(themeColor)},0.3);}
+      .modal-header {padding:15px;border-bottom:1px solid ${themeColor};background:rgba(${hexToRgb(themeColor)},0.1);}
+      .modal-header h3 {margin:0;color:${themeColor};text-align:center;font-size:1.3em;font-weight:bold;}
+      .modal-content {padding:15px;line-height:1.6;}
+      #close-modal {font-weight:bold;padding:0 10px;}
+      #close-modal:hover {color:#fff;}
+      .spinner {border:3px solid rgba(${hexToRgb(themeColor)},0.3);border-radius:50%;border-top:3px solid ${themeColor};width:20px;height:20px;animation:spin 1s linear infinite;margin:0 auto 10px;}
+      @keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(style);
+    document.body.appendChild(overlay);
+  }
+
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `${r}, ${g}, ${b}`;
+  }
+
+  function closeModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) modal.remove();
+    const style = document.querySelector('style');
+    if (style) style.remove();
+  }
+};
+
+checkAndAddDownloadButton();
+
+})();
+
+(function() {
+    'use strict';
+
+if (document.body.innerHTML.includes('<h1>404 Not Found</h1>') && location.href.includes('https://lightspeedst.net/')) {
+  window.history.back();
+}
+
+})();
