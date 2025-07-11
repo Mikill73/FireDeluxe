@@ -1524,6 +1524,7 @@ let observer = null;
 
 function initAnimePreview() {
     const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes') || '{}');
+    const themeColor = config.themeColor || '#e36722';
 
     const cleanUp = () => {
         document.querySelectorAll('[data-preview-overlay]').forEach(el => el.remove());
@@ -1535,9 +1536,9 @@ function initAnimePreview() {
     const applyPreviewToItems = (items) => {
         items.forEach(item => {
             if (item.hasAttribute('data-preview-enabled')) return;
-            
+
             item.setAttribute('data-preview-enabled', 'true');
-            
+
             const animeContainer = item.querySelector('.divArticleLancamentos');
             if (!animeContainer) return;
 
@@ -1553,8 +1554,8 @@ function initAnimePreview() {
                 height: '24px',
                 borderRadius: '50%',
                 background: 'rgba(0,0,0,0.8)',
-                border: '1px solid #e36722',
-                color: '#e36722',
+                border: `1px solid ${themeColor}`,
+                color: themeColor,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1565,15 +1566,25 @@ function initAnimePreview() {
                 margin: '0',
                 lineHeight: '1',
                 outline: 'none',
-                boxShadow: '0 0 5px rgba(0,0,0,0.5)'
+                boxShadow: '0 0 5px rgba(0,0,0,0.5)',
+                transition: 'all 0.2s ease'
             });
 
             toggleBtn.innerHTML = 'i';
             animeContainer.prepend(toggleBtn);
 
+            toggleBtn.addEventListener('mouseenter', () => {
+                toggleBtn.style.background = themeColor;
+                toggleBtn.style.color = '#fff';
+            });
+            toggleBtn.addEventListener('mouseleave', () => {
+                toggleBtn.style.background = 'rgba(0,0,0,0.8)';
+                toggleBtn.style.color = themeColor;
+            });
+
             const toggleOverlay = async (e) => {
                 if (e) e.stopPropagation();
-                
+
                 const existingOverlay = animeContainer.querySelector('[data-preview-overlay]');
                 if (existingOverlay) {
                     existingOverlay.remove();
@@ -1587,7 +1598,7 @@ function initAnimePreview() {
                 if (!animeLink) return;
 
                 if (animeContainer.dataset.preview) {
-                    createOverlay(animeContainer, JSON.parse(animeContainer.dataset.preview), item.querySelector('.animeTitle')?.textContent);
+                    createOverlay(animeContainer, JSON.parse(animeContainer.dataset.preview), item.querySelector('.animeTitle')?.textContent, themeColor);
                     return;
                 }
 
@@ -1607,10 +1618,8 @@ function initAnimePreview() {
                         generos: [...doc.querySelectorAll('.spanGeneros')].map(el => el.textContent.trim()).join(', ') || 'N/A',
                         temporada: getInfo('Temporada:'),
                         estudio: getInfo('Estúdios:'),
-                        audio: getInfo('Áudio:'),
                         episodios: getInfo('Episódios:'),
                         status: getInfo('Status do Anime:'),
-                        diaLancamento: getInfo('Dia de Lançamento:'),
                         ano: getInfo('Ano:')
                     };
 
@@ -1620,7 +1629,7 @@ function initAnimePreview() {
                     }
 
                     animeContainer.dataset.preview = JSON.stringify(animeData);
-                    createOverlay(animeContainer, animeData, item.querySelector('.animeTitle')?.textContent);
+                    createOverlay(animeContainer, animeData, item.querySelector('.animeTitle')?.textContent, themeColor);
 
                 } catch (error) {
                     console.error('Erro ao carregar preview:', error);
@@ -1654,7 +1663,7 @@ function initAnimePreview() {
     }
 }
 
-function createOverlay(container, animeData, title) {
+function createOverlay(container, animeData, title, themeColor) {
     const overlay = document.createElement('div');
     overlay.setAttribute('data-preview-overlay', 'true');
     Object.assign(overlay.style, {
@@ -1663,33 +1672,41 @@ function createOverlay(container, animeData, title) {
         left: '0',
         right: '0',
         bottom: '0',
-        backdropFilter: 'blur(5px)',
-        backgroundColor: 'rgba(0,0,0,0.85)',
-        color: 'white',
-        padding: '20px 15px',
+        backdropFilter: 'blur(4px)',
+        backgroundColor: 'rgba(0,0,0,0.9)',
+        color: '#f8f8f8',
+        padding: '12px 10px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start',
-        alignItems: 'center',
-        textAlign: 'center',
+        alignItems: 'flex-start',
+        textAlign: 'left',
         borderRadius: '5px',
         zIndex: '1000',
         cursor: 'default',
         overflowY: 'auto',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        fontSize: '12px',
+        lineHeight: '1.5',
+        border: `1px solid ${themeColor}40`,
+        boxShadow: `0 0 12px ${themeColor}30`
     });
 
+    const formatText = (text, maxLength = 30) => {
+        if (!text || text === 'N/A') return '-';
+        if (text.length > maxLength) return text.substring(0, maxLength) + '...';
+        return text;
+    };
+
     overlay.innerHTML = `
-        <div style="margin-bottom:15px;font-size:15px;font-weight:bold;color:#e36722">${title || ''}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;text-align:left;font-size:13px;width:100%;max-height:200px;overflow-y:auto;padding-right:5px">
-            <div><strong style="color:#e36722">Gêneros:</strong> ${animeData.generos}</div>
-            <div><strong style="color:#e36722">Episódios:</strong> ${animeData.episodios}</div>
-            <div><strong style="color:#e36722">Temporada:</strong> ${animeData.temporada}</div>
-            <div><strong style="color:#e36722">Status:</strong> ${animeData.status}</div>
-            <div><strong style="color:#e36722">Estúdio:</strong> ${animeData.estudio}</div>
-            <div><strong style="color:#e36722">Lançamento:</strong> ${animeData.diaLancamento}</div>
-            <div><strong style="color:#e36722">Áudio:</strong> ${animeData.audio}</div>
-            <div><strong style="color:#e36722">Ano:</strong> ${animeData.ano}</div>
+        <div style="margin-bottom:10px;font-size:14px;font-weight:bold;color:${themeColor};width:100%;text-align:center;text-shadow:0 0 8px ${themeColor}40">${formatText(title || '', 26)}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;width:100%">
+            <div><strong style="color:${themeColor}">Gêneros:</strong><br>${formatText(animeData.generos, 40)}</div>
+            <div><strong style="color:${themeColor}">Episódios:</strong> ${animeData.episodios}</div>
+            <div><strong style="color:${themeColor}">Temporada:</strong> ${formatText(animeData.temporada, 15)}</div>
+            <div><strong style="color:${themeColor}">Status:</strong> ${formatText(animeData.status, 15)}</div>
+            <div><strong style="color:${themeColor}">Estúdio:</strong> ${formatText(animeData.estudio, 20)}</div>
+            <div><strong style="color:${themeColor}">Ano:</strong> ${animeData.ano}</div>
         </div>
     `;
 
@@ -1701,7 +1718,7 @@ function createOverlay(container, animeData, title) {
 
 function observeConfigChanges() {
     let lastConfig = localStorage.getItem('firedeluxe_configuracoes');
-    
+
     const checkConfig = () => {
         const currentConfig = localStorage.getItem('firedeluxe_configuracoes');
         if (currentConfig !== lastConfig) {
@@ -1711,7 +1728,7 @@ function observeConfigChanges() {
             initAnimePreview();
         }
     };
-    
+
     const intervalId = setInterval(checkConfig, 1000);
     return () => clearInterval(intervalId);
 }
