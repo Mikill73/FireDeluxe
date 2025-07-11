@@ -1234,7 +1234,8 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
         {hex: '#21d3ff', rgb: 'rgb(33, 211, 255)'},
         {hex: '#29DFFF', rgb: 'rgb(41, 223, 255)'},
         {hex: '#4CDCF4', rgb: 'rgb(76, 220, 244)'},
-        {hex: '#17a2b8', rgb: 'rgb(23, 162, 184)'}
+        {hex: '#17a2b8', rgb: 'rgb(23, 162, 184)'},
+        {hex: '#ff6f21', rgb: 'rgb(255, 111, 33)'}
     ];
     const novaCor = {hex: '#FFA500', rgb: 'rgb(255, 165, 0)'};
 
