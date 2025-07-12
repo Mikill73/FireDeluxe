@@ -1747,6 +1747,8 @@ window.addEventListener('beforeunload', () => {
 (function() {
     'use strict';
     
+if (!location.href.includes('historico')) return;
+
 document.querySelector('form[action="https://animefire.plus/proc/delete_historic"] button[type="submit"]').addEventListener('click', function(e) {
     e.preventDefault();
 
