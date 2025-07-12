@@ -2068,7 +2068,7 @@ if (document.body.innerHTML.includes('<h1>404 Not Found</h1>') && location.href.
 })();
 
 //Divulgar discord da maior comunidade do animefire
-/*(function() {
+(function() {
     'use strict';
 
 if (!document.cookie.includes('firedeluxe_discord_modal')) {
@@ -2120,7 +2120,7 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
   closeButton.style.cursor = 'pointer';
 
   joinButton.addEventListener('click', () => {
-    window.open('https://discord.gg/m5hUySKwYe', '_blank');
+    window.open('https://discord.gg/PTnkFaNR8Y', '_blank');
     document.cookie = 'firedeluxe_discord_modal=shown; expires=Fri, 31 Dec 2999 23:59:59 GMT; path=/';
     document.body.removeChild(modal);
   });
@@ -2140,4 +2140,4 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
   document.body.appendChild(modal);
 }
 
-})(); /*
+})();
