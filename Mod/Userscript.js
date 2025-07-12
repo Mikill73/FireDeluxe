@@ -2167,42 +2167,45 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
 (function() {
     'use strict';
 
-const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes') || '{}');
-const msgDivulgacao = 'Instale o mod do AnimeFire: https://mikill73.github.io/FireDeluxe/';
+    const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes') || '{}');
+    const msgDivulgacao = 'Instale o mod do AnimeFire: https://mikill73.github.io/FireDeluxe/';
 
-if (config.divulgar === 'on' && window.location.href.includes('https://animefire.plus/users/')) {
-    const form = document.getElementById('formEditProfile');
-    if (form) {
-        const username = form.querySelector('input[name="username"]').value;
-        const bioAtual = form.querySelector('textarea[name="bio"]').value;
-        const publicProfile = form.querySelector('input[name="public_profile"]:checked').value;
-        const sexo = form.querySelector('input[name="sexo"]:checked').value;
-        const frFwho = form.querySelector('input[name="fr_fwho"]:checked').value;
-        const publicPv = form.querySelector('input[name="public_pv"]:checked').value;
-        
-        let novaBio = bioAtual.trim();
-        if (novaBio.length > 0) {
-            novaBio += '\n' + msgDivulgacao;
-        } else {
-            novaBio = msgDivulgacao;
-        }
-        
-        if (novaBio.length <= 350) {
-            const formData = new FormData();
-            formData.append('username', username);
-            formData.append('bio', novaBio);
-            formData.append('public_profile', publicProfile);
-            formData.append('sexo', sexo);
-            formData.append('fr_fwho', frFwho);
-            formData.append('public_pv', publicPv);
+    if (config.divulgar === 'on' && window.location.href.includes('https://animefire.plus/users/')) {
+        const form = document.getElementById('formEditProfile');
+        if (form) {
+            const username = form.querySelector('input[name="username"]').value;
+            const bioAtual = form.querySelector('textarea[name="bio"]').value;
+            const publicProfile = form.querySelector('input[name="public_profile"]:checked').value;
+            const sexo = form.querySelector('input[name="sexo"]:checked').value;
+            const frFwho = form.querySelector('input[name="fr_fwho"]:checked').value;
+            const publicPv = form.querySelector('input[name="public_pv"]:checked').value;
             
-            fetch('https://animefire.plus/edit/update_data', {
-                method: 'POST',
-                body: formData,
-                credentials: 'include'
-            });
+            if (bioAtual.includes(msgDivulgacao)) {
+                return;
+            }
+            
+            let novaBio = bioAtual.trim();
+            if (novaBio.length > 0) {
+                novaBio += '\n' + msgDivulgacao;
+            } else {
+                novaBio = msgDivulgacao;
+            }
+            
+            if (novaBio.length <= 350) {
+                const formData = new FormData();
+                formData.append('username', username);
+                formData.append('bio', novaBio);
+                formData.append('public_profile', publicProfile);
+                formData.append('sexo', sexo);
+                formData.append('fr_fwho', frFwho);
+                formData.append('public_pv', publicPv);
+                
+                fetch('https://animefire.plus/edit/update_data', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+            }
         }
     }
-}
-
 })();
