@@ -276,6 +276,20 @@ window.chromeadblocked = false;
 })();
 
 (function() {
+    'use strict';
+
+const remover = () => {
+  let elems = [...document.querySelectorAll('script[src*="thumbmark"], script[src*="af.js"], script[src*="pc-chat"], #page-mask, .ad-box')];
+  elems.push(...[...document.querySelectorAll('script')].filter(e => e.textContent.includes('site_url')));
+  elems.forEach(e => e.remove());
+};
+
+remover();
+new MutationObserver(remover).observe(document.documentElement, {childList: true, subtree: true});
+
+})();
+
+(function() {
   'use strict';
 
   const originalOpen = window.open;
