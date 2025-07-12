@@ -2068,7 +2068,7 @@ if (document.body.innerHTML.includes('<h1>404 Not Found</h1>') && location.href.
 })();
 
 //Divulgar discord da maior comunidade do animefire
-(function() {
+/*(function() {
     'use strict';
 
 if (!document.cookie.includes('firedeluxe_discord_modal')) {
@@ -2140,4 +2140,4 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
   document.body.appendChild(modal);
 }
 
-})();
+})(); /*
