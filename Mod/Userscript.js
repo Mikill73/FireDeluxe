@@ -977,7 +977,7 @@ const configuracoesHTML = `
                 siteBgImage: siteBgDataUrl,
                 chatBgImage: chatBgDataUrl,
                 adblocker: document.getElementById('adblockerToggle').checked ? 'on' : 'off',
-                divulgar: document.getElementById('divulgarToggle').checked ? 'on' : 'off'
+                divulgar: document.getElementById('divulgarToggle').checked ? 'on' : 'off',
                 email: document.getElementById('automationEmail').value,
                 senha: document.getElementById('automationPassword').value
             };
