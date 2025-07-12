@@ -734,6 +734,20 @@ const configuracoesHTML = `
         </div>
 
         <div class="settings-section">
+            <h3 class="section-title">Divulgar o FireDeluxe</h3>
+            <div class="settings-row">
+                <label class="settings-label">Permitir divulgação:</label>
+                <label class="switch">
+                    <input type="checkbox" id="divulgarToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="info-text">
+                Quando ativado, verifica se tem caracteres suficientes na sua biografia, se tiver, coloca o link do site do FireDeluxe.
+            </div>
+        </div>
+
+        <div class="settings-section">
             <h3 class="section-title">Tema do Site</h3>
             <div class="settings-row">
                 <label class="settings-label">Cor do Tema:</label>
@@ -806,7 +820,7 @@ const configuracoesHTML = `
         let chatBgDataUrl = '';
         let themeColor = '#FFA500';
         let adblockerEnabled = false;
-        let previewEnabled = false;
+        let divulgarEnabled = false;
 
         function loadSettings() {
             const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
@@ -833,6 +847,11 @@ const configuracoesHTML = `
                 if (settings.adblocker) {
                     adblockerEnabled = settings.adblocker === 'on';
                     document.getElementById('adblockerToggle').checked = adblockerEnabled;
+                }
+
+                if (settings.divulgar) {
+                    divulgarEnabled = settings.divulgar === 'on';
+                    document.getElementById('divulgarToggle').checked = divulgarEnabled;
                 }
 
                 if (settings.email) {
@@ -958,6 +977,7 @@ const configuracoesHTML = `
                 siteBgImage: siteBgDataUrl,
                 chatBgImage: chatBgDataUrl,
                 adblocker: document.getElementById('adblockerToggle').checked ? 'on' : 'off',
+                divulgar: document.getElementById('divulgarToggle').checked ? 'on' : 'off'
                 email: document.getElementById('automationEmail').value,
                 senha: document.getElementById('automationPassword').value
             };
@@ -986,6 +1006,7 @@ const configuracoesHTML = `
                 document.getElementById('chatBgError').style.display = 'none';
 
                 document.getElementById('adblockerToggle').checked = false;
+                document.getElementById('divulgarToggle').checked = false;
                 document.getElementById('automationEmail').value = '';
                 document.getElementById('automationPassword').value = '';
                 
@@ -2138,6 +2159,50 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
   modalContent.appendChild(buttonContainer);
   modal.appendChild(modalContent);
   document.body.appendChild(modal);
+}
+
+})();
+
+//FireDeluxe na biografia (caso a configuração esteja ativa)
+(function() {
+    'use strict';
+
+const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes') || '{}');
+const msgDivulgacao = 'Instale o mod do AnimeFire: https://mikill73.github.io/FireDeluxe/';
+
+if (config.divulgar === 'on' && window.location.href.includes('https://animefire.plus/users/')) {
+    const form = document.getElementById('formEditProfile');
+    if (form) {
+        const username = form.querySelector('input[name="username"]').value;
+        const bioAtual = form.querySelector('textarea[name="bio"]').value;
+        const publicProfile = form.querySelector('input[name="public_profile"]:checked').value;
+        const sexo = form.querySelector('input[name="sexo"]:checked').value;
+        const frFwho = form.querySelector('input[name="fr_fwho"]:checked').value;
+        const publicPv = form.querySelector('input[name="public_pv"]:checked').value;
+        
+        let novaBio = bioAtual.trim();
+        if (novaBio.length > 0) {
+            novaBio += '\n' + msgDivulgacao;
+        } else {
+            novaBio = msgDivulgacao;
+        }
+        
+        if (novaBio.length <= 350) {
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('bio', novaBio);
+            formData.append('public_profile', publicProfile);
+            formData.append('sexo', sexo);
+            formData.append('fr_fwho', frFwho);
+            formData.append('public_pv', publicPv);
+            
+            fetch('https://animefire.plus/edit/update_data', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include'
+            });
+        }
+    }
 }
 
 })();
