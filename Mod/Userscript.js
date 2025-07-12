@@ -2055,11 +2055,87 @@ const checkIntervalId = setInterval(() => {
 
 })();
 
+//Se parar em um dowload com o episódio com erro, volta para a página anterior, onde está sendo realizado o dowload de todos os eps (é uma função pro botão de baixar todos os eps)
 (function() {
     'use strict';
 
 if (document.body.innerHTML.includes('<h1>404 Not Found</h1>') && location.href.includes('https://lightspeedst.net/')) {
   window.history.back();
+}
+
+})();
+
+//Divulgar discord da maior comunidade do animefire
+(function() {
+    'use strict';
+
+if (!document.cookie.includes('firedeluxe_discord_modal')) {
+  const modal = document.createElement('div');
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100%';
+  modal.style.height = '100%';
+  modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+  modal.style.display = 'flex';
+  modal.style.justifyContent = 'center';
+  modal.style.alignItems = 'center';
+  modal.style.zIndex = '9999';
+
+  const modalContent = document.createElement('div');
+  modalContent.style.backgroundColor = '#36393f';
+  modalContent.style.padding = '20px';
+  modalContent.style.borderRadius = '8px';
+  modalContent.style.maxWidth = '400px';
+  modalContent.style.textAlign = 'center';
+  modalContent.style.color = 'white';
+
+  const message = document.createElement('p');
+  message.textContent = 'Junte-se à nossa vibrante comunidade no Discord! AnimeFire é um servidor criado por fãs, para fãs, onde você pode discutir seus animes favoritos, fazer amigos e ficar por dentro das novidades.';
+  message.style.marginBottom = '20px';
+
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.display = 'flex';
+  buttonContainer.style.justifyContent = 'center';
+  buttonContainer.style.gap = '10px';
+
+  const joinButton = document.createElement('button');
+  joinButton.textContent = 'Entrar';
+  joinButton.style.padding = '10px 20px';
+  joinButton.style.backgroundColor = '#5865F2';
+  joinButton.style.color = 'white';
+  joinButton.style.border = 'none';
+  joinButton.style.borderRadius = '4px';
+  joinButton.style.cursor = 'pointer';
+
+  const closeButton = document.createElement('button');
+  closeButton.textContent = 'Fechar';
+  closeButton.style.padding = '10px 20px';
+  closeButton.style.backgroundColor = '#4f545c';
+  closeButton.style.color = 'white';
+  closeButton.style.border = 'none';
+  closeButton.style.borderRadius = '4px';
+  closeButton.style.cursor = 'pointer';
+
+  joinButton.addEventListener('click', () => {
+    window.open('https://discord.gg/m5hUySKwYe', '_blank');
+    document.cookie = 'firedeluxe_discord_modal=shown; expires=Fri, 31 Dec 2999 23:59:59 GMT; path=/';
+    document.body.removeChild(modal);
+  });
+
+  closeButton.addEventListener('click', () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 5);
+    document.cookie = `firedeluxe_discord_modal=shown; expires=${date.toUTCString()}; path=/`;
+    document.body.removeChild(modal);
+  });
+
+  buttonContainer.appendChild(joinButton);
+  buttonContainer.appendChild(closeButton);
+  modalContent.appendChild(message);
+  modalContent.appendChild(buttonContainer);
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
 }
 
 })();
