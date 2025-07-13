@@ -303,12 +303,28 @@ window.chromeadblocked = false;
 
 })();
 
+//Remoção de elementos de ads
 (function() {
     'use strict';
 
 const remover = () => {
-  let elems = [...document.querySelectorAll('script[src*="thumbmark"], script[src*="af.js"], #page-mask, .ad-box')];
-  elems.push(...[...document.querySelectorAll('script')].filter(e => e.textContent.includes('site_url')));
+  let elems = [
+    ...document.querySelectorAll(
+      'script[src*="thumbmark"], script[src*="af.js"], script[src*="aclib.js"], script[src*="displayvertising.com"], ' +
+      'script[src*="acscdn.com/script/suv5.js"], script[src*="acscdn.com/script/banner.js"], ' +
+      'meta[name="admaven-placement"], meta[name="a.validate.01"], ' +
+      'link[href*="youradexchange.com"], link[href*="acscdn.com"], ' +
+      '#page-mask, .ad-box'
+    )
+  ];
+  elems.push(
+    ...[...document.querySelectorAll('script')].filter(e => 
+      e.textContent.includes('site_url') ||
+      e.textContent.includes('aclib.runPop') ||
+      e.textContent.trim().startsWith(`(function(options){
+(function(){"use strict";var __webpack_exports__={},u=b;function _typeof(n){var t=b,r={fLUJA:function(n,t){return`)
+    )
+  );
   elems.forEach(e => e.remove());
 };
 
@@ -317,6 +333,7 @@ new MutationObserver(remover).observe(document.documentElement, {childList: true
 
 })();
 
+//Medida contra um tipo de ad
 (function() {
   'use strict';
 
