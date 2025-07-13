@@ -307,7 +307,7 @@ window.chromeadblocked = false;
     'use strict';
 
 const remover = () => {
-  let elems = [...document.querySelectorAll('script[src*="thumbmark"], script[src*="af.js"], script[src*="pc-chat"], #page-mask, .ad-box')];
+  let elems = [...document.querySelectorAll('script[src*="thumbmark"], script[src*="af.js"], #page-mask, .ad-box')];
   elems.push(...[...document.querySelectorAll('script')].filter(e => e.textContent.includes('site_url')));
   elems.forEach(e => e.remove());
 };
