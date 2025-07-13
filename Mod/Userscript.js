@@ -314,7 +314,7 @@ const remover = () => {
       'script[src*="acscdn.com/script/suv5.js"], script[src*="acscdn.com/script/banner.js"], ' +
       'meta[name="admaven-placement"], meta[name="a.validate.01"], ' +
       'link[href*="youradexchange.com"], link[href*="acscdn.com"], ' +
-      '#page-mask, .ad-box'
+      '#page-mask, .ad-box, #dontfoid'
     )
   ];
   elems.push(
