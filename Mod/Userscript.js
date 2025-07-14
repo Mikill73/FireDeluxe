@@ -2253,10 +2253,17 @@ const checkAndAddDownloadButton = () => {
         }
 
         const qualityButtons = qualityContainer.querySelectorAll('a');
-        const selectedButton = Array.from(qualityButtons).find(btn => 
-          btn.textContent.trim() === quality
-        );
-
+let selectedButton = Array.from(qualityButtons).find(btn => btn.textContent.trim() === quality && btn.href);
+if (!selectedButton) {
+  const fallbackQuality = quality === 'HD' ? 'SD' : 'HD';
+  selectedButton = Array.from(qualityButtons).find(btn => btn.textContent.trim() === fallbackQuality && btn.href);
+  if (selectedButton) {
+    addResultToModal(episodeTitle, 'success', `Qualidade ${quality} indisponível, baixando ${fallbackQuality}`);
+  } else {
+    addResultToModal(episodeTitle, 'failed', `Nenhuma qualidade disponível`);
+    continue;
+  }
+}
         if (selectedButton && selectedButton.href) {
           const downloadUrl = selectedButton.href;
           const a = document.createElement('a');
