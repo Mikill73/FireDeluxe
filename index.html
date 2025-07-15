@@ -499,10 +499,8 @@
 
                 const user = document.createElement('div');
                 user.className = 'feedback-user';
-                user.innerHTML = `
-                    <img src="https://cdn.discordapp.com/avatars/000000000000000000/a_abcdefghijklmnopqrstuvwxyz123456.png?size=64" alt="${feedback.user}">
-                    ${feedback.user}
-                `;
+                user.innerHTML = `${feedback.user}`;
+
                 card.appendChild(user);
 
                 if (feedback.link) {
