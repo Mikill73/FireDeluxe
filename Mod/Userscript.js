@@ -2512,292 +2512,294 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
 })();
 
 //Notificar o usuário de mensagens novas, sem recarregar a página
+/*
 (function() {
     'use strict';
 
-function showModal(title, content, actionUrl = null) {
-  const existingModal = document.querySelector('.modal-overlay');
-  if (existingModal) existingModal.remove();
+    function showModal(title, content, actionUrl = null) {
+      const existingModal = document.querySelector('.modal-overlay');
+      if (existingModal) existingModal.remove();
 
-  const themeColor = getThemeColor();
-  const modal = document.createElement('div');
-  modal.className = 'modal-panel';
-  
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  
-  modal.innerHTML = `
-    <div class="modal-header">
-      <h3>${title}</h3>
-    </div>
-    <div class="modal-content">
-      ${content}
-    </div>
-    <div class="modal-buttons">
-      ${actionUrl ? `
-        <a href="${actionUrl}" target="_blank" class="update-button" style="background-color: ${themeColor};">
-          Ver Mensagem
-        </a>` : ''}
-      <button class="close-button">
-        Fechar
-      </button>
-    </div>
-  `;
+      const themeColor = getThemeColor();
+      const modal = document.createElement('div');
+      modal.className = 'modal-panel';
+      
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      
+      modal.innerHTML = `
+        <div class="modal-header">
+          <h3>${title}</h3>
+        </div>
+        <div class="modal-content">
+          ${content}
+        </div>
+        <div class="modal-buttons">
+          ${actionUrl ? `
+            <a href="${actionUrl}" target="_blank" class="update-button" style="background-color: ${themeColor};">
+              Ver Mensagem
+            </a>` : ''}
+          <button class="close-button">
+            Fechar
+          </button>
+        </div>
+      `;
 
-  const style = document.createElement('style');
-  style.textContent = `
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0,0,0,0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
+      const style = document.createElement('style');
+      style.textContent = `
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0,0,0,0.7);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 10000;
+        }
+        .modal-panel {
+          background-color: #222;
+          border: 1px solid ${themeColor};
+          border-radius: 8px;
+          width: 90%;
+          max-width: 400px;
+          color: #EEE;
+        }
+        .modal-header {
+          padding: 15px;
+          border-bottom: 1px solid #333;
+        }
+        .modal-header h3 {
+          margin: 0;
+          color: ${themeColor};
+          text-align: center;
+          font-size: 1.2em;
+        }
+        .modal-content {
+          padding: 20px;
+          text-align: center;
+          line-height: 1.6;
+        }
+        .modal-buttons {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          padding: 15px;
+          border-top: 1px solid #333;
+        }
+        .update-button, .close-button {
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+          border: none;
+          transition: all 0.2s;
+          font-size: 0.9em;
+        }
+        .update-button {
+          background-color: ${themeColor};
+          color: #000 !important;
+          text-decoration: none;
+        }
+        .update-button:hover {
+          opacity: 0.9;
+        }
+        .close-button {
+          background-color: #444;
+          color: #FFF !important;
+        }
+        .close-button:hover {
+          background-color: #555;
+        }
+      `;
+
+      overlay.appendChild(modal);
+      document.body.appendChild(style);
+      document.body.appendChild(overlay);
+
+      overlay.querySelector('.close-button').addEventListener('click', () => {
+        overlay.remove();
+        style.remove();
+      });
     }
-    .modal-panel {
-      background-color: #222;
-      border: 1px solid ${themeColor};
-      border-radius: 8px;
-      width: 90%;
-      max-width: 400px;
-      color: #EEE;
+
+    function fetchNotifications() {
+      fetch('/proc/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=load'
+      })
+      .then(response => response.json())
+      .then(data => handleNotificationResponse(data[0]))
+      .catch(console.error);
     }
-    .modal-header {
-      padding: 15px;
-      border-bottom: 1px solid #333;
+
+    function handleNotificationResponse(response) {
+      if (response.target !== 'bell' || !response.data) return;
+
+      const existingNotifications = getExistingNotifications();
+      const newNotifications = response.data.filter(notification => {
+        return !isNotificationInDOM(existingNotifications, notification);
+      });
+
+      if (newNotifications.length > 0) {
+        updateNotificationCount(response.count);
+        addNewNotifications(newNotifications);
+        showNewMessageModal(newNotifications[0]);
+      }
     }
-    .modal-header h3 {
-      margin: 0;
-      color: ${themeColor};
-      text-align: center;
-      font-size: 1.2em;
+
+    function decodeHtmlEntities(text) {
+      const textArea = document.createElement('textarea');
+      textArea.innerHTML = text;
+      return textArea.value;
     }
-    .modal-content {
-      padding: 20px;
-      text-align: center;
-      line-height: 1.6;
+
+    function getExistingNotifications() {
+      const container = document.getElementById('card_group_notification');
+      if (!container) return [];
+      
+      return Array.from(container.querySelectorAll('a.dropdown-item')).map(item => {
+        const link = item.getAttribute('href').replace('https://animefire.plus', '');
+        const texto = decodeHtmlEntities(item.querySelector('.reply_noti_span').textContent.trim());
+        const username = item.querySelector('.noti_us').textContent.trim();
+        const slug = item.querySelector('.span_icon_lk_noti span').textContent.trim();
+        const time = item.querySelector('.noti_data').textContent.trim();
+        
+        return { link, texto, username, slug, time };
+      });
     }
-    .modal-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      padding: 15px;
-      border-top: 1px solid #333;
+
+    function isNotificationInDOM(existingNotifications, newNotification) {
+      const normalizedNew = {
+        link: newNotification.link,
+        texto: decodeHtmlEntities(newNotification.texto).trim(),
+        username: newNotification.username.trim(),
+        slug: newNotification.slug.trim(),
+        time: newNotification.time.trim()
+      };
+
+      return existingNotifications.some(existing => {
+        return existing.link === normalizedNew.link &&
+              existing.texto === normalizedNew.texto &&
+              existing.username === normalizedNew.username &&
+              existing.slug === normalizedNew.slug &&
+              existing.time === normalizedNew.time;
+      });
     }
-    .update-button, .close-button {
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      border: none;
-      transition: all 0.2s;
-      font-size: 0.9em;
+
+    function updateNotificationCount(count) {
+      const badge = document.querySelector('.badge-notification');
+      if (badge) badge.textContent = count;
     }
-    .update-button {
-      background-color: ${themeColor};
-      color: #000 !important;
-      text-decoration: none;
+
+    function addNewNotifications(notifications) {
+      const container = document.getElementById('card_group_notification');
+      if (!container) return;
+
+      notifications.reverse().forEach(notification => {
+        const notificationElement = createNotificationElement(notification);
+        const hrElement = createHrElement();
+        container.insertBefore(hrElement, container.firstChild);
+        container.insertBefore(notificationElement, container.firstChild);
+      });
     }
-    .update-button:hover {
-      opacity: 0.9;
-    }
-    .close-button {
-      background-color: #444;
-      color: #FFF !important;
-    }
-    .close-button:hover {
-      background-color: #555;
-    }
-  `;
 
-  overlay.appendChild(modal);
-  document.body.appendChild(style);
-  document.body.appendChild(overlay);
+    function createNotificationElement(notification) {
+      const themeColor = getThemeColor();
+      const element = document.createElement('a');
+      element.className = 'dropdown-item px-2 py-2';
+      element.href = `https://animefire.plus${notification.link}`;
+      element.style.whiteSpace = 'unset !important';
+      element.setAttribute('data-tema-processado', 'true');
 
-  overlay.querySelector('.close-button').addEventListener('click', () => {
-    overlay.remove();
-    style.remove();
-  });
-}
-
-function fetchNotifications() {
-  fetch('/proc/notifications', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'action=load'
-  })
-  .then(response => response.json())
-  .then(data => handleNotificationResponse(data[0]))
-  .catch(console.error);
-}
-
-function handleNotificationResponse(response) {
-  if (response.target !== 'bell' || !response.data) return;
-
-  const existingNotifications = getExistingNotifications();
-  const newNotifications = response.data.filter(notification => {
-    return !isNotificationInDOM(existingNotifications, notification);
-  });
-
-  if (newNotifications.length > 0) {
-    updateNotificationCount(response.count);
-    addNewNotifications(newNotifications);
-    showNewMessageModal(newNotifications[0]);
-  }
-}
-
-function decodeHtmlEntities(text) {
-  const textArea = document.createElement('textarea');
-  textArea.innerHTML = text;
-  return textArea.value;
-}
-
-function getExistingNotifications() {
-  const container = document.getElementById('card_group_notification');
-  if (!container) return [];
-  
-  return Array.from(container.querySelectorAll('a.dropdown-item')).map(item => {
-    const link = item.getAttribute('href').replace('https://animefire.plus', '');
-    const texto = decodeHtmlEntities(item.querySelector('.reply_noti_span').textContent.trim());
-    const username = item.querySelector('.noti_us').textContent.trim();
-    const slug = item.querySelector('.span_icon_lk_noti span').textContent.trim();
-    const time = item.querySelector('.noti_data').textContent.trim();
-    
-    return { link, texto, username, slug, time };
-  });
-}
-
-function isNotificationInDOM(existingNotifications, newNotification) {
-  const normalizedNew = {
-    link: newNotification.link,
-    texto: decodeHtmlEntities(newNotification.texto).trim(),
-    username: newNotification.username.trim(),
-    slug: newNotification.slug.trim(),
-    time: newNotification.time.trim()
-  };
-
-  return existingNotifications.some(existing => {
-    return existing.link === normalizedNew.link &&
-           existing.texto === normalizedNew.texto &&
-           existing.username === normalizedNew.username &&
-           existing.slug === normalizedNew.slug &&
-           existing.time === normalizedNew.time;
-  });
-}
-
-function updateNotificationCount(count) {
-  const badge = document.querySelector('.badge-notification');
-  if (badge) badge.textContent = count;
-}
-
-function addNewNotifications(notifications) {
-  const container = document.getElementById('card_group_notification');
-  if (!container) return;
-
-  notifications.reverse().forEach(notification => {
-    const notificationElement = createNotificationElement(notification);
-    const hrElement = createHrElement();
-    container.insertBefore(hrElement, container.firstChild);
-    container.insertBefore(notificationElement, container.firstChild);
-  });
-}
-
-function createNotificationElement(notification) {
-  const themeColor = getThemeColor();
-  const element = document.createElement('a');
-  element.className = 'dropdown-item px-2 py-2';
-  element.href = `https://animefire.plus${notification.link}`;
-  element.style.whiteSpace = 'unset !important';
-  element.setAttribute('data-tema-processado', 'true');
-
-  element.innerHTML = `
-    <div class="d-flex" data-tema-processado="true">
-      <div style="width:115px" data-tema-processado="true">
-        <img class="img_cmt_noti mr-2" src="https://animefire.plus${notification.reply_avatar}" data-tema-processado="true">
-      </div>
-      <div class="spanTextNT" style="width:100%;display:flex;flex-direction:column;justify-content:space-between" data-tema-processado="true">
-        <div style="overflow:hidden;text-align:left" data-tema-processado="true">
-          <div class="d-flex" data-tema-processado="true">
-            <div data-tema-processado="true">
-              <span class="mr-2 noti_us" data-tema-processado="true" style="color: ${themeColor};">${notification.username}</span>
-              <span class="span_rspd" data-tema-processado="true">respondeu:</span>
+      element.innerHTML = `
+        <div class="d-flex" data-tema-processado="true">
+          <div style="width:115px" data-tema-processado="true">
+            <img class="img_cmt_noti mr-2" src="https://animefire.plus${notification.reply_avatar}" data-tema-processado="true">
+          </div>
+          <div class="spanTextNT" style="width:100%;display:flex;flex-direction:column;justify-content:space-between" data-tema-processado="true">
+            <div style="overflow:hidden;text-align:left" data-tema-processado="true">
+              <div class="d-flex" data-tema-processado="true">
+                <div data-tema-processado="true">
+                  <span class="mr-2 noti_us" data-tema-processado="true" style="color: ${themeColor};">${notification.username}</span>
+                  <span class="span_rspd" data-tema-processado="true">respondeu:</span>
+                </div>
+              </div>
+              <span class="reply_noti_span my-2" style="line-height:18px;display:block" data-tema-processado="true">${decodeHtmlEntities(notification.texto)}</span>
+            </div>
+            <div class="d-flex justify-content-between" style="margin-bottom:-3px" data-tema-processado="true">
+              <span class="span_icon_lk_noti" data-tema-processado="true">
+                <img class="mr-1" src="https://animefire.plus/img/icons/link.png" data-tema-processado="true">
+                <span data-tema-processado="true">${notification.slug}</span>
+              </span>
+              <span class="pl-2 noti_data d-flex" data-tema-processado="true" style="color: ${themeColor};">${notification.time}</span>
             </div>
           </div>
-          <span class="reply_noti_span my-2" style="line-height:18px;display:block" data-tema-processado="true">${decodeHtmlEntities(notification.texto)}</span>
         </div>
-        <div class="d-flex justify-content-between" style="margin-bottom:-3px" data-tema-processado="true">
-          <span class="span_icon_lk_noti" data-tema-processado="true">
-            <img class="mr-1" src="https://animefire.plus/img/icons/link.png" data-tema-processado="true">
-            <span data-tema-processado="true">${notification.slug}</span>
-          </span>
-          <span class="pl-2 noti_data d-flex" data-tema-processado="true" style="color: ${themeColor};">${notification.time}</span>
-        </div>
-      </div>
-    </div>
-  `;
+      `;
 
-  return element;
-}
-
-function createHrElement() {
-  const hr = document.createElement('hr');
-  hr.className = 'rmvLinha_cmt_msg my-0';
-  hr.setAttribute('data-tema-processado', 'true');
-  return hr;
-}
-
-function showNewMessageModal(notification) {
-  const themeColor = getThemeColor();
-  const content = `
-    <div class="notification-content">
-      <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
-        <img src="https://animefire.plus${notification.reply_avatar}" style="width:50px;height:50px;border-radius:50%;border:2px solid ${themeColor};">
-        <div>
-          <div style="font-weight:bold;color:${themeColor};">${notification.username}</div>
-          <div style="font-size:0.9em;">${notification.time}</div>
-        </div>
-      </div>
-      <div style="background:rgba(0,0,0,0.2);padding:15px;border-radius:8px;border-left:3px solid ${themeColor};">
-        ${decodeHtmlEntities(notification.texto)}
-      </div>
-      <div style="margin-top:15px;font-size:0.8em;display:flex;align-items:center;gap:5px;">
-        <img src="https://animefire.plus/img/icons/link.png" style="width:12px;">
-        ${notification.slug}
-      </div>
-    </div>
-  `;
-
-  showModal('Nova Mensagem', content, `https://animefire.plus${notification.link}`);
-}
-
-function getThemeColor() {
-  try {
-    const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes'));
-    return config?.themeColor || '#FFA500';
-  } catch {
-    return '#FFA500';
-  }
-}
-
-function waitForElement(selector, callback) {
-  const interval = setInterval(() => {
-    const el = document.querySelector(selector);
-    if (el) {
-      clearInterval(interval);
-      setTimeout(() => callback(el), 1000);
+      return element;
     }
-  }, 100);
-}
 
-waitForElement('#card_group_notification', () => {
-  fetchNotifications();
-  setInterval(fetchNotifications, 30000);
-});
+    function createHrElement() {
+      const hr = document.createElement('hr');
+      hr.className = 'rmvLinha_cmt_msg my-0';
+      hr.setAttribute('data-tema-processado', 'true');
+      return hr;
+    }
+
+    function showNewMessageModal(notification) {
+      const themeColor = getThemeColor();
+      const content = `
+        <div class="notification-content">
+          <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
+            <img src="https://animefire.plus${notification.reply_avatar}" style="width:50px;height:50px;border-radius:50%;border:2px solid ${themeColor};">
+            <div>
+              <div style="font-weight:bold;color:${themeColor};">${notification.username}</div>
+              <div style="font-size:0.9em;">${notification.time}</div>
+            </div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);padding:15px;border-radius:8px;border-left:3px solid ${themeColor};">
+            ${decodeHtmlEntities(notification.texto)}
+          </div>
+          <div style="margin-top:15px;font-size:0.8em;display:flex;align-items:center;gap:5px;">
+            <img src="https://animefire.plus/img/icons/link.png" style="width:12px;">
+            ${notification.slug}
+          </div>
+        </div>
+      `;
+
+      showModal('Nova Mensagem', content, `https://animefire.plus${notification.link}`);
+    }
+
+    function getThemeColor() {
+      try {
+        const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes'));
+        return config?.themeColor || '#FFA500';
+      } catch {
+        return '#FFA500';
+      }
+    }
+
+    function waitForElement(selector, callback) {
+      const interval = setInterval(() => {
+        const el = document.querySelector(selector);
+        if (el) {
+          clearInterval(interval);
+          setTimeout(() => callback(el), 1000);
+        }
+      }, 100);
+    }
+
+    waitForElement('#card_group_notification', () => {
+      fetchNotifications();
+      setInterval(fetchNotifications, 30000);
+    });
 
 })();
+*/
