@@ -1581,7 +1581,6 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
             }
 
             if (tentativas >= MAX_TENTATIVAS) {
-                console.log('Mudando para modo observador (MutationObserver)');
                 return;
             }
 
