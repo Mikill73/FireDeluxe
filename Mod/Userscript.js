@@ -9,6 +9,223 @@
 // @grant        none
 // ==/UserScript==
 
+//Verificar versão
+(function() {
+    'use strict';
+
+    async function checkVersion() {
+        try {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('firedeluxe_versao='))
+                ?.split('=')[1];
+            
+            if (!cookieValue) {
+                showUpdateAlert();
+                return;
+            }
+
+            const response = await fetch('https://greasyfork.org/pt-BR/scripts/470618-firedeluxe');
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const versionElements = [...doc.querySelectorAll('.script-show-version span')];
+            const latestVersion = versionElements.find(el => /\d/.test(el.textContent))?.textContent.trim();
+
+            if (latestVersion && cookieValue !== latestVersion) {
+                showModal(
+                    'Atualização Disponível', 
+                    `<div class="update-message">Uma nova versão está disponível:</div>
+                    <div class="version-container">
+                        <strong>Sua versão:</strong> <span class="version-text">${cookieValue}</span><br>
+                        <strong>Nova versão:</strong> <span class="version-text">${latestVersion}</span>
+                    </div>`,
+                    'https://greasyfork.org/pt-BR/scripts/470618-firedeluxe'
+                );
+            }
+        } catch (error) {
+            console.error('Erro ao verificar versão:', error);
+            showModal('Erro', '<div class="error-message">Ocorreu um erro ao verificar a versão atual.</div>');
+        }
+    }
+
+    function showUpdateAlert() {
+        showModal(
+            'Atualização Recomendada', 
+            '<div class="update-message">Uma atualização do FireDeluxe está disponível.</div>',
+            'https://greasyfork.org/pt-BR/scripts/470618-firedeluxe'
+        );
+    }
+
+    function showModal(title, content, actionUrl = null) {
+        const existingModal = document.querySelector('.modal-overlay');
+        if (existingModal) existingModal.remove();
+
+        let themeColor = '#FFA500';
+        try {
+            const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes'));
+            if (config && config.themeColor) {
+                themeColor = config.themeColor.startsWith('#') ? config.themeColor : `#${config.themeColor}`;
+            }
+        } catch (e) {
+            console.log('Erro ao ler cor do tema:', e);
+        }
+
+        const modal = document.createElement('div');
+        modal.className = 'modal-panel';
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        
+        modal.innerHTML = `
+            <div class="modal-header">
+                <h3>${title}</h3>
+            </div>
+            <div class="modal-content">
+                ${content}
+            </div>
+            <div class="modal-buttons">
+                ${actionUrl ? `
+                    <a href="${actionUrl}" target="_blank" rel="noopener noreferrer" class="update-button">
+                        Atualizar
+                    </a>` : ''}
+                <button class="close-button">
+                    Fechar
+                </button>
+            </div>
+        `;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            }
+            .modal-panel {
+                background-color: #222;
+                border: 1px solid ${themeColor};
+                border-radius: 8px;
+                width: 90%;
+                max-width: 400px;
+                color: #EEE;
+            }
+            .modal-header {
+                padding: 15px;
+                border-bottom: 1px solid #333;
+            }
+            .modal-header h3 {
+                margin: 0;
+                color: ${themeColor};
+                text-align: center;
+                font-size: 1.2em;
+            }
+            .modal-content {
+                padding: 20px;
+                text-align: center;
+                line-height: 1.6;
+            }
+            .update-message {
+                color: #EEE;
+                margin-bottom: 15px;
+                font-size: 1em;
+            }
+            .error-message {
+                color: #EEE;
+            }
+            .version-container {
+                background: rgba(0,0,0,0.3);
+                padding: 15px;
+                border-radius: 6px;
+                margin-top: 10px;
+            }
+            .version-container strong {
+                color: ${themeColor};
+            }
+            .version-text {
+                color: #FFF;
+                background-color: #333;
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-family: monospace;
+                display: inline-block;
+                margin: 3px 0;
+            }
+            .modal-buttons {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                padding: 15px;
+                border-top: 1px solid #333;
+            }
+            .update-button, .close-button {
+                padding: 10px 20px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: bold;
+                border: none;
+                transition: all 0.2s;
+                font-size: 0.9em;
+            }
+            .update-button {
+                background-color: ${themeColor};
+                color: #000;
+                text-decoration: none;
+            }
+            .update-button:hover {
+                background-color: ${adjustBrightness(themeColor, 20)};
+            }
+            .close-button {
+                background-color: #444;
+                color: #FFF;
+            }
+            .close-button:hover {
+                background-color: #555;
+            }
+        `;
+
+        overlay.appendChild(modal);
+        document.body.appendChild(style);
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay || e.target.classList.contains('close-button')) {
+                overlay.remove();
+                style.remove();
+            }
+        });
+    }
+
+    function adjustBrightness(color, percent) {
+        let R = parseInt(color.substring(1,3), 16);
+        let G = parseInt(color.substring(3,5), 16);
+        let B = parseInt(color.substring(5,7), 16);
+
+        R = parseInt(R * (100 + percent) / 100);
+        G = parseInt(G * (100 + percent) / 100);
+        B = parseInt(B * (100 + percent) / 100);
+
+        R = R < 255 ? R : 255;
+        G = G < 255 ? G : 255;
+        B = B < 255 ? B : 255;
+
+        const RR = R.toString(16).padStart(2, '0');
+        const GG = G.toString(16).padStart(2, '0');
+        const BB = B.toString(16).padStart(2, '0');
+
+        return `#${RR}${GG}${BB}`;
+    }
+
+    checkVersion();
+})();
+
 //Botão Principal
 (function() {
     'use strict';
@@ -1357,223 +1574,6 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
   aplicarImagensFundo();
   window.addEventListener('resize', aplicarImagensFundo);
 
-})();
-
-//Verificar versão
-(function() {
-    'use strict';
-
-    async function checkVersion() {
-        try {
-            const cookieValue = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('firedeluxe_versao='))
-                ?.split('=')[1];
-            
-            if (!cookieValue) {
-                showUpdateAlert();
-                return;
-            }
-
-            const response = await fetch('https://greasyfork.org/pt-BR/scripts/470618-firedeluxe');
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const versionElements = [...doc.querySelectorAll('.script-show-version span')];
-            const latestVersion = versionElements.find(el => /\d/.test(el.textContent))?.textContent.trim();
-
-            if (latestVersion && cookieValue !== latestVersion) {
-                showModal(
-                    'Atualização Disponível', 
-                    `<div class="update-message">Uma nova versão está disponível:</div>
-                    <div class="version-container">
-                        <strong>Sua versão:</strong> <span class="version-text">${cookieValue}</span><br>
-                        <strong>Nova versão:</strong> <span class="version-text">${latestVersion}</span>
-                    </div>`,
-                    'https://greasyfork.org/pt-BR/scripts/470618-firedeluxe'
-                );
-            }
-        } catch (error) {
-            console.error('Erro ao verificar versão:', error);
-            showModal('Erro', '<div class="error-message">Ocorreu um erro ao verificar a versão atual.</div>');
-        }
-    }
-
-    function showUpdateAlert() {
-        showModal(
-            'Atualização Recomendada', 
-            '<div class="update-message">Uma atualização do FireDeluxe está disponível.</div>',
-            'https://greasyfork.org/pt-BR/scripts/470618-firedeluxe'
-        );
-    }
-
-    function showModal(title, content, actionUrl = null) {
-        const existingModal = document.querySelector('.modal-overlay');
-        if (existingModal) existingModal.remove();
-
-        let themeColor = '#FFA500';
-        try {
-            const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes'));
-            if (config && config.themeColor) {
-                themeColor = config.themeColor.startsWith('#') ? config.themeColor : `#${config.themeColor}`;
-            }
-        } catch (e) {
-            console.log('Erro ao ler cor do tema:', e);
-        }
-
-        const modal = document.createElement('div');
-        modal.className = 'modal-panel';
-        
-        const overlay = document.createElement('div');
-        overlay.className = 'modal-overlay';
-        
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h3>${title}</h3>
-            </div>
-            <div class="modal-content">
-                ${content}
-            </div>
-            <div class="modal-buttons">
-                ${actionUrl ? `
-                    <a href="${actionUrl}" target="_blank" rel="noopener noreferrer" class="update-button">
-                        Atualizar
-                    </a>` : ''}
-                <button class="close-button">
-                    Fechar
-                </button>
-            </div>
-        `;
-
-        const style = document.createElement('style');
-        style.textContent = `
-            .modal-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0,0,0,0.7);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 10000;
-            }
-            .modal-panel {
-                background-color: #222;
-                border: 1px solid ${themeColor};
-                border-radius: 8px;
-                width: 90%;
-                max-width: 400px;
-                color: #EEE;
-            }
-            .modal-header {
-                padding: 15px;
-                border-bottom: 1px solid #333;
-            }
-            .modal-header h3 {
-                margin: 0;
-                color: ${themeColor};
-                text-align: center;
-                font-size: 1.2em;
-            }
-            .modal-content {
-                padding: 20px;
-                text-align: center;
-                line-height: 1.6;
-            }
-            .update-message {
-                color: #EEE;
-                margin-bottom: 15px;
-                font-size: 1em;
-            }
-            .error-message {
-                color: #EEE;
-            }
-            .version-container {
-                background: rgba(0,0,0,0.3);
-                padding: 15px;
-                border-radius: 6px;
-                margin-top: 10px;
-            }
-            .version-container strong {
-                color: ${themeColor};
-            }
-            .version-text {
-                color: #FFF;
-                background-color: #333;
-                padding: 3px 8px;
-                border-radius: 4px;
-                font-family: monospace;
-                display: inline-block;
-                margin: 3px 0;
-            }
-            .modal-buttons {
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-                padding: 15px;
-                border-top: 1px solid #333;
-            }
-            .update-button, .close-button {
-                padding: 10px 20px;
-                border-radius: 6px;
-                cursor: pointer;
-                font-weight: bold;
-                border: none;
-                transition: all 0.2s;
-                font-size: 0.9em;
-            }
-            .update-button {
-                background-color: ${themeColor};
-                color: #000;
-                text-decoration: none;
-            }
-            .update-button:hover {
-                background-color: ${adjustBrightness(themeColor, 20)};
-            }
-            .close-button {
-                background-color: #444;
-                color: #FFF;
-            }
-            .close-button:hover {
-                background-color: #555;
-            }
-        `;
-
-        overlay.appendChild(modal);
-        document.body.appendChild(style);
-        document.body.appendChild(overlay);
-
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay || e.target.classList.contains('close-button')) {
-                overlay.remove();
-                style.remove();
-            }
-        });
-    }
-
-    function adjustBrightness(color, percent) {
-        let R = parseInt(color.substring(1,3), 16);
-        let G = parseInt(color.substring(3,5), 16);
-        let B = parseInt(color.substring(5,7), 16);
-
-        R = parseInt(R * (100 + percent) / 100);
-        G = parseInt(G * (100 + percent) / 100);
-        B = parseInt(B * (100 + percent) / 100);
-
-        R = R < 255 ? R : 255;
-        G = G < 255 ? G : 255;
-        B = B < 255 ? B : 255;
-
-        const RR = R.toString(16).padStart(2, '0');
-        const GG = G.toString(16).padStart(2, '0');
-        const BB = B.toString(16).padStart(2, '0');
-
-        return `#${RR}${GG}${BB}`;
-    }
-
-    checkVersion();
 })();
 
 //Trocar cores de elementos do site para o tema
