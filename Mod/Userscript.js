@@ -107,7 +107,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                z-index: 10000;
+                z-index: 2147483647;
             }
             .modal-panel {
                 background-color: #222;
