@@ -2899,3 +2899,45 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
 })();
 
 })();
+
+//Efeitos no meu nome (pq sim)
+(function() {
+    'use strict';
+
+(() => {
+    function h(t) { return document.querySelectorAll(t); }
+    
+    function d() {
+        h('a[href*="/users/988233449"]').forEach(e => {
+            if (!e.dataset.rainbow) {
+                e.dataset.rainbow = 'true';
+                e.style.display = 'inline-block';
+                
+                const t = e.textContent;
+                e.innerHTML = '';
+                
+                t.split('').forEach((c, i) => {
+                    const s = document.createElement('span');
+                    s.textContent = c;
+                    s.style.display = 'inline-block';
+                    s.style.fontWeight = 'bold';
+                    s.style.fontSize = '1.2em';
+                    e.appendChild(s);
+                    
+                    setInterval(() => {
+                        const h = (Date.now()/50 + i*30) % 360;
+                        s.style.color = `hsl(${h}, 100%, 50%)`;
+                        s.style.textShadow = `0 0 5px hsl(${h}, 100%, 50%)`;
+                    }, 50);
+                });
+            }
+        });
+    }
+    
+    d();
+    
+    const observer = new MutationObserver(() => d());
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
+
+})();
