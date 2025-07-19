@@ -39,6 +39,14 @@
                     <div class="version-container">
                         <strong>Sua versão:</strong> <span class="version-text">${cookieValue}</span><br>
                         <strong>Nova versão:</strong> <span class="version-text">${latestVersion}</span>
+                    </div>
+                    <div class="manual-update-container">
+                        <div class="manual-update-warning">Caso o botão de Atualizar não funcione:</div>
+                        <div class="link-container">
+                            <input type="text" value="https://update.greasyfork.org/scripts/470618/FireDeluxe.user.js" readonly class="update-link">
+                            <button class="copy-button">Copiar</button>
+                        </div>
+                        <div class="instructions">Cole esse link na barra de pesquisa do navegador</div>
                     </div>`,
                     'https://greasyfork.org/pt-BR/scripts/470618-firedeluxe'
                 );
@@ -52,7 +60,15 @@
     function showUpdateAlert() {
         showModal(
             'Atualização Recomendada', 
-            '<div class="update-message">Uma atualização do FireDeluxe está disponível.</div>',
+            `<div class="update-message">Uma atualização do FireDeluxe está disponível.</div>
+            <div class="manual-update-container">
+                <div class="manual-update-warning">Caso o botão de Atualizar não funcione:</div>
+                <div class="link-container">
+                    <input type="text" value="https://update.greasyfork.org/scripts/470618/FireDeluxe.user.js" readonly class="update-link">
+                    <button class="copy-button">Copiar</button>
+                </div>
+                <div class="instructions">Cole esse link na barra de pesquisa do navegador</div>
+            </div>`,
             'https://greasyfork.org/pt-BR/scripts/470618-firedeluxe'
         );
     }
@@ -107,7 +123,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                z-index: 2147483647;
+                z-index: 10000;
             }
             .modal-panel {
                 background-color: #222;
@@ -145,6 +161,7 @@
                 padding: 15px;
                 border-radius: 6px;
                 margin-top: 10px;
+                margin-bottom: 15px;
             }
             .version-container strong {
                 color: ${themeColor};
@@ -157,6 +174,52 @@
                 font-family: monospace;
                 display: inline-block;
                 margin: 3px 0;
+            }
+            .manual-update-container {
+                background: rgba(0,0,0,0.2);
+                padding: 15px;
+                border-radius: 6px;
+                margin-top: 15px;
+                border: 1px dashed ${themeColor}66;
+            }
+            .manual-update-warning {
+                color: ${themeColor};
+                margin-bottom: 10px;
+                font-size: 0.9em;
+            }
+            .link-container {
+                display: flex;
+                gap: 5px;
+                margin-bottom: 8px;
+            }
+            .update-link {
+                flex: 1;
+                padding: 8px;
+                background-color: #333;
+                border: 1px solid #444;
+                border-radius: 4px;
+                color: #EEE;
+                font-family: monospace;
+                font-size: 0.8em;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .copy-button {
+                padding: 8px 12px;
+                background-color: ${themeColor};
+                color: #000;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: background-color 0.2s;
+            }
+            .copy-button:hover {
+                background-color: ${adjustBrightness(themeColor, 15)};
+            }
+            .instructions {
+                font-size: 0.8em;
+                color: #AAA;
             }
             .modal-buttons {
                 display: flex;
@@ -194,6 +257,24 @@
         overlay.appendChild(modal);
         document.body.appendChild(style);
         document.body.appendChild(overlay);
+
+        const copyButton = overlay.querySelector('.copy-button');
+        if (copyButton) {
+            copyButton.addEventListener('click', () => {
+                const linkInput = overlay.querySelector('.update-link');
+                linkInput.select();
+                document.execCommand('copy');
+                
+                const originalText = copyButton.textContent;
+                copyButton.textContent = 'Copiado!';
+                copyButton.style.backgroundColor = '#4CAF50';
+                
+                setTimeout(() => {
+                    copyButton.textContent = originalText;
+                    copyButton.style.backgroundColor = themeColor;
+                }, 2000);
+            });
+        }
 
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay || e.target.classList.contains('close-button')) {
