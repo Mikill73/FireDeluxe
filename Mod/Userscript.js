@@ -314,7 +314,8 @@ const remover = () => {
       'script[src*="acscdn.com/script/suv5.js"], script[src*="acscdn.com/script/banner.js"], ' +
       'meta[name="admaven-placement"], meta[name="a.validate.01"], ' +
       'link[href*="youradexchange.com"], link[href*="acscdn.com"], ' +
-      '#page-mask, .ad-box, #dontfoid, iframe[src="javascript:false"][width="0"][height="0"][style="display: none;"]'
+      '#page-mask, .ad-box, #dontfoid, iframe[src="javascript:false"][width="0"][height="0"][style="display: none;"], ' +
+      'a[href*="adexchangeclear.com/ad/visit.php?al="][style*="display: none"][style*="left: -1000px"]'
     )
   ];
   elems.push(
@@ -369,9 +370,16 @@ new MutationObserver(remover).observe(document.documentElement, {childList: true
 
 })();
 
-//Remoção de localstorages relacionados a anúncios
+//Remoção de localstorages e cookies relacionados a anúncios
 (function() {
   'use strict';
+
+document.cookie.split(';').forEach(cookie => {
+  const name = cookie.split('=')[0].trim();
+  if (name.startsWith('PopAds')) {
+    document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
+  }
+});
 
 localStorage.removeItem('_spop_popfired');
 localStorage.removeItem('_spop_popfired_expires');
