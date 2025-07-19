@@ -1411,6 +1411,16 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
         const existingModal = document.querySelector('.modal-overlay');
         if (existingModal) existingModal.remove();
 
+        let themeColor = '#FFA500';
+        try {
+            const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes'));
+            if (config && config.themeColor) {
+                themeColor = config.themeColor.startsWith('#') ? config.themeColor : `#${config.themeColor}`;
+            }
+        } catch (e) {
+            console.log('Erro ao ler cor do tema:', e);
+        }
+
         const modal = document.createElement('div');
         modal.className = 'modal-panel';
         
@@ -1426,7 +1436,7 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
             </div>
             <div class="modal-buttons">
                 ${actionUrl ? `
-                    <a href="${actionUrl}" target="_blank" class="update-button">
+                    <a href="${actionUrl}" target="_blank" rel="noopener noreferrer" class="update-button">
                         Atualizar
                     </a>` : ''}
                 <button class="close-button">
@@ -1451,7 +1461,7 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
             }
             .modal-panel {
                 background-color: #222;
-                border: 1px solid #FFA500;
+                border: 1px solid ${themeColor};
                 border-radius: 8px;
                 width: 90%;
                 max-width: 400px;
@@ -1463,7 +1473,7 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
             }
             .modal-header h3 {
                 margin: 0;
-                color: #FFA500;
+                color: ${themeColor};
                 text-align: center;
                 font-size: 1.2em;
             }
@@ -1473,12 +1483,12 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
                 line-height: 1.6;
             }
             .update-message {
-                color: #EEE !important;
+                color: #EEE;
                 margin-bottom: 15px;
                 font-size: 1em;
             }
             .error-message {
-                color: #EEE !important;
+                color: #EEE;
             }
             .version-container {
                 background: rgba(0,0,0,0.3);
@@ -1487,10 +1497,10 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
                 margin-top: 10px;
             }
             .version-container strong {
-                color: #FFA500;
+                color: ${themeColor};
             }
             .version-text {
-                color: #FFF !important;
+                color: #FFF;
                 background-color: #333;
                 padding: 3px 8px;
                 border-radius: 4px;
@@ -1515,16 +1525,16 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
                 font-size: 0.9em;
             }
             .update-button {
-                background-color: #FFA500;
-                color: #000 !important;
+                background-color: ${themeColor};
+                color: #000;
                 text-decoration: none;
             }
             .update-button:hover {
-                background-color: #FFB733;
+                background-color: ${adjustBrightness(themeColor, 20)};
             }
             .close-button {
                 background-color: #444;
-                color: #FFF !important;
+                color: #FFF;
             }
             .close-button:hover {
                 background-color: #555;
@@ -1538,8 +1548,29 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay || e.target.classList.contains('close-button')) {
                 overlay.remove();
+                style.remove();
             }
         });
+    }
+
+    function adjustBrightness(color, percent) {
+        let R = parseInt(color.substring(1,3), 16);
+        let G = parseInt(color.substring(3,5), 16);
+        let B = parseInt(color.substring(5,7), 16);
+
+        R = parseInt(R * (100 + percent) / 100);
+        G = parseInt(G * (100 + percent) / 100);
+        B = parseInt(B * (100 + percent) / 100);
+
+        R = R < 255 ? R : 255;
+        G = G < 255 ? G : 255;
+        B = B < 255 ? B : 255;
+
+        const RR = R.toString(16).padStart(2, '0');
+        const GG = G.toString(16).padStart(2, '0');
+        const BB = B.toString(16).padStart(2, '0');
+
+        return `#${RR}${GG}${BB}`;
     }
 
     checkVersion();
