@@ -1275,7 +1275,7 @@ const configuracoesHTML = `
             return color;
         }
 
-        function handleImageUpload(inputId, previewId, containerId, errorId, dataUrlVar) {
+        function handleImageUpload(inputId, previewId, containerId, errorId) {
             const file = document.getElementById(inputId).files[0];
             const errorElement = document.getElementById(errorId);
             errorElement.style.display = 'none';
@@ -1289,8 +1289,13 @@ const configuracoesHTML = `
                 
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    window[dataUrlVar] = event.target.result;
-                    document.getElementById(previewId).src = window[dataUrlVar];
+                    if (inputId === 'siteBgImage') {
+                        siteBgDataUrl = event.target.result;
+                    } else if (inputId === 'chatBgImage') {
+                        chatBgDataUrl = event.target.result;
+                    }
+                    
+                    document.getElementById(previewId).src = event.target.result;
                     document.getElementById(containerId).style.display = 'block';
                 };
                 reader.onerror = function() {
@@ -1300,12 +1305,17 @@ const configuracoesHTML = `
             }
         }
 
-        function removeImage(inputId, previewId, containerId, errorId, dataUrlVar) {
+        function removeImage(inputId, previewId, containerId, errorId) {
             document.getElementById(inputId).value = '';
             document.getElementById(previewId).src = '';
             document.getElementById(containerId).style.display = 'none';
-            window[dataUrlVar] = '';
             document.getElementById(errorId).style.display = 'none';
+            
+            if (inputId === 'siteBgImage') {
+                siteBgDataUrl = '';
+            } else if (inputId === 'chatBgImage') {
+                chatBgDataUrl = '';
+            }
         }
 
         document.getElementById('randomColorBtn').addEventListener('click', function() {
@@ -1327,19 +1337,19 @@ const configuracoesHTML = `
         });
 
         document.getElementById('siteBgImage').addEventListener('change', function() {
-            handleImageUpload('siteBgImage', 'siteBgPreview', 'siteBgPreviewContainer', 'siteBgError', 'siteBgDataUrl');
+            handleImageUpload('siteBgImage', 'siteBgPreview', 'siteBgPreviewContainer', 'siteBgError');
         });
 
         document.getElementById('removeSiteBg').addEventListener('click', function() {
-            removeImage('siteBgImage', 'siteBgPreview', 'siteBgPreviewContainer', 'siteBgError', 'siteBgDataUrl');
+            removeImage('siteBgImage', 'siteBgPreview', 'siteBgPreviewContainer', 'siteBgError');
         });
 
         document.getElementById('chatBgImage').addEventListener('change', function() {
-            handleImageUpload('chatBgImage', 'chatBgPreview', 'chatBgPreviewContainer', 'chatBgError', 'chatBgDataUrl');
+            handleImageUpload('chatBgImage', 'chatBgPreview', 'chatBgPreviewContainer', 'chatBgError');
         });
 
         document.getElementById('removeChatBg').addEventListener('click', function() {
-            removeImage('chatBgImage', 'chatBgPreview', 'chatBgPreviewContainer', 'chatBgError', 'chatBgDataUrl');
+            removeImage('chatBgImage', 'chatBgPreview', 'chatBgPreviewContainer', 'chatBgError');
         });
 
         document.getElementById('saveSettings').addEventListener('click', function() {
@@ -1360,29 +1370,24 @@ const configuracoesHTML = `
         document.getElementById('resetSettings').addEventListener('click', function() {
             if (confirm('Tem certeza que deseja redefinir todas as configurações para os valores padrão?')) {
                 localStorage.removeItem('firedeluxe_configuracoes');
-
                 themeColor = '#FFA500';
                 document.getElementById('themeColor').value = themeColor;
                 updateThemeSample(themeColor);
-
                 document.getElementById('siteBgImage').value = '';
                 document.getElementById('siteBgPreview').src = '';
                 document.getElementById('siteBgPreviewContainer').style.display = 'none';
                 siteBgDataUrl = '';
                 document.getElementById('siteBgError').style.display = 'none';
-
                 document.getElementById('chatBgImage').value = '';
                 document.getElementById('chatBgPreview').src = '';
                 document.getElementById('chatBgPreviewContainer').style.display = 'none';
                 chatBgDataUrl = '';
                 document.getElementById('chatBgError').style.display = 'none';
-
                 document.getElementById('adblockerToggle').checked = false;
                 document.getElementById('divulgarToggle').checked = false;
                 document.getElementById('allSeasonsToggle').checked = false;
                 document.getElementById('automationEmail').value = '';
                 document.getElementById('automationPassword').value = '';
-                
                 window.location.reload();
             }
         });
