@@ -1113,6 +1113,23 @@ const configuracoesHTML = `
         </div>
 
         <div class="settings-section">
+            <h3 class="section-title">Carregar Todas as Temporadas</h3>
+            <div class="settings-row">
+                <label class="settings-label">Ativar função:</label>
+                <label class="switch">
+                    <input type="checkbox" id="allSeasonsToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="info-text">
+                Quando ativado, tenta carregar todas as temporadas de um anime em uma única página. Uma tela de carregamento será exibida durante o processo.
+            </div>
+            <div class="warning-text">
+                Esta função não funciona para todos os animes e pode aumentar o tempo de carregamento.
+            </div>
+        </div>
+
+        <div class="settings-section">
             <h3 class="section-title">Tema do Site</h3>
             <div class="settings-row">
                 <label class="settings-label">Cor do Tema:</label>
@@ -1186,6 +1203,7 @@ const configuracoesHTML = `
         let themeColor = '#FFA500';
         let adblockerEnabled = false;
         let divulgarEnabled = false;
+        let allSeasonsEnabled = false;
 
         function loadSettings() {
             const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
@@ -1217,6 +1235,11 @@ const configuracoesHTML = `
                 if (settings.divulgar) {
                     divulgarEnabled = settings.divulgar === 'on';
                     document.getElementById('divulgarToggle').checked = divulgarEnabled;
+                }
+
+                if (settings.allSeasons) {
+                    allSeasonsEnabled = settings.allSeasons === 'on';
+                    document.getElementById('allSeasonsToggle').checked = allSeasonsEnabled;
                 }
 
                 if (settings.email) {
@@ -1252,6 +1275,39 @@ const configuracoesHTML = `
             return color;
         }
 
+        function handleImageUpload(inputId, previewId, containerId, errorId, dataUrlVar) {
+            const file = document.getElementById(inputId).files[0];
+            const errorElement = document.getElementById(errorId);
+            errorElement.style.display = 'none';
+            
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    errorElement.style.display = 'block';
+                    document.getElementById(inputId).value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    window[dataUrlVar] = event.target.result;
+                    document.getElementById(previewId).src = window[dataUrlVar];
+                    document.getElementById(containerId).style.display = 'block';
+                };
+                reader.onerror = function() {
+                    errorElement.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage(inputId, previewId, containerId, errorId, dataUrlVar) {
+            document.getElementById(inputId).value = '';
+            document.getElementById(previewId).src = '';
+            document.getElementById(containerId).style.display = 'none';
+            window[dataUrlVar] = '';
+            document.getElementById(errorId).style.display = 'none';
+        }
+
         document.getElementById('randomColorBtn').addEventListener('click', function() {
             const randomColor = getRandomColor();
             themeColor = randomColor;
@@ -1270,70 +1326,20 @@ const configuracoesHTML = `
             updateThemeSample(themeColor);
         });
 
-        document.getElementById('siteBgImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const errorElement = document.getElementById('siteBgError');
-            errorElement.style.display = 'none';
-            
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    errorElement.style.display = 'block';
-                    document.getElementById('siteBgImage').value = '';
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    siteBgDataUrl = event.target.result;
-                    document.getElementById('siteBgPreview').src = siteBgDataUrl;
-                    document.getElementById('siteBgPreviewContainer').style.display = 'block';
-                };
-                reader.onerror = function() {
-                    errorElement.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
+        document.getElementById('siteBgImage').addEventListener('change', function() {
+            handleImageUpload('siteBgImage', 'siteBgPreview', 'siteBgPreviewContainer', 'siteBgError', 'siteBgDataUrl');
         });
 
         document.getElementById('removeSiteBg').addEventListener('click', function() {
-            document.getElementById('siteBgImage').value = '';
-            document.getElementById('siteBgPreview').src = '';
-            document.getElementById('siteBgPreviewContainer').style.display = 'none';
-            siteBgDataUrl = '';
-            document.getElementById('siteBgError').style.display = 'none';
+            removeImage('siteBgImage', 'siteBgPreview', 'siteBgPreviewContainer', 'siteBgError', 'siteBgDataUrl');
         });
 
-        document.getElementById('chatBgImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const errorElement = document.getElementById('chatBgError');
-            errorElement.style.display = 'none';
-            
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    errorElement.style.display = 'block';
-                    document.getElementById('chatBgImage').value = '';
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    chatBgDataUrl = event.target.result;
-                    document.getElementById('chatBgPreview').src = chatBgDataUrl;
-                    document.getElementById('chatBgPreviewContainer').style.display = 'block';
-                };
-                reader.onerror = function() {
-                    errorElement.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
+        document.getElementById('chatBgImage').addEventListener('change', function() {
+            handleImageUpload('chatBgImage', 'chatBgPreview', 'chatBgPreviewContainer', 'chatBgError', 'chatBgDataUrl');
         });
 
         document.getElementById('removeChatBg').addEventListener('click', function() {
-            document.getElementById('chatBgImage').value = '';
-            document.getElementById('chatBgPreview').src = '';
-            document.getElementById('chatBgPreviewContainer').style.display = 'none';
-            chatBgDataUrl = '';
-            document.getElementById('chatBgError').style.display = 'none';
+            removeImage('chatBgImage', 'chatBgPreview', 'chatBgPreviewContainer', 'chatBgError', 'chatBgDataUrl');
         });
 
         document.getElementById('saveSettings').addEventListener('click', function() {
@@ -1343,6 +1349,7 @@ const configuracoesHTML = `
                 chatBgImage: chatBgDataUrl,
                 adblocker: document.getElementById('adblockerToggle').checked ? 'on' : 'off',
                 divulgar: document.getElementById('divulgarToggle').checked ? 'on' : 'off',
+                allSeasons: document.getElementById('allSeasonsToggle').checked ? 'on' : 'off',
                 email: document.getElementById('automationEmail').value,
                 senha: document.getElementById('automationPassword').value
             };
@@ -1372,6 +1379,7 @@ const configuracoesHTML = `
 
                 document.getElementById('adblockerToggle').checked = false;
                 document.getElementById('divulgarToggle').checked = false;
+                document.getElementById('allSeasonsToggle').checked = false;
                 document.getElementById('automationEmail').value = '';
                 document.getElementById('automationPassword').value = '';
                 
@@ -3051,5 +3059,314 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
     const observer = new MutationObserver(() => d());
     observer.observe(document.body, { childList: true, subtree: true });
 })();
+
+})();
+
+//Todas as temporadas do anime em uma página (não funciona para todos)
+(function() {
+    'use strict';
+
+const currentHref = window.location.href;
+const matchResult = currentHref.match(/\/animes\/(.+)-todos-os-episodios/);
+
+const getThemeColor = () => {
+  try {
+    const config = localStorage.getItem('firedeluxe_configuracoes');
+    if (config) {
+      const parsedConfig = JSON.parse(config);
+      return parsedConfig.themeColor || '#FFA500';
+    }
+  } catch (e) {
+    return '#FFA500';
+  }
+  return '#FFA500';
+};
+
+const shouldRunAllSeasons = () => {
+  try {
+    const config = localStorage.getItem('firedeluxe_configuracoes');
+    if (config) {
+      const parsedConfig = JSON.parse(config);
+      return parsedConfig.allSeasons === 'on';
+    }
+  } catch (e) {
+    return false;
+  }
+  return false;
+};
+
+const createLoadingOverlay = () => {
+  const themeColor = getThemeColor();
+  
+  const overlay = document.createElement('div');
+  overlay.id = 'season-loader-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+  overlay.style.display = 'flex';
+  overlay.style.flexDirection = 'column';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '99999';
+  overlay.style.color = themeColor;
+  overlay.style.fontSize = '24px';
+  overlay.style.fontWeight = 'bold';
+  overlay.style.fontFamily = 'Arial, sans-serif';
+  overlay.style.transition = 'opacity 0.3s ease';
+  
+  const loadingText = document.createElement('div');
+  loadingText.id = 'season-loader-text';
+  loadingText.textContent = 'Carregando';
+  loadingText.style.marginBottom = '20px';
+  loadingText.style.textShadow = `0 0 10px ${themeColor}70`;
+  
+  const dotsAnimation = document.createElement('div');
+  dotsAnimation.id = 'season-loader-dots';
+  dotsAnimation.style.display = 'flex';
+  dotsAnimation.style.justifyContent = 'center';
+  
+  for (let i = 0; i < 3; i++) {
+    const dot = document.createElement('div');
+    dot.style.width = '10px';
+    dot.style.height = '10px';
+    dot.style.backgroundColor = themeColor;
+    dot.style.borderRadius = '50%';
+    dot.style.margin = '0 5px';
+    dot.style.opacity = '0.3';
+    dot.style.transform = 'translateY(0)';
+    dot.style.animation = `pulse 1.5s infinite ${i * 0.2}s`;
+    dotsAnimation.appendChild(dot);
+  }
+  
+  overlay.appendChild(loadingText);
+  overlay.appendChild(dotsAnimation);
+  
+  const style = document.createElement('style');
+  style.textContent = `@keyframes pulse{0%,100%{opacity:0.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-5px)}}`;
+  
+  document.head.appendChild(style);
+  document.body.appendChild(overlay);
+  
+  return overlay;
+};
+
+const showLoader = () => {
+  createLoadingOverlay();
+};
+
+const hideLoader = () => {
+  const overlay = document.getElementById('season-loader-overlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.remove();
+      const style = document.head.querySelector('style');
+      if (style) style.remove();
+    }, 300);
+  }
+};
+
+if (matchResult && shouldRunAllSeasons()) {
+    const fullPath = matchResult[1];
+    let baseName = '';
+    let currentSeason = 1;
+    let isNumberedSeason = false;
+    let isDubbed = fullPath.includes('-dublado');
+    let seasonPrefix = '';
+
+    const cleanBaseName = (name) => name ? name.replace(/--+/g, '-').replace(/-+$/, '') : '';
+    const extractSeasonFromRoman = (str) => (str?.match(/(i+)$/i) || [])[1]?.length || 0;
+
+    const seasonPatterns = [
+        { regex: /(.+?)-(2nd|3rd|\d+th)-season(-dublado)?$/, type: 'suffix' },
+        { regex: /(.+?)-season-(\d+)(-dublado)?$/, type: 'season' },
+        { regex: /(.+?)-part-(\d+)(-dublado)?$/, type: 'part' },
+        { regex: /(.+?)-part-(\d+th)(-dublado)?$/, type: 'part-th' },
+        { regex: /(.+?)-(second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth)-season(-dublado)?$/, type: 'word' },
+        { regex: /(.+?)(i{1,3})(-dublado)?$/, type: 'roman' },
+        { regex: /(.+?)-(\d+)(-dublado)?$/, type: 'number' }
+    ];
+
+    const bestMatch = seasonPatterns.reduce((best, pattern) => {
+        const match = fullPath.match(pattern.regex);
+        if (match) {
+            const matchEnd = match.index + match[0].length;
+            return matchEnd > (best?.index || -1) ? { ...pattern, match, index: matchEnd } : best;
+        }
+        return best;
+    }, null);
+
+    if (bestMatch?.match) {
+        baseName = cleanBaseName(bestMatch.match[1]);
+        isDubbed = isDubbed || (bestMatch.match[bestMatch.match.length - 2] === '-dublado');
+        
+        switch (bestMatch.type) {
+            case 'roman': 
+                currentSeason = extractSeasonFromRoman(bestMatch.match[2]); 
+                seasonPrefix = bestMatch.match[2];
+                break;
+            case 'number': 
+                currentSeason = parseInt(bestMatch.match[2]); 
+                isNumberedSeason = true;
+                seasonPrefix = `-${bestMatch.match[2]}`;
+                break;
+            case 'part': 
+            case 'part-th': 
+                currentSeason = parseInt(bestMatch.match[2]); 
+                seasonPrefix = `-part-${bestMatch.match[2]}`;
+                break;
+            case 'season': 
+                currentSeason = parseInt(bestMatch.match[2]); 
+                seasonPrefix = `-season-${bestMatch.match[2]}`;
+                break;
+            case 'suffix': 
+                const num = bestMatch.match[2];
+                currentSeason = num === '2nd' ? 2 : num === '3rd' ? 3 : parseInt(num);
+                seasonPrefix = `-${num}-season`;
+                break;
+            case 'word': 
+                const words = ['second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth'];
+                currentSeason = words.indexOf(bestMatch.match[2]) + 2;
+                seasonPrefix = `-${bestMatch.match[2]}-season`;
+                break;
+        }
+    } else {
+        const numberMatch = fullPath.match(/(.+?)-(\d+)(-dublado)?$/);
+        if (numberMatch) {
+            baseName = cleanBaseName(numberMatch[1]);
+            currentSeason = parseInt(numberMatch[2]);
+            isNumberedSeason = true;
+            seasonPrefix = `-${numberMatch[2]}`;
+            isDubbed = isDubbed || (numberMatch[3] !== undefined);
+        } else {
+            baseName = cleanBaseName(fullPath.replace(/-dublado$/, ''));
+            isDubbed = fullPath.endsWith('-dublado');
+        }
+    }
+
+    const checkSeasonExists = async (season, prefix = '') => {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const dubbedSuffix = isDubbed ? '-dublado' : '';
+        const seasonUrl = `https://animefire.plus/animes/${baseName}${prefix}${dubbedSuffix}-todos-os-episodios`.replace(/--+/g, '-');
+        try {
+            const response = await fetch(seasonUrl, { method: 'HEAD' });
+            return response.ok ? seasonUrl : false;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const getSeasonContent = async (url) => {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        try {
+            const response = await fetch(url);
+            if (response.ok) {
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const section = doc.querySelector('section.mt-3.mb-2');
+                if (section) {
+                    return { 
+                        section: section.cloneNode(true), 
+                        episodes: Array.from(section.querySelectorAll('a.lEp')) 
+                    };
+                }
+            }
+        } catch (error) {
+            return null;
+        }
+        return null;
+    };
+
+    const existingSeasons = new Set();
+    const currentSections = Array.from(document.querySelectorAll('section.mt-3.mb-2'));
+    currentSections.forEach(section => {
+        const match = section.querySelector('h2.tEp')?.textContent.match(/Temporada (\d+)/);
+        if (match) existingSeasons.add(parseInt(match[1]));
+    });
+
+    if (!existingSeasons.has(currentSeason) && currentSections[0]) {
+        currentSections[0].querySelector('h2.tEp').textContent = `Temporada ${currentSeason}`;
+        existingSeasons.add(currentSeason);
+    }
+
+    const processSeason = async (season) => {
+        if (existingSeasons.has(season)) return null;
+        
+        let seasonUrl;
+        
+        if (season === 1) {
+            seasonUrl = await checkSeasonExists(1);
+            if (!seasonUrl) seasonUrl = await checkSeasonExists(1, isDubbed ? '-dublado' : '');
+        } else {
+            const prefixes = [];
+            
+            if (seasonPrefix.includes('ii')) prefixes.push(`-${'i'.repeat(season)}`);
+            if (seasonPrefix.includes('part')) prefixes.push(`-part-${season}`, `-part-${season}th`);
+            if (seasonPrefix.includes('season')) prefixes.push(`-season-${season}`);
+            if (isNumberedSeason) prefixes.push(`-${season}`);
+            if (prefixes.length === 0) prefixes.push(`-${season}th-season`, `-season-${season}`, `-part-${season}`, `-${season}`);
+            
+            for (const prefix of prefixes) {
+                seasonUrl = await checkSeasonExists(season, prefix);
+                if (seasonUrl) break;
+            }
+        }
+        
+        return seasonUrl ? await getSeasonContent(seasonUrl) : null;
+    };
+
+    const collectSeasons = async (seasonsToCheck) => {
+        const results = [];
+        for (const season of seasonsToCheck) {
+            const content = await processSeason(season);
+            if (content) results.push({ season, content });
+            else if (season !== currentSeason) break;
+        }
+        return results;
+    };
+
+    (async () => {
+        showLoader();
+        
+        try {
+            const seasonsToCheck = [];
+            if (!existingSeasons.has(1)) seasonsToCheck.push(1);
+            for (let i = currentSeason - 1; i >= 2; i--) seasonsToCheck.push(i);
+            for (let i = currentSeason + 1; i <= currentSeason + 15; i++) seasonsToCheck.push(i);
+
+            const collectedSeasons = await collectSeasons(seasonsToCheck);
+            const uniqueSeasons = collectedSeasons.filter((v, i, a) => a.findIndex(t => t.season === v.season) === i);
+
+            if (uniqueSeasons.length > 0) {
+                const fragment = document.createDocumentFragment();
+                uniqueSeasons
+                    .sort((a, b) => a.season - b.season)
+                    .forEach(({season, content}) => {
+                        const newSection = content.section;
+                        newSection.querySelector('h2.tEp').textContent = `Temporada ${season}`;
+                        const episodesDiv = newSection.querySelector('.div_video_list');
+                        episodesDiv.innerHTML = '';
+                        content.episodes.forEach(ep => episodesDiv.appendChild(ep.cloneNode(true)));
+                        fragment.appendChild(newSection);
+                    });
+
+                if (currentSections[0]) {
+                    currentSections[0].parentNode.insertBefore(fragment, currentSections[0]);
+                } else {
+                    document.body.appendChild(fragment);
+                }
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (error) {
+        } finally {
+            hideLoader();
+        }
+    })();
+}
 
 })();
