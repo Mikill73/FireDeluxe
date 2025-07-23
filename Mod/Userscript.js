@@ -3375,3 +3375,183 @@ if (matchResult && shouldRunAllSeasons()) {
 }
 
 })();
+
+//Aviso de novos episódios e adição dos mesmos sem reiniciar a página
+(function() {
+    'use strict';
+
+const styleElement = document.createElement('style');
+styleElement.innerHTML = `
+  .animefire-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 9999;
+    font-weight: bold;
+    animation: animefireFadeIn 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    max-width: 90%;
+    backdrop-filter: blur(5px);
+  }
+  @keyframes animefireFadeIn {
+    from { opacity: 0; transform: translate(-50%, -20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  @keyframes animefireFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+`;
+document.head.appendChild(styleElement);
+
+let notificationQueue = [];
+let isNotificationActive = false;
+let initialEpisodesLoaded = false;
+
+const showNotification = (title) => {
+  const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes')) || {};
+  const themeColor = config.themeColor || '#21D3FF';
+  
+  const notification = document.createElement('div');
+  notification.className = 'animefire-notification';
+  notification.style.backgroundColor = `${themeColor}40`;
+  notification.style.border = `1px solid ${themeColor}`;
+  notification.style.color = '#fff';
+  notification.textContent = `Novo episódio: ${title}`;
+  
+  document.body.appendChild(notification);
+  isNotificationActive = true;
+  
+  setTimeout(() => {
+    notification.style.animation = 'animefireFadeOut 0.5s ease-in';
+    setTimeout(() => {
+      notification.remove();
+      isNotificationActive = false;
+      processQueue();
+    }, 500);
+  }, 5000);
+};
+
+const processQueue = () => {
+  if (notificationQueue.length > 0 && !isNotificationActive) {
+    const nextEpisode = notificationQueue.shift();
+    showNotification(nextEpisode);
+  }
+};
+
+const addToQueue = (titles) => {
+  notificationQueue = [...notificationQueue, ...titles];
+  processQueue();
+};
+
+const getEpisodesList = async () => {
+  const response = await fetch('https://animefire.plus/');
+  const html = await response.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  
+  return {
+    elements: Array.from(doc.querySelectorAll('.divCardUltimosEpsHome')),
+    data: Array.from(doc.querySelectorAll('.divCardUltimosEpsHome')).map(ep => ({
+      title: ep.getAttribute('title'),
+      href: ep.querySelector('a').href,
+      time: ep.querySelector('.ep-dateModified').getAttribute('data-date-modified')
+    }))
+  };
+};
+
+const formatTimeAgo = (dateString) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = Math.floor((now - date) / 1000);
+  
+  if (diff < 60) return `${diff} segundos atrás`;
+  if (diff < 3600) return `${Math.floor(diff/60)} minutos atrás`;
+  if (diff < 86400) return `${Math.floor(diff/3600)} horas atrás`;
+  if (diff < 2592000) return `${Math.floor(diff/86400)} dias atrás`;
+  if (diff < 31536000) return `${Math.floor(diff/2592000)} meses atrás`;
+  return `${Math.floor(diff/31536000)} anos atrás`;
+};
+
+const updateHomePageEpisodes = (newEpisodes) => {
+  const row = document.querySelector(".card-group .row");
+  if (!row) return;
+
+  newEpisodes.reverse().forEach(episode => {
+    const clonedEpisode = episode.cloneNode(true);
+    const lazyImages = clonedEpisode.querySelectorAll('.lazy');
+    
+    lazyImages.forEach(img => {
+      if (img.dataset.src) {
+        img.src = img.dataset.src;
+        img.classList.remove('lazy');
+      }
+    });
+    
+    const timeElement = clonedEpisode.querySelector('.ep-dateModified');
+    if (timeElement) {
+      const dateModified = timeElement.getAttribute('data-date-modified');
+      if (dateModified) {
+        timeElement.textContent = formatTimeAgo(dateModified);
+      }
+    }
+    
+    row.insertBefore(clonedEpisode, row.firstChild);
+  });
+};
+
+const updateLocalStorageEpisodes = async () => {
+  const { elements, data } = await getEpisodesList();
+  localStorage.setItem('firedeluxe_episodios', JSON.stringify(data));
+  
+  if (window.location.href === 'https://animefire.plus/') {
+    const storedTitles = JSON.parse(localStorage.getItem('firedeluxe_episodios_prev') || '[]');
+    const newEpisodes = elements.filter(ep => 
+      !storedTitles.some(storedEp => storedEp.title === ep.getAttribute('title'))
+    );
+    
+    if (newEpisodes.length > 0) {
+      updateHomePageEpisodes(newEpisodes);
+    }
+  }
+  
+  localStorage.setItem('firedeluxe_episodios_prev', JSON.stringify(data));
+  return data;
+};
+
+const checkForNewEpisodes = async () => {
+  const { data: currentEpisodes } = await getEpisodesList();
+  const storedEpisodes = JSON.parse(localStorage.getItem('firedeluxe_episodios')) || [];
+  
+  if (window.location.href !== 'https://animefire.plus/') {
+    const newEpisodes = currentEpisodes.filter(ep => 
+      !storedEpisodes.some(storedEp => storedEp.title === ep.title)
+    );
+    
+    if (newEpisodes.length > 0) {
+      addToQueue(newEpisodes.map(ep => ep.title));
+    }
+  }
+};
+
+const initialize = async () => {
+  if (!initialEpisodesLoaded) {
+    await updateLocalStorageEpisodes();
+    initialEpisodesLoaded = true;
+    
+    if (window.location.href !== 'https://animefire.plus/') {
+      setInterval(checkForNewEpisodes, 6000);
+    }
+    
+    setInterval(updateLocalStorageEpisodes, 30000);
+  }
+};
+
+initialize();
+
+})();
