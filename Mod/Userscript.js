@@ -3039,7 +3039,7 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
     function h(t) { return document.querySelectorAll(t); }
     
     function d() {
-        h('a[href*="/users/988233449"]').forEach(e => {
+        h('a.linkPerfilPC[href*="/users/988233449"], a.usr_name_cmt[href*="/users/988233449"], a.us_reply[href*="/users/988233449"]').forEach(e => {
             if (!e.dataset.rainbow) {
                 e.dataset.rainbow = 'true';
                 e.style.display = 'inline-block';
