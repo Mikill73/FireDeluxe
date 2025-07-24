@@ -1489,6 +1489,12 @@ const codigoJS = `
             botaoTexto: 'Dar Sugestão',
             icone: '💡',
             usarImagem: false 
+        },
+        {
+            titulo: 'Ative a configuração de divulgar o FireDeluxe',
+            descricao: 'Essa configuração coloca o link do site do FireDeluxe na sua biografia',
+            icone: '📢',
+            usarImagem: false 
         }
     ];
 
