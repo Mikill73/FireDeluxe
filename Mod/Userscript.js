@@ -1409,8 +1409,10 @@ const configuracoesHTML = `
 </html>
 `;
 
-localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
-    configuracoes: configuracoesHTML
+const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_html')) || {};
+dados.configuracoes = configuracoesHTML;
+localStorage.setItem('firedeluxe_codigos_html', JSON.stringify(dados));
+
 }));
 
 })();
@@ -1644,8 +1646,10 @@ const codigoJS = `
 })();
 `;
 
-localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
-    contribuição: codigoJS
+const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
+dados.contribuição = codigoJS;
+localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
+
 }));
 
 })();
@@ -1842,8 +1846,10 @@ const codigoJS = `(() => {
     init();
 })();`;
 
-localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
-    funcionalidades: codigoJS
+const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
+dados.contribuição = codigoJS;
+localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
+
 }));
 
 })();
