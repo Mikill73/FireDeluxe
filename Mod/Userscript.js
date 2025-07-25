@@ -369,17 +369,6 @@
 
     const columnsData = [
         {
-            name: 'Controles',
-            buttons: [
-                {
-                    name: 'Configurações',
-                    storageKey: 'configuracoes',
-                    type: 'html',
-                    info: 'Configura diversas funções do FireDeluxe, incluindo aparência, comportamentos e preferências.'
-                }
-            ]
-        },
-        {
             name: 'Informações',
             buttons: [
                 {
@@ -398,6 +387,17 @@
                     storageKey: 'funcionalidades',
                     type: 'js',
                     info: 'Tudo que o FireDeluxe tem a oferecer'
+                }
+            ]
+        },
+        {
+            name: 'Controles',
+            buttons: [
+                {
+                    name: 'Configurações',
+                    storageKey: 'configuracoes',
+                    type: 'html',
+                    info: 'Configura diversas funções do FireDeluxe, incluindo aparência, comportamentos e preferências.'
                 }
             ]
         }
