@@ -380,13 +380,24 @@
             ]
         },
         {
-            name: 'Controles',
+            name: 'Informações',
             buttons: [
                 {
                     name: 'Contribuição',
                     storageKey: 'contribuição',
                     type: 'js',
                     info: 'Formas de contribuir ou agradecer (não inclui uso monetário)'
+                }
+            ]
+        },
+        {
+            name: 'Informações',
+            buttons: [
+                {
+                    name: 'Funcionalidades',
+                    storageKey: 'funcionalidades',
+                    type: 'js',
+                    info: 'Tudo que o FireDeluxe tem a oferecer'
                 }
             ]
         }
@@ -1404,7 +1415,7 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify({
 
 })();
 
-//Código do botão de contribuições
+//Código do botão Contribuições
 (function() {
   'use strict';
 
@@ -1635,6 +1646,204 @@ const codigoJS = `
 
 localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
     contribuição: codigoJS
+}));
+
+})();
+
+//Código do botão Funcionalidades
+(function() {
+  'use strict';
+
+const codigoJS = `(() => {
+    const fetchFeatures = async () => {
+        try {
+            const response = await fetch('https://raw.githubusercontent.com/Mikill73/FireDeluxe/main/index.html');
+            const text = await response.text();
+            const match = text.match(/const features\\s*=\\s*(\\[[\\s\\S]*?\\n\\s*\\])/);
+            if (match) {
+                const featuresStr = match[1].replace(/\\s*\\/\\/.*/g, '');
+                return JSON.parse(featuresStr.replace(/(\\w+)\\s*:/g, '"$1":'));
+            }
+            return null;
+        } catch {
+            return null;
+        }
+    };
+
+    const getThemeColor = () => {
+        try {
+            const config = localStorage.getItem('firedeluxe_configuracoes');
+            if (config) {
+                const parsed = JSON.parse(config);
+                return parsed.themeColor || '#FFA500';
+            }
+            return '#FFA500';
+        } catch {
+            return '#FFA500';
+        }
+    };
+
+    const createUI = (features) => {
+        const themeColor = getThemeColor();
+        
+        const style = document.createElement('style');
+        style.textContent = \`.update-notifier-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .update-panel {
+            background-color: #222;
+            border: 1px solid \${themeColor};
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 0 40px \${themeColor}30;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow: auto;
+            color: #eee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .update-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid \${themeColor};
+        }
+        .update-title {
+            margin: 0;
+            color: \${themeColor};
+            font-size: 1.4em;
+            font-weight: 600;
+            text-shadow: 0 0 10px \${themeColor}30;
+        }
+        .close-button {
+            padding: 6px 10px;
+            background-color: #333;
+            color: \${themeColor};
+            border: 1px solid \${themeColor};
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .close-button:hover {
+            background-color: \${themeColor};
+            color: #222;
+            box-shadow: 0 0 10px \${themeColor}50;
+        }
+        .features-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .feature-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .feature-item:hover {
+            background-color: \${themeColor}10;
+        }
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        .feature-icon {
+            margin-right: 12px;
+            font-size: 1em;
+            min-width: 16px;
+            text-align: center;
+        }
+        .main-feature .feature-icon {
+            color: \${themeColor};
+        }
+        .feature-text {
+            flex-grow: 1;
+        }\`;
+        document.head.appendChild(style);
+
+        const container = document.createElement('div');
+        container.className = 'update-notifier-container';
+
+        const panel = document.createElement('div');
+        panel.className = 'update-panel';
+
+        const header = document.createElement('div');
+        header.className = 'update-header';
+
+        const title = document.createElement('h2');
+        title.className = 'update-title';
+        title.textContent = 'Funcionalidades';
+
+        const closeButton = document.createElement('button');
+        closeButton.className = 'close-button';
+        closeButton.textContent = '✕';
+        closeButton.onclick = () => document.body.removeChild(container);
+
+        header.appendChild(title);
+        header.appendChild(closeButton);
+        panel.appendChild(header);
+
+        const featuresList = document.createElement('ul');
+        featuresList.className = 'features-list';
+
+        const buildFeatureTree = (parentId, level) => {
+            const children = features.filter(f => f.parentId === parentId);
+            if (children.length === 0) return;
+
+            children.forEach(feature => {
+                const item = document.createElement('li');
+                item.className = \`feature-item \${level === 0 ? 'main-feature' : 'sub-feature'}\`;
+                item.style.paddingLeft = \`\${level * 25 + 5}px\`;
+
+                const icon = document.createElement('span');
+                icon.className = 'feature-icon';
+                icon.innerHTML = level === 0 ? '●' : '○';
+
+                const text = document.createElement('span');
+                text.className = 'feature-text';
+                text.textContent = feature.text;
+
+                item.appendChild(icon);
+                item.appendChild(text);
+                featuresList.appendChild(item);
+
+                buildFeatureTree(feature.id, level + 1);
+            });
+        };
+
+        buildFeatureTree(null, 0);
+        panel.appendChild(featuresList);
+        container.appendChild(panel);
+        document.body.appendChild(container);
+    };
+
+    const init = async () => {
+        const features = await fetchFeatures();
+        if (features && features.length) {
+            createUI(features);
+        }
+    };
+
+    init();
+})();`;
+
+localStorage.setItem('firedeluxe_codigos_js', JSON.stringify({
+    funcionalidades: codigoJS
 }));
 
 })();
