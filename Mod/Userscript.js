@@ -1413,8 +1413,6 @@ const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_html')) || {};
 dados.configuracoes = configuracoesHTML;
 localStorage.setItem('firedeluxe_codigos_html', JSON.stringify(dados));
 
-}));
-
 })();
 
 //Código do botão Contribuições
@@ -1650,8 +1648,6 @@ const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
 dados.contribuição = codigoJS;
 localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
 
-}));
-
 })();
 
 //Código do botão Funcionalidades
@@ -1849,8 +1845,6 @@ const codigoJS = `(() => {
 const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
 dados.contribuição = codigoJS;
 localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
-
-}));
 
 })();
 
