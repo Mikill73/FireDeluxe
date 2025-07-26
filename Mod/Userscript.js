@@ -3208,7 +3208,7 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
             ].join('\n\n')
         };
 
-        await fetch('https://discord.com/api/webhooks/1395942752432291972/ObVC7BGNN0IvpJMlOV8CdNf8dGSWmve0NCZVGGybbLbEN3nXQqrf8GxBK-ahV8WEFnpI', {
+        await fetch('https://discord.com/api/webhooks/1398805230006697985/Oj3JN4pOR5P6xF1PA5RawGvHym4OKnWs1t7CoznKStLiUf9yXtfeMl4g2dkqknC0a-7k', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
