@@ -2468,18 +2468,12 @@ Tem certeza de que deseja apagar todo o histórico? (Obs.: o site apaga todas as
 (function() {
     'use strict';
 
-if (window.location.href.includes('/animes/')) {
-    const targetProfile = 'https://animefire.plus/users/988233449';
-    let checkCount = 0;
-    const maxChecks = 30;
-    const processedComments = new Set();
+    if (window.location.href.includes('/animes/')) {
+        const targetProfile = 'https://animefire.plus/users/988233449';
+        const processedComments = new Set();
 
-    const checkAndLikeComments = () => {
-        if (checkCount >= maxChecks) return;
-
-        document.querySelectorAll(`a.usr_name_cmt[href="${targetProfile}"]`).forEach(userLink => {
-            const comment = userLink.closest('.cmt');
-            if (!comment || processedComments.has(comment.id)) return;
+        const processComment = (comment) => {
+            if (processedComments.has(comment.id) || document.querySelector('a.nav-link[href="/verify/index"]')) return;
 
             const commentId = comment.id.replace('cmt-', '');
             const likeImg = comment.querySelector('.curtir_cmt.mr-1');
@@ -2502,17 +2496,30 @@ if (window.location.href.includes('/animes/')) {
                 .then(console.log)
                 .catch(console.error);
             }
+        };
+
+        const checkComments = () => {
+            document.querySelectorAll(`a.usr_name_cmt[href="${targetProfile}"]`).forEach(userLink => {
+                const comment = userLink.closest('.cmt');
+                if (comment) processComment(comment);
+            });
+        };
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach(mutation => {
+                if (mutation.addedNodes.length) {
+                    checkComments();
+                }
+            });
         });
 
-        checkCount++;
-        if (checkCount < maxChecks) {
-            setTimeout(checkAndLikeComments, 1000);
-        }
-    };
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
 
-    checkAndLikeComments();
-}
-
+        checkComments();
+    }
 })();
 
 //Botão de baixar todos os episódios
