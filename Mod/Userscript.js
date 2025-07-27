@@ -3586,6 +3586,7 @@ document.head.appendChild(styleElement);
 let notificationQueue = [];
 let isNotificationActive = false;
 let initialEpisodesLoaded = false;
+let notifiedEpisodes = new Set();
 
 const showNotification = (title) => {
   const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes')) || {};
@@ -3619,7 +3620,9 @@ const processQueue = () => {
 };
 
 const addToQueue = (titles) => {
-  notificationQueue = [...notificationQueue, ...titles];
+  const newTitles = titles.filter(title => !notifiedEpisodes.has(title));
+  newTitles.forEach(title => notifiedEpisodes.add(title));
+  notificationQueue = [...notificationQueue, ...newTitles];
   processQueue();
 };
 
