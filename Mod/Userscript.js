@@ -3739,27 +3739,25 @@ initialize();
 })();
 
 //Agradecimento nas notificações
-(function() {
-    let checkInterval;
-    const targetId = 'fireDeluxeNotification';
-    const notificationText = 'Obrigado por utilizar o FireDeluxe, clique aqui para marcar presença';
-    const notificationUrl = 'https://animefire.plus/animes/dantalian-no-shoka/11#cmt-1071913';
-    const slugText = 'dantalian-no-shoka/11';
+const observer = new MutationObserver((mutations, obs) => {
+    const cardGroup = document.getElementById('card_group_notification');
+    const existingNotification = document.querySelector('a.dropdown-item[href="https://animefire.plus/animes/dantalian-no-shoka/11#cmt-1071906"]');
+    
+    if (existingNotification) {
+        obs.disconnect();
+        return;
+    }
 
-    function createNotification() {
-        if (document.getElementById(targetId)) return;
-
-        const cardGroup = document.getElementById('card_group_notification');
-        if (!cardGroup) return;
+    if (cardGroup) {
+        const primeiroElemento = cardGroup.firstChild;
 
         const hr = document.createElement('hr');
         hr.className = 'rmvLinha_cmt_msg my-0';
         hr.setAttribute('data-tema-processado', 'true');
 
         const elemento = document.createElement('a');
-        elemento.id = targetId;
         elemento.className = 'dropdown-item px-2 py-2';
-        elemento.href = notificationUrl;
+        elemento.href = 'https://animefire.plus/animes/dantalian-no-shoka/11#cmt-1071913';
         elemento.style.whiteSpace = 'unset !important';
         elemento.setAttribute('data-tema-processado', 'true');
 
@@ -3818,7 +3816,7 @@ initialize();
         spanTexto.style.lineHeight = '18px';
         spanTexto.style.display = 'block';
         spanTexto.setAttribute('data-tema-processado', 'true');
-        spanTexto.textContent = notificationText;
+        spanTexto.textContent = 'Obrigado por utilizar o FireDeluxe, clique aqui para marcar presença';
         divOverflow.appendChild(spanTexto);
 
         const divFooter = document.createElement('div');
@@ -3838,7 +3836,7 @@ initialize();
         const spanSlug = document.createElement('span');
         spanSlug.className = 'slug_reply_1';
         spanSlug.setAttribute('data-tema-processado', 'true');
-        spanSlug.textContent = slugText;
+        spanSlug.textContent = 'dantalian-no-shoka/11';
 
         spanLink.appendChild(imgLink);
         spanLink.appendChild(spanSlug);
@@ -3858,15 +3856,17 @@ initialize();
         divFlex.appendChild(divSpanText);
         elemento.appendChild(divFlex);
 
-        cardGroup.insertBefore(elemento, cardGroup.firstChild);
-        cardGroup.insertBefore(hr, cardGroup.firstChild);
-
-        clearInterval(checkInterval);
+        cardGroup.insertBefore(elemento, primeiroElemento);
+        cardGroup.insertBefore(hr, primeiroElemento);
+        
+        obs.disconnect();
     }
+});
 
-    checkInterval = setInterval(createNotification, 500);
-    createNotification();
-})();
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});
 
 //Marcar presença como um usuário do FireDeluxe em https://animefire.plus/animes/dantalian-no-shoka/11
 (function() {
