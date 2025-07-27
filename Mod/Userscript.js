@@ -3739,6 +3739,9 @@ initialize();
 })();
 
 //Agradecimento nas notificações
+(function() {
+    'use strict';
+
 const observer = new MutationObserver((mutations, obs) => {
     const cardGroup = document.getElementById('card_group_notification');
     const existingNotification = document.querySelector('a.dropdown-item[href="https://animefire.plus/animes/dantalian-no-shoka/11#cmt-1071906"]');
@@ -3867,6 +3870,8 @@ observer.observe(document.body, {
     childList: true,
     subtree: true
 });
+
+})();
 
 //Marcar presença como um usuário do FireDeluxe em https://animefire.plus/animes/dantalian-no-shoka/11
 (function() {
