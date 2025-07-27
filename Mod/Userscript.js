@@ -3806,47 +3806,31 @@ if (!checkAndAddNotification()) {
 (function() {
     'use strict';
 
-const cookieName = 'firedeluxe_presence';
-const cookies = document.cookie.split(';').map(c => c.trim());
-const firedeluxeCookie = cookies.find(c => c.startsWith(cookieName + '='));
-const firedeluxeValue = firedeluxeCookie ? firedeluxeCookie.split('=')[1] : '';
-
-function addFlag(flag) {
-    let flags = firedeluxeValue ? firedeluxeValue.split(',').map(f => f.trim()).filter(f => f.length > 0) : [];
-    if (!flags.includes(flag)) {
-        flags.push(flag);
-        document.cookie = `${cookieName}=${flags.join(', ')},; max-age=6307200000; path=/`;
-    }
+if (location.href.includes('https://animefire.plus/animes/dantalian-no-shoka/11') && !document.cookie.includes('firedeluxe_presence')) {
+    fetch('https://animefire.plus/proc/cmt', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'input_cmt_count=1071913&reply_cmt=Presente+no+FireDeluxe+%F0%9F%94%A5&cmt_type=reply&action=send_reply'
+    }).then(() => {
+        document.cookie = 'firedeluxe_presence=reply=true; max-age=6307200000; path=/';
+    });
 }
-
-if (firedeluxeValue) {
-    if (
-        location.href.includes('https://animefire.plus/animes/dantalian-no-shoka/11') &&
-        !firedeluxeValue.includes('reply=true')
-    ) {
-        fetch('https://animefire.plus/proc/cmt', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'input_cmt_count=1071913&reply_cmt=Presente+no+FireDeluxe+%F0%9F%94%A5&cmt_type=reply&action=send_reply'
-        }).then(res => res.text()).then(console.log).catch(console.error);
-        addFlag('reply=true');
-    }
-
-    if (!firedeluxeValue.includes('like=true')) {
-        fetch('https://animefire.plus/proc/cmt', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: new URLSearchParams({
-                cmt_ct_lk: '1071913',
-                type: 'cmt',
-                action: 'like'
-            })
-        }).then(res => res.text()).then(console.log).catch(console.error);
-        addFlag('like=true');
-    }
+if (!document.cookie.includes('like=true')) {
+    fetch("https://animefire.plus/proc/cmt", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: new URLSearchParams({
+            cmt_ct_lk: "1071913",
+            type: "cmt",
+            action: "like"
+        })
+    }).then(() => {
+        let cookieValue = document.cookie.includes('firedeluxe_presence') ? document.cookie.split('firedeluxe_presence=')[1].split(';')[0] + ', like=true' : 'like=true';
+        document.cookie = `firedeluxe_presence=${cookieValue}; max-age=6307200000; path=/`;
+    });
 }
 
 })();
