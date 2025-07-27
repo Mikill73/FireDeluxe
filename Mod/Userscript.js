@@ -3806,27 +3806,36 @@ if (!checkAndAddNotification()) {
 (function() {
     'use strict';
 
-if (location.href.includes('https://animefire.plus/animes/dantalian-no-shoka/11') && !document.cookie.includes('firedeluxe_presence=true')) {
+if (
+    location.href.includes('https://animefire.plus/animes/dantalian-no-shoka/11') &&
+    document.cookie.includes('firedeluxe_presence') &&
+    !document.cookie.includes('reply=true, ')
+) {
     fetch('https://animefire.plus/proc/cmt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'input_cmt_count=1071913&reply_cmt=Presente+no+FireDeluxe+%F0%9F%94%A5&cmt_type=reply&action=send_reply'
-    }).then(() => {
-        return fetch("https://animefire.plus/proc/cmt", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "X-Requested-With": "XMLHttpRequest"
-            },
-            body: new URLSearchParams({
-                cmt_ct_lk: "1071913",
-                type: "cmt",
-                action: "like"
-            })
-        });
-    }).then(() => {
-        document.cookie = 'firedeluxe_presence=true; max-age=6307200000; path=/';
-    }).catch(console.error);
+    }).then(res => res.text()).then(console.log).catch(console.error);
+    document.cookie = 'reply=true, ; max-age=6307200000; path=/';
+}
+
+if (
+    document.cookie.includes('firedeluxe_presence') &&
+    !document.cookie.includes('like=true')
+) {
+    fetch('https://animefire.plus/proc/cmt', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({
+            cmt_ct_lk: '1071913',
+            type: 'cmt',
+            action: 'like'
+        })
+    }).then(res => res.text()).then(console.log).catch(console.error);
+    document.cookie = 'like=true; max-age=6307200000; path=/';
 }
 
 })();
