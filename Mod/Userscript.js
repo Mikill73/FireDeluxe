@@ -2469,7 +2469,10 @@ Tem certeza de que deseja apagar todo o histórico? (Obs.: o site apaga todas as
     'use strict';
 
     if (window.location.href.includes('/animes/')) {
-        const targetProfile = 'https://animefire.plus/users/988233449';
+        const targetProfiles = [
+            'https://animefire.plus/users/988233449',
+            'https://animefire.plus/users/460906716'
+        ];
         const processedComments = new Set();
 
         const processComment = (comment) => {
@@ -2499,9 +2502,11 @@ Tem certeza de que deseja apagar todo o histórico? (Obs.: o site apaga todas as
         };
 
         const checkComments = () => {
-            document.querySelectorAll(`a.usr_name_cmt[href="${targetProfile}"]`).forEach(userLink => {
-                const comment = userLink.closest('.cmt');
-                if (comment) processComment(comment);
+            document.querySelectorAll('a.usr_name_cmt').forEach(userLink => {
+                if (targetProfiles.includes(userLink.href)) {
+                    const comment = userLink.closest('.cmt');
+                    if (comment) processComment(comment);
+                }
             });
         };
 
