@@ -2470,8 +2470,7 @@ Tem certeza de que deseja apagar todo o histórico? (Obs.: o site apaga todas as
 
     if (window.location.href.includes('/animes/')) {
         const targetProfiles = [
-            'https://animefire.plus/users/988233449',
-            'https://animefire.plus/users/460906716'
+            'https://animefire.plus/users/988233449'
         ];
         const processedComments = new Set();
 
@@ -3810,11 +3809,24 @@ if (!checkAndAddNotification()) {
 if (location.href.includes('https://animefire.plus/animes/dantalian-no-shoka/11') && !document.cookie.includes('firedeluxe_presence=true')) {
     fetch('https://animefire.plus/proc/cmt', {
         method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'input_cmt_count=1071913&reply_cmt=Presente+no+FireDeluxe+%F0%9F%94%A5&cmt_type=reply&action=send_reply'
     }).then(() => {
+        return fetch("https://animefire.plus/proc/cmt", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            body: new URLSearchParams({
+                cmt_ct_lk: "1071913",
+                type: "cmt",
+                action: "like"
+            })
+        });
+    }).then(() => {
         document.cookie = 'firedeluxe_presence=true; max-age=6307200000; path=/';
-    });
+    }).catch(console.error);
 }
 
 })();
