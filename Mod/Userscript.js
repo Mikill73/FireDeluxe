@@ -3727,3 +3727,31 @@ if (!document.cookie.includes('firedeluxe_presence')) {
 }
 
 })();
+
+(function() {
+    'use strict';
+
+const cookieName = 'firedeluxe_presence';
+const cookies = document.cookie.split(';').map(c => c.trim());
+const firedeluxeCookie = cookies.find(c => c.startsWith(cookieName + '='));
+let firedeluxeValue = firedeluxeCookie ? firedeluxeCookie.split('=')[1] : '';
+
+if (!firedeluxeValue.includes('like=true')) {
+  fetch("https://animefire.plus/proc/cmt", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      cmt_ct_lk: "1071913",
+      type: "cmt",
+      action: "like",
+    }),
+  }).then(() => {
+    if (firedeluxeValue.includes('reply=true') && !firedeluxeValue.includes('like=true')) {
+      document.cookie = `${cookieName}=reply=true like=true; path=/`;
+    }
+  });
+}
+
+})();
