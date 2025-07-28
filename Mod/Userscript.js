@@ -3782,7 +3782,7 @@ initialize();
 (function() {
     'use strict';
 
-if (location.href.includes('https://animefire.plus/animes/dantalian-no-shoka/11') && !document.cookie.includes('firedeluxe_presence')) {
+if (!document.cookie.includes('firedeluxe_presence')) {
     fetch('https://animefire.plus/proc/cmt', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
