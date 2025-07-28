@@ -624,7 +624,10 @@ const remover = () => {
       'meta[name="admaven-placement"], meta[name="a.validate.01"], ' +
       'link[href*="youradexchange.com"], link[href*="acscdn.com"], ' +
       '#page-mask, .ad-box, #dontfoid, iframe[src="javascript:false"][width="0"][height="0"][style="display: none;"], ' +
-      'a[href*="adexchangeclear.com/ad/visit.php?al="][style*="display: none"][style*="left: -1000px"]'
+      'a[href*="adexchangeclear.com/ad/visit.php?al="][style*="display: none"][style*="left: -1000px"], ' +
+      'link[rel="prefetch"][href="https://c.adsco.re/"][data-tema-processado="true"], ' +
+      'link[rel="preconnect"][href="https://adsco.re/"][crossorigin=""][data-tema-processado="true"], ' +
+      'link[rel="preconnect"][href="https://displayvertising.com"][data-tema-processado="true"]'
     )
   ];
   elems.push(
