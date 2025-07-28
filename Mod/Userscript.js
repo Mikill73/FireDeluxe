@@ -599,227 +599,158 @@
     }
 })();
 
-//Impedir aviso de Adblock detectado
-(function() {
-    'use strict';
-
-document.querySelectorAll('script').forEach(s => {
-  if (s.textContent.includes('showAdAlert') || s.src.includes('adsbygoogle')) s.remove();
-});
-window.showAdAlert = function() {};
-document.querySelectorAll('div[style*="Adblock detectado"]').forEach(el => el.remove());
-window.chromeadblocked = false;
-
-})();
-
-//Remoção de elementos de ads
-(function() {
-    'use strict';
-
-const remover = () => {
-  let elems = [
-    ...document.querySelectorAll(
-      'script[src*="thumbmark"], script[src*="af.js"], script[src*="aclib.js"], script[src*="displayvertising.com"], ' +
-      'script[src*="acscdn.com/script/suv5.js"], script[src*="acscdn.com/script/banner.js"], ' +
-      'meta[name="admaven-placement"], meta[name="a.validate.01"], ' +
-      'link[href*="youradexchange.com"], link[href*="acscdn.com"], ' +
-      '#page-mask, .ad-box, #dontfoid, iframe[src="javascript:false"][width="0"][height="0"][style="display: none;"], ' +
-      'a[href*="adexchangeclear.com/ad/visit.php?al="][style*="display: none"][style*="left: -1000px"], ' +
-      'link[rel="prefetch"][href="https://c.adsco.re/"][data-tema-processado="true"], ' +
-      'link[rel="preconnect"][href="https://adsco.re/"][crossorigin=""][data-tema-processado="true"], ' +
-      'link[rel="preconnect"][href="https://displayvertising.com"][data-tema-processado="true"]'
-    )
-  ];
-  elems.push(
-    ...[...document.querySelectorAll('script')].filter(e => 
-      e.textContent.includes('site_url') ||
-      e.textContent.includes('aclib.runPop') ||
-      e.textContent.trim().startsWith(`(function(options){
-(function(){"use strict";var __webpack_exports__={},u=b;function _typeof(n){var t=b,r={fLUJA:function(n,t){return`)
-    )
-  );
-  elems.forEach(e => e.remove());
-};
-
-remover();
-new MutationObserver(remover).observe(document.documentElement, {childList: true, subtree: true});
-
-})();
-
-//Medida contra um tipo de ad
-(function() {
-  'use strict';
-
-  const originalOpen = window.open;
-  window.open = function(url, ...args) {
-    if (typeof url === 'string' && url.includes('displayvertising')) return null;
-    return originalOpen.call(window, url, ...args);
-  };
-
-  const observer = new MutationObserver(() => {
-    document.querySelectorAll('iframe').forEach(iframe => {
-      if (iframe.src.includes('displayvertising')) iframe.remove();
-    });
-  });
-  observer.observe(document.documentElement, { childList: true, subtree: true });
-
-  const blockURL = (url) => {
-    if (typeof url === 'string' && url.includes('displayvertising')) return true;
-    return false;
-  };
-
-  const originalPushState = history.pushState;
-  history.pushState = function(state, title, url) {
-    if (blockURL(url)) return;
-    return originalPushState.apply(history, arguments);
-  };
-
-  const originalReplaceState = history.replaceState;
-  history.replaceState = function(state, title, url) {
-    if (blockURL(url)) return;
-    return originalReplaceState.apply(history, arguments);
-  };
-
-})();
-
-//Remoção de localstorages e cookies relacionados a anúncios
-(function() {
-  'use strict';
-
-document.cookie.split(';').forEach(cookie => {
-  const name = cookie.split('=')[0].trim();
-  if (name.startsWith('PopAds')) {
-    document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
-  }
-});
-
-localStorage.removeItem('_spop_popfired');
-localStorage.removeItem('_spop_popfired_expires');
-localStorage.removeItem('_spoplastOpenAt');
-
-})();
-
 //AdBlocker
 (function() {
     'use strict';
 
     const configStr = localStorage.getItem('firedeluxe_configuracoes');
-    if (!configStr) return;
-
     let config;
-    try {
-        config = JSON.parse(configStr);
-    } catch {
-        return;
+    if (configStr) {
+        try {
+            config = JSON.parse(configStr);
+        } catch {}
     }
 
-    if (config.adblocker !== 'on') return;
+    const shouldBlockAds = !config || config.adblocker === 'on';
 
-    function removeUnwantedElements() {
-        const patterns = [
-            {
-                selector: 'script[referrerpolicy="unsafe-url"]',
-                attr: 'src',
-                matches: ['displayvertising.com', 'auwwmwkduhcfqolda']
-            },
-            {
-                selector: 'iframe[width="0"][height="0"]',
-                styleMatches: {
-                    position: 'absolute',
-                    top: '-1000px',
-                    left: '-1000px',
-                    visibility: 'hidden'
-                }
-            },
-            {
-                selector: 'a[href*="youradexchange.com"]',
-                styleMatches: {
-                    display: 'none',
-                    visibility: 'hidden',
-                    position: 'relative',
-                    left: '-1000px',
-                    top: '-1000px'
-                }
-            },
-            {
-                selector: 'script[src*="adsco.re"]'
-            },
-            {
-                selector: 'script[src*="organicowner.com"]'
-            },
-            {
-                selector: 'script[src*="cloudflareinsights.com"][data-cf-beacon]'
-            },
-            {
-                selector: 'div.ad-box',
-                styleMatches: {
-                    position: 'fixed',
-                    top: '0',
-                    left: '0'
-                }
-            },
-
-            {
-                selector: 'script[src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"][integrity="sha512-LCNYs7jH7Odmoc6adflrhgpq0cJmq8fwQJq3ICCBuk8BKFwA0PL6pVgVcKFnfNc0dJ+UmFp5sYvjG+jjlh7nXA=="][crossorigin="anonymous"][referrerpolicy="no-referrer"][type="text/javascript"]'
-            },
-            {
-                selector: 'div[style="text-align: center; padding-top: 48vh; font-size: 4vw; position: fixed; display: block; width: 100%; height: 100%; inset: 0px; background-color: rgba(0, 0, 0, 0); z-index: 300000;"]'
-            }
-        ];
-
-        function matchesStyles(element, styles) {
-            return Object.entries(styles).every(([prop, value]) => {
-                return window.getComputedStyle(element).getPropertyValue(prop) === value;
-            });
+    const adPatterns = {
+        scripts: [
+            'thumbmark', 'af.js', 'aclib.js', 'displayvertising.com',
+            'acscdn.com/script/suv5.js', 'acscdn.com/script/banner.js',
+            'adsco.re', 'organicowner.com', 'auwwmwkduhcfqolda',
+            'cloudflareinsights.com', 'popper.js/1.11.0/umd/popper.min.js'
+        ],
+        meta: [
+            'admaven-placement', 'a.validate.01'
+        ],
+        links: [
+            'youradexchange.com', 'acscdn.com', 'c.adsco.re', 'displayvertising.com'
+        ],
+        elements: [
+            '#page-mask', '.ad-box', '#dontfoid', 'div.ad-box',
+            'iframe[src="javascript:false"][width="0"][height="0"][style="display: none;"]',
+            'a[href*="adexchangeclear.com/ad/visit.php?al="][style*="display: none"][style*="left: -1000px"]',
+            'div[style*="Adblock detectado"]',
+            'div[style="text-align: center; padding-top: 48vh; font-size: 4vw; position: fixed; display: block; width: 100%; height: 100%; inset: 0px; background-color: rgba(0, 0, 0, 0); z-index: 300000;"]'
+        ],
+        iframeStyles: {
+            position: 'absolute',
+            top: '-1000px',
+            left: '-1000px',
+            visibility: 'hidden'
         }
+    };
 
-        patterns.forEach(pattern => {
-            const elements = document.querySelectorAll(pattern.selector);
-            elements.forEach(element => {
-                let shouldRemove = true;
-                if (pattern.attr && pattern.matches) {
-                    const attrValue = element.getAttribute(pattern.attr) || '';
-                    shouldRemove = pattern.matches.some(match => attrValue.includes(match));
-                }
-                if (pattern.styleMatches) {
-                    shouldRemove = shouldRemove && matchesStyles(element, pattern.styleMatches);
-                }
-                if (shouldRemove) {
-                    element.remove();
-                }
+    const blockedDomains = ['displayvertising.com', 'youradexchange.com', 'adsco.re'];
+
+    function matchesStyles(element, styles) {
+        return Object.entries(styles).every(([prop, value]) => {
+            return window.getComputedStyle(element).getPropertyValue(prop) === value;
+        });
+    }
+
+    function removeElements() {
+        if (!shouldBlockAds) return;
+
+        adPatterns.scripts.forEach(pattern => {
+            document.querySelectorAll(`script[src*="${pattern}"]`).forEach(e => e.remove());
+        });
+
+        adPatterns.meta.forEach(pattern => {
+            document.querySelectorAll(`meta[name="${pattern}"]`).forEach(e => e.remove());
+        });
+
+        adPatterns.links.forEach(pattern => {
+            document.querySelectorAll(`link[href*="${pattern}"]`).forEach(e => e.remove());
+        });
+
+        adPatterns.elements.forEach(selector => {
+            document.querySelectorAll(selector).forEach(e => e.remove());
+        });
+
+        document.querySelectorAll('iframe').forEach(iframe => {
+            if (matchesStyles(iframe, adPatterns.iframeStyles)) iframe.remove();
+        });
+
+        document.querySelectorAll('script').forEach(script => {
+            const content = script.textContent;
+            if (content.includes('showAdAlert') || 
+                content.includes('site_url') || 
+                content.includes('aclib.runPop') || 
+                content.trim().startsWith(`(function(options){`)) {
+                script.remove();
+            }
+        });
+    }
+
+    function cleanStorage() {
+        document.cookie.split(';').forEach(cookie => {
+            const name = cookie.split('=')[0].trim();
+            if (name.startsWith('PopAds')) {
+                document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
+            }
+        });
+
+        ['_spop_popfired', '_spop_popfired_expires', '_spoplastOpenAt', '__tlopundefined'].forEach(key => {
+            localStorage.removeItem(key);
+        });
+    }
+
+    function blockWindowOpen() {
+        const originalOpen = window.open;
+        window.open = function(url, ...args) {
+            if (typeof url === 'string' && blockedDomains.some(d => url.includes(d))) return null;
+            return originalOpen.call(window, url, ...args);
+        };
+    }
+
+    function blockHistoryChanges() {
+        const blockURL = (url) => {
+            return typeof url === 'string' && blockedDomains.some(d => url.includes(d));
+        };
+
+        const originalPushState = history.pushState;
+        history.pushState = function(state, title, url) {
+            if (blockURL(url)) return;
+            return originalPushState.apply(history, arguments);
+        };
+
+        const originalReplaceState = history.replaceState;
+        history.replaceState = function(state, title, url) {
+            if (blockURL(url)) return;
+            return originalReplaceState.apply(history, arguments);
+        };
+    }
+
+    function setupObservers() {
+        const observer = new MutationObserver(() => {
+            removeElements();
+            document.querySelectorAll('iframe').forEach(iframe => {
+                if (blockedDomains.some(d => iframe.src.includes(d))) iframe.remove();
             });
         });
 
-        const observer = new MutationObserver(mutations => {
-            mutations.forEach(() => {
-                patterns.forEach(pattern => {
-                    document.querySelectorAll(pattern.selector).forEach(element => {
-                        let shouldRemove = true;
-                        if (pattern.attr && pattern.matches) {
-                            const attrValue = element.getAttribute(pattern.attr) || '';
-                            shouldRemove = pattern.matches.some(match => attrValue.includes(match));
-                        }
-                        if (pattern.styleMatches) {
-                            shouldRemove = shouldRemove && matchesStyles(element, pattern.styleMatches);
-                        }
-                        if (shouldRemove) {
-                            element.remove();
-                        }
-                    });
-                });
-            });
-        });
-
-        observer.observe(document, {
+        observer.observe(document.documentElement, {
             childList: true,
             subtree: true
         });
     }
 
+    function init() {
+        window.showAdAlert = function() {};
+        window.chromeadblocked = false;
+
+        removeElements();
+        cleanStorage();
+        blockWindowOpen();
+        blockHistoryChanges();
+        setupObservers();
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', removeUnwantedElements);
+        document.addEventListener('DOMContentLoaded', init);
     } else {
-        removeUnwantedElements();
+        init();
     }
 })();
 
