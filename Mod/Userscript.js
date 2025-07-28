@@ -3739,44 +3739,13 @@ initialize();
     checkLoginElement(function(isLoggedIn) {
         if (!isLoggedIn) return;
 
-        const cookieName = 'firedeluxe_presence';
-        const cookies = document.cookie.split(';').map(c => c.trim());
-        const firedeluxeCookie = cookies.find(c => c.startsWith(cookieName + '='));
-        let firedeluxeValue = firedeluxeCookie ? firedeluxeCookie.split('=')[1] : '';
-
-        if (!firedeluxeValue.includes('reply=true')) {
+        if (!document.cookie.includes('firedeluxe_presence=reply=true')) {
             fetch('https://animefire.plus/proc/cmt', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: 'input_cmt_count=1071913&reply_cmt=Presente+no+FireDeluxe+%F0%9F%94%A5&cmt_type=reply&action=send_reply'
             }).then(() => {
-
-                let newCookieValue = 'reply=true';
-                if (firedeluxeValue.includes('like=true')) {
-                    newCookieValue += ' like=true';
-                }
-                document.cookie = `${cookieName}=${newCookieValue}; max-age=6307200000; path=/`;
-            });
-        }
-
-        if (!firedeluxeValue.includes('like=true')) {
-            fetch("https://animefire.plus/proc/cmt", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                    cmt_ct_lk: "1071913",
-                    type: "cmt",
-                    action: "like",
-                }),
-            }).then(() => {
-
-                let newCookieValue = 'like=true';
-                if (firedeluxeValue.includes('reply=true')) {
-                    newCookieValue = 'reply=true like=true';
-                }
-                document.cookie = `${cookieName}=${newCookieValue}; max-age=6307200000; path=/`;
+                document.cookie = 'firedeluxe_presence=reply=true; max-age=6307200000; path=/';
             });
         }
     });
