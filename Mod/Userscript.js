@@ -3716,42 +3716,68 @@ initialize();
 (function() {
     'use strict';
 
-if (!document.cookie.includes('firedeluxe_presence')) {
-    fetch('https://animefire.plus/proc/cmt', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'input_cmt_count=1071913&reply_cmt=Presente+no+FireDeluxe+%F0%9F%94%A5&cmt_type=reply&action=send_reply'
-    }).then(() => {
-        document.cookie = 'firedeluxe_presence=reply=true; max-age=6307200000; path=/';
-    });
-}
-
-})();
-
-(function() {
-    'use strict';
-
-const cookieName = 'firedeluxe_presence';
-const cookies = document.cookie.split(';').map(c => c.trim());
-const firedeluxeCookie = cookies.find(c => c.startsWith(cookieName + '='));
-let firedeluxeValue = firedeluxeCookie ? firedeluxeCookie.split('=')[1] : '';
-
-if (!firedeluxeValue.includes('like=true')) {
-  fetch("https://animefire.plus/proc/cmt", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      cmt_ct_lk: "1071913",
-      type: "cmt",
-      action: "like",
-    }),
-  }).then(() => {
-    if (firedeluxeValue.includes('reply=true') && !firedeluxeValue.includes('like=true')) {
-      document.cookie = `${cookieName}=reply=true like=true; path=/`;
+    function checkLoginElement(callback) {
+        const maxAttempts = 20;
+        let attempts = 0;
+        
+        const checkInterval = setInterval(() => {
+            const loginElement = document.querySelector('li.nav-item.pr-2.navbarItem a.nav-link[href="/verify/index"]');
+            
+            if (!loginElement) {
+                clearInterval(checkInterval);
+                callback(true);
+            } else {
+                attempts++;
+                if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    callback(false);
+                }
+            }
+        }, 500);
     }
-  });
-}
 
+    checkLoginElement(function(isLoggedIn) {
+        if (!isLoggedIn) return;
+
+        const cookieName = 'firedeluxe_presence';
+        const cookies = document.cookie.split(';').map(c => c.trim());
+        const firedeluxeCookie = cookies.find(c => c.startsWith(cookieName + '='));
+        let firedeluxeValue = firedeluxeCookie ? firedeluxeCookie.split('=')[1] : '';
+
+        if (!firedeluxeValue.includes('reply=true')) {
+            fetch('https://animefire.plus/proc/cmt', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'input_cmt_count=1071913&reply_cmt=Presente+no+FireDeluxe+%F0%9F%94%A5&cmt_type=reply&action=send_reply'
+            }).then(() => {
+
+                let newCookieValue = 'reply=true';
+                if (firedeluxeValue.includes('like=true')) {
+                    newCookieValue += ' like=true';
+                }
+                document.cookie = `${cookieName}=${newCookieValue}; max-age=6307200000; path=/`;
+            });
+        }
+
+        if (!firedeluxeValue.includes('like=true')) {
+            fetch("https://animefire.plus/proc/cmt", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                    cmt_ct_lk: "1071913",
+                    type: "cmt",
+                    action: "like",
+                }),
+            }).then(() => {
+
+                let newCookieValue = 'like=true';
+                if (firedeluxeValue.includes('reply=true')) {
+                    newCookieValue = 'reply=true like=true';
+                }
+                document.cookie = `${cookieName}=${newCookieValue}; max-age=6307200000; path=/`;
+            });
+        }
+    });
 })();
