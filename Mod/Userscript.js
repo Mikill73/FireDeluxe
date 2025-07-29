@@ -2467,28 +2467,61 @@ Tem certeza de que deseja apagar todo o histórico? (Obs.: o site apaga todas as
 (function() {
     'use strict';
 
-const checkAndAddDownloadButton = () => {
-  const themeColor = localStorage.getItem('firedeluxe_configuracoes') ? JSON.parse(localStorage.getItem('firedeluxe_configuracoes')).themeColor : '#FFA500';
-  const episodesSection = document.querySelector('section.mt-3.mb-2[style*="background-color:#161616"] h2.tEp');
-  if (!episodesSection || episodesSection.textContent !== "Episódios") return false;
+const checkAndAddDownloadButtons = () => {
+  if (!window.location.href.includes('todos-os-episodios')) return false;
 
-  const episodesContainer = episodesSection.closest('section').querySelector('.div_video_list');
-  if (!episodesContainer) return false;
+  const themeColor = localStorage.getItem('firedeluxe_configuracoes') ? JSON.parse(localStorage.getItem('firedeluxe_configuracoes')).themeColor : '#FFA500';
+  const seasonsSections = document.querySelectorAll('section.mt-3.mb-2[style*="background-color:#161616"]');
+  if (seasonsSections.length === 0) return false;
 
   const currentUrl = window.location.href;
   const animeSlug = currentUrl.match(/\/animes\/(.*?)-todos-os-episodios/)?.[1] || currentUrl.match(/\/animes\/([^\/]+)/)?.[1];
 
-  const downloadAllBtn = document.createElement('button');
-  downloadAllBtn.textContent = 'Baixar Todos Episódios';
-  downloadAllBtn.style.cssText = `padding:10px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;margin:10px auto;display:block;font-weight:bold;`;
-  
-  episodesSection.closest('section').insertBefore(downloadAllBtn, episodesContainer);
+  let hasMultipleSeasons = seasonsSections.length > 1;
+  let addedButtons = 0;
 
-  downloadAllBtn.addEventListener('click', () => {
-    showQualityModal();
+  if (hasMultipleSeasons) {
+    const firstSeason = seasonsSections[0];
+    const existingGlobalButton = document.querySelector('.download-all-seasons-btn');
+    if (!existingGlobalButton && firstSeason.parentNode) {
+      const downloadAllSeasonsBtn = document.createElement('button');
+      downloadAllSeasonsBtn.className = 'download-all-seasons-btn';
+      downloadAllSeasonsBtn.textContent = 'Baixar Todas as Temporadas';
+      downloadAllSeasonsBtn.style.cssText = `padding:10px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;margin:10px auto;display:block;font-weight:bold;`;
+      
+      firstSeason.parentNode.insertBefore(downloadAllSeasonsBtn, firstSeason);
+      downloadAllSeasonsBtn.addEventListener('click', () => showQualityModal('all'));
+      addedButtons++;
+    }
+  }
+
+  seasonsSections.forEach((section, index) => {
+    const seasonTitle = section.querySelector('h2.tEp');
+    if (!seasonTitle) return;
+
+    const episodesContainer = section.querySelector('.div_video_list');
+    if (!episodesContainer) return;
+
+    const existingButton = section.querySelector('.download-season-btn');
+    if (existingButton) return;
+
+    const downloadSeasonBtn = document.createElement('button');
+    downloadSeasonBtn.className = 'download-season-btn';
+    downloadSeasonBtn.dataset.seasonIndex = index;
+    downloadSeasonBtn.textContent = `Baixar Temporada ${index + 1}`;
+    downloadSeasonBtn.style.cssText = `padding:10px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;margin:10px auto;display:block;font-weight:bold;`;
+    
+    section.insertBefore(downloadSeasonBtn, episodesContainer);
+
+    downloadSeasonBtn.addEventListener('click', (e) => {
+      const seasonIdx = e.target.dataset.seasonIndex;
+      showQualityModal(seasonIdx);
+    });
+
+    addedButtons++;
   });
 
-  function showQualityModal() {
+  function showQualityModal(seasonIndex) {
     const modalContent = `
       <div style="text-align:center;margin-bottom:15px;position:relative;">
         <button id="close-modal" style="position:absolute;right:0;top:0;background:none;border:none;color:${themeColor};font-size:1.5em;cursor:pointer;">×</button>
@@ -2506,16 +2539,27 @@ const checkAndAddDownloadButton = () => {
 
     showModal('Selecionar Qualidade', modalContent, null, true);
 
-    document.getElementById('quality-sd').addEventListener('click', () => startDownloads('SD'));
-    document.getElementById('quality-hd').addEventListener('click', () => startDownloads('HD'));
+    document.getElementById('quality-sd').addEventListener('click', () => startDownloads('SD', seasonIndex));
+    document.getElementById('quality-hd').addEventListener('click', () => startDownloads('HD', seasonIndex));
     document.getElementById('close-modal').addEventListener('click', closeModal);
   }
 
-  async function startDownloads(quality) {
+  async function startDownloads(quality, seasonIndex) {
     const resultsContainer = document.querySelector('#results-container');
     resultsContainer.innerHTML = '<div style="text-align:center;padding:10px;"><div class="spinner"></div><p>Iniciando downloads...</p></div>';
     
-    const episodeLinks = Array.from(episodesContainer.querySelectorAll('a.lEp'));
+    let episodeLinks = [];
+    if (seasonIndex === 'all') {
+      document.querySelectorAll('.div_video_list a.lEp').forEach(link => {
+        episodeLinks.push(link);
+      });
+    } else {
+      const seasonSection = document.querySelector(`section.mt-3.mb-2[style*="background-color:#161616"]:nth-of-type(${parseInt(seasonIndex) + 1})`);
+      if (seasonSection) {
+        episodeLinks = Array.from(seasonSection.querySelectorAll('a.lEp'));
+      }
+    }
+
     if (episodeLinks.length === 0) return;
 
     for (const [index, episodeLink] of episodeLinks.entries()) {
@@ -2542,17 +2586,17 @@ const checkAndAddDownloadButton = () => {
         }
 
         const qualityButtons = qualityContainer.querySelectorAll('a');
-let selectedButton = Array.from(qualityButtons).find(btn => btn.textContent.trim() === quality && btn.href);
-if (!selectedButton) {
-  const fallbackQuality = quality === 'HD' ? 'SD' : 'HD';
-  selectedButton = Array.from(qualityButtons).find(btn => btn.textContent.trim() === fallbackQuality && btn.href);
-  if (selectedButton) {
-    addResultToModal(episodeTitle, 'success', `Qualidade ${quality} indisponível, baixando ${fallbackQuality}`);
-  } else {
-    addResultToModal(episodeTitle, 'failed', `Nenhuma qualidade disponível`);
-    continue;
-  }
-}
+        let selectedButton = Array.from(qualityButtons).find(btn => btn.textContent.trim() === quality && btn.href);
+        if (!selectedButton) {
+          const fallbackQuality = quality === 'HD' ? 'SD' : 'HD';
+          selectedButton = Array.from(qualityButtons).find(btn => btn.textContent.trim() === fallbackQuality && btn.href);
+          if (selectedButton) {
+            addResultToModal(episodeTitle, 'success', `Qualidade ${quality} indisponível, baixando ${fallbackQuality}`);
+          } else {
+            addResultToModal(episodeTitle, 'failed', `Nenhuma qualidade disponível`);
+            continue;
+          }
+        }
         if (selectedButton && selectedButton.href) {
           const downloadUrl = selectedButton.href;
           const a = document.createElement('a');
@@ -2566,7 +2610,6 @@ if (!selectedButton) {
           addResultToModal(episodeTitle, 'failed', `Qualidade ${quality} não disponível`);
         }
       } catch (error) {
-        console.error('Erro ao processar episódio:', error);
         addResultToModal(episodeTitle, 'failed', 'Erro ao processar');
       }
 
@@ -2650,15 +2693,24 @@ if (!selectedButton) {
     if (style) style.remove();
   }
   
-  return true;
+  return addedButtons > 0;
 };
+
+const observer = new MutationObserver(() => {
+  checkAndAddDownloadButtons();
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
 
 let checkCount = 0;
 const maxChecks = 30;
 const checkInterval = 1000;
 
 const checkIntervalId = setInterval(() => {
-  if (checkAndAddDownloadButton()) {
+  if (checkAndAddDownloadButtons()) {
     clearInterval(checkIntervalId);
   } else if (checkCount >= maxChecks) {
     clearInterval(checkIntervalId);
