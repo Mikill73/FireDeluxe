@@ -144,7 +144,9 @@
 
         observer.observe(document.documentElement, {
             childList: true,
-            subtree: true
+            subtree: true,
+            attributes: true,
+            characterData: true
         });
     }
 
@@ -159,11 +161,7 @@
         setupObservers();
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    init();
 })();
 
 //Verificar versão
