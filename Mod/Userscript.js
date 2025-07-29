@@ -3674,6 +3674,8 @@ initialize();
 
 //Agradecimento nas notificações
 (function() {
+    'use strict';
+
     const NOTIFICATION_ID = 'fire-deluxe-custom-notification';
     const BELL_SELECTOR = '.dropdown_notification_bell';
     const MAX_ATTEMPTS = 100;
@@ -3710,4 +3712,31 @@ initialize();
     }
 
     checkForBell();
+})();
+
+//Deletar mensagens de divulgação do FireDeluxe
+(function() {
+    'use strict';
+
+(() => {
+    const targetText = "🟧 FireDeluxe 🟧";
+    
+    const hideFireDeluxeComments = () => {
+        document.querySelectorAll('.cmt, .cmt_reply_div').forEach(comment => {
+            if (comment.textContent.includes(targetText)) {
+                setTimeout(() => {
+                    comment.remove();
+                }, 200);
+            }
+        });
+    };
+
+    const observer = new MutationObserver(() => {
+        hideFireDeluxeComments();
+    });
+
+    hideFireDeluxeComments();
+    observer.observe(document.body, { childList: true, subtree: true }); 
+})();
+
 })();
