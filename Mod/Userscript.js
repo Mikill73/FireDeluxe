@@ -3692,7 +3692,7 @@ initialize();
     }
 
     function handleBellClick() {
-        setTimeout(addNotification, 500);
+        setTimeout(addNotification, 1);
     }
 
     function setupBellListener() {
