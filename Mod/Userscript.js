@@ -34,14 +34,16 @@
             'admaven-placement', 'a.validate.01'
         ],
         links: [
-            'youradexchange.com', 'acscdn.com', 'c.adsco.re', 'displayvertising.com'
+            'youradexchange.com', 'acscdn.com', 'c.adsco.re', 'displayvertising.com',
+            'adexchangeclear.com'
         ],
         elements: [
             '#page-mask', '.ad-box', '#dontfoid', 'div.ad-box',
             'iframe[src="javascript:false"][width="0"][height="0"][style="display: none;"]',
             'a[href*="adexchangeclear.com/ad/visit.php?al="][style*="display: none"][style*="left: -1000px"]',
             'div[style*="Adblock detectado"]',
-            'div[style="text-align: center; padding-top: 48vh; font-size: 4vw; position: fixed; display: block; width: 100%; height: 100%; inset: 0px; background-color: rgba(0, 0, 0, 0); z-index: 300000;"]'
+            'div[style="text-align: center; padding-top: 48vh; font-size: 4vw; position: fixed; display: block; width: 100%; height: 100%; inset: 0px; background-color: rgba(0, 0, 0, 0); z-index: 300000;"]',
+            'link[rel="dns-prefetch"][href*="adexchangeclear.com"]'
         ],
         iframeStyles: {
             position: 'absolute',
@@ -51,7 +53,7 @@
         }
     };
 
-    const blockedDomains = ['displayvertising.com', 'youradexchange.com', 'adsco.re'];
+    const blockedDomains = ['displayvertising.com', 'youradexchange.com', 'adsco.re', 'adexchangeclear.com'];
 
     function matchesStyles(element, styles) {
         return Object.entries(styles).every(([prop, value]) => {
