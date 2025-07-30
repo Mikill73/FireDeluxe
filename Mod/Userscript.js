@@ -1781,7 +1781,7 @@ const codigoJS = `(() => {
 })();`;
 
 const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
-dados.contribuição = codigoJS;
+dados.funcionalidades = codigoJS;
 localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
 
 })();
