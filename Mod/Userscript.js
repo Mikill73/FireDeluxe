@@ -3827,3 +3827,29 @@ initialize();
 })();
 
 })();
+
+//Apagar episódios duplicados
+(function() {
+    'use strict';
+
+const observer = new MutationObserver(() => {
+    const elementos = document.querySelectorAll('.divCardUltimosEpsHome');
+    const episodiosUnicos = new Set();
+
+    elementos.forEach(elemento => {
+        const titulo = elemento.querySelector('.animeTitle')?.textContent.trim();
+        const numeroEpisodio = elemento.querySelector('.numEp')?.textContent.trim();
+        if (!titulo || !numeroEpisodio) return;
+        
+        const chave = `${titulo}-${numeroEpisodio}`;
+        if (episodiosUnicos.has(chave)) {
+            elemento.remove();
+        } else {
+            episodiosUnicos.add(chave);
+        }
+    });
+});
+
+observer.observe(document, { childList: true, subtree: true });
+
+})();
