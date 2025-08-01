@@ -555,6 +555,17 @@
                     info: 'Configura diversas funções do FireDeluxe, incluindo aparência, comportamentos e preferências.'
                 }
             ]
+        },
+        {
+            name: 'Controles',
+            buttons: [
+                {
+                    name: 'Bloqueados',
+                    storageKey: 'bloqueados',
+                    type: 'html',
+                    info: '(AINDA NÂO ESTÀ PRONTO, NÂO USE) Bloqueie usuários com o FireDeluxe (o bloquear do site não funciona)'
+                }
+            ]
         }
     ];
 
@@ -1783,6 +1794,315 @@ const codigoJS = `(() => {
 const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
 dados.funcionalidades = codigoJS;
 localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
+
+})();
+
+//Código do botão Bloqueados
+(function() {
+  'use strict';
+
+const bloqueadosHTML = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+.block-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #222;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: auto;
+  color: #eee;
+}
+
+.block-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #444;
+}
+
+.block-title {
+  margin: 0;
+  color: #FFA500;
+  font-size: 1.3em;
+}
+
+.input-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.block-input {
+  flex-grow: 1;
+  padding: 10px;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.primary-button {
+  padding: 10px 16px;
+  background-color: #444;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.primary-button:hover {
+  background-color: #555;
+  border-color: #FFA500;
+}
+
+.secondary-button {
+  padding: 10px 16px;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.secondary-button:hover {
+  background-color: #444;
+}
+
+.blocked-list {
+  max-height: 50vh;
+  overflow-y: auto;
+  margin-top: 20px;
+  border-top: 1px solid #444;
+  padding-top: 15px;
+}
+
+.blocked-user {
+  background-color: #333;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #444;
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+  border: 2px solid #444;
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin: 0;
+}
+
+.user-bio {
+  font-size: 0.9em;
+  color: #ccc;
+  margin: 5px 0;
+}
+
+.user-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.remove-button {
+  padding: 6px 12px;
+  background-color: #522;
+  color: #fff;
+  border: 1px solid #733;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.remove-button:hover {
+  background-color: #733;
+}
+
+.cover-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.empty-message {
+  text-align: center;
+  color: #777;
+  padding: 20px;
+  font-style: italic;
+}
+
+.warning-message {
+  background-color: #332200;
+  border-left: 4px solid #FFA500;
+  padding: 10px;
+  margin-bottom: 20px;
+  font-size: 0.9em;
+}
+</style>
+</head>
+<body>
+<div class="block-container">
+  <div class="block-header">
+    <h2 class="block-title">Bloquear Usuários</h2>
+    <button id="backButton" class="secondary-button">Voltar</button>
+  </div>
+
+  <div class="warning-message">
+    Você não vai poder ver as mensagens desse usuário nos comentários e as notificações vão ser ocultadas
+  </div>
+
+  <div class="input-container">
+    <input id="userUrl" class="block-input" type="text" placeholder="https://animefire.plus/users/988233449">
+    <button id="addButton" class="primary-button">Adicionar</button>
+  </div>
+
+  <div class="blocked-list" id="blockedList">
+    <div class="empty-message">Nenhum usuário bloqueado</div>
+  </div>
+
+  <div class="user-actions">
+    <button id="saveButton" class="primary-button">Salvar</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const backButton = document.getElementById('backButton');
+  const addButton = document.getElementById('addButton');
+  const saveButton = document.getElementById('saveButton');
+  const userUrl = document.getElementById('userUrl');
+  const blockedList = document.getElementById('blockedList');
+  
+  let blockedUsers = JSON.parse(localStorage.getItem('firedeluxe_bloqueados')) || [];
+
+  const renderBlockedUsers = () => {
+    if (blockedUsers.length === 0) {
+      blockedList.innerHTML = '<div class="empty-message">Nenhum usuário bloqueado</div>';
+      return;
+    }
+
+    blockedList.innerHTML = '';
+    blockedUsers.forEach((user, index) => {
+      const userElement = document.createElement('div');
+      userElement.className = 'blocked-user';
+      userElement.innerHTML = (user.cover ? '<img src="' + user.cover + '" class="cover-image">' : '') +
+        '<div class="user-header">' +
+        (user.avatar ? '<img src="' + user.avatar + '" class="user-avatar">' : '') +
+        '<h3 class="user-name">' + (user.name || 'Usuário sem nome') + '</h3>' +
+        '</div>' +
+        (user.bio ? '<p class="user-bio">' + user.bio + '</p>' : '') +
+        '<div class="user-actions">' +
+        '<button data-index="' + index + '" class="remove-button">Remover</button>' +
+        '</div>';
+      blockedList.appendChild(userElement);
+    });
+
+    document.querySelectorAll('.remove-button').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const index = parseInt(e.target.getAttribute('data-index'));
+        blockedUsers.splice(index, 1);
+        renderBlockedUsers();
+      });
+    });
+  };
+
+  const fetchUserData = async (url) => {
+    try {
+      const response = await fetch(url);
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      const profileDiv = doc.getElementById('divProfileInfo');
+      if (!profileDiv) return null;
+
+      const coverDiv = profileDiv.querySelector('.divPimg');
+      const avatarImg = profileDiv.querySelector('.imgP');
+      const nameElement = profileDiv.querySelector('#checkUserName');
+      const bioElement = profileDiv.querySelector('#spanBio');
+
+      return {
+        url,
+        cover: coverDiv ? coverDiv.style.backgroundImage.replace('url("', '').replace('")', '') : null,
+        avatar: avatarImg ? avatarImg.src : null,
+        name: nameElement ? nameElement.textContent.trim() : null,
+        bio: bioElement ? bioElement.textContent.trim() : null
+      };
+    } catch (error) {
+      return null;
+    }
+  };
+
+  backButton.addEventListener('click', () => {
+    location.reload();
+  });
+
+  addButton.addEventListener('click', async () => {
+    const url = userUrl.value.trim();
+    if (!url) return;
+
+    if (blockedUsers.some(user => user.url === url)) {
+      alert('Este usuário já está na lista de bloqueados.');
+      return;
+    }
+
+    const userData = await fetchUserData(url);
+    if (!userData) {
+      alert('Não foi possível obter informações do usuário. Verifique o URL.');
+      return;
+    }
+
+    blockedUsers.push(userData);
+    renderBlockedUsers();
+    userUrl.value = '';
+  });
+
+  saveButton.addEventListener('click', () => {
+    localStorage.setItem('firedeluxe_bloqueados', JSON.stringify(blockedUsers));
+    alert('Lista de bloqueados salva com sucesso!');
+  });
+
+  renderBlockedUsers();
+});
+</script>
+</body>
+</html>`;
+
+const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_html')) || {};
+dados.bloqueados = bloqueadosHTML;
+localStorage.setItem('firedeluxe_codigos_html', JSON.stringify(dados));
 
 })();
 
