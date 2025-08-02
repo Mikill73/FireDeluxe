@@ -2843,18 +2843,109 @@ const checkAndAddDownloadButtons = () => {
 
     downloadSeasonBtn.addEventListener('click', (e) => {
       const seasonIdx = e.target.dataset.seasonIndex;
-      showQualityModal(seasonIdx);
+      showEpisodeSelection(seasonIdx);
     });
 
     addedButtons++;
   });
 
-  function showQualityModal(seasonIndex) {
+  function showEpisodeSelection(seasonIndex) {
+    let episodes = [];
+    if (seasonIndex === 'all') {
+      document.querySelectorAll('.div_video_list a.lEp').forEach(link => {
+        episodes.push({
+          href: link.href,
+          title: link.textContent.trim(),
+          num: link.href.split('/').pop(),
+          selected: false
+        });
+      });
+    } else {
+      const seasonSection = document.querySelector(`section.mt-3.mb-2[style*="background-color:#161616"]:nth-of-type(${parseInt(seasonIndex) + 1})`);
+      if (seasonSection) {
+        seasonSection.querySelectorAll('a.lEp').forEach(link => {
+          episodes.push({
+            href: link.href,
+            title: link.textContent.trim(),
+            num: link.href.split('/').pop(),
+            selected: false
+          });
+        });
+      }
+    }
+
+    if (episodes.length === 0) return;
+
+    const episodesList = episodes.map(ep => `
+      <div class="episode-item" data-ep-num="${ep.num}" style="padding:10px;margin:5px 0;border-radius:4px;background:#333;cursor:pointer;transition:all 0.3s;${ep.selected ? 'border-left:4px solid ' + themeColor + ';' : ''}">
+        ${ep.title}
+      </div>
+    `).join('');
+
+    const modalContent = `
+      <div style="text-align:center;margin-bottom:15px;position:relative;">
+        <button id="close-modal" style="position:absolute;right:0;top:0;background:none;border:none;color:${themeColor};font-size:1.5em;cursor:pointer;">×</button>
+        <p style="margin-bottom:20px;">Clique nos episódios que deseja baixar:</p>
+        <p style="font-size:12px;color:${themeColor};margin-bottom:15px;">Episódios selecionados: <span id="selected-count">0</span></p>
+        <div style="max-height:300px;overflow-y:auto;margin-bottom:15px;border:1px solid #333;border-radius:4px;padding:10px;">
+          ${episodesList}
+        </div>
+        <div style="display:flex;justify-content:center;gap:15px;">
+          <button id="download-selected" style="padding:10px 20px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">Baixar Selecionados</button>
+          <button id="download-all" style="padding:10px 20px;background:#444;color:#FFF;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">Baixar Todos</button>
+        </div>
+      </div>
+    `;
+
+    showModal('Selecionar Episódios', modalContent);
+
+    const episodeElements = document.querySelectorAll('.episode-item');
+    episodeElements.forEach(el => {
+      el.addEventListener('click', () => {
+        const epNum = el.dataset.epNum;
+        const episodeIndex = episodes.findIndex(ep => ep.num === epNum);
+        episodes[episodeIndex].selected = !episodes[episodeIndex].selected;
+        
+        if (episodes[episodeIndex].selected) {
+          el.style.borderLeft = `4px solid ${themeColor}`;
+        } else {
+          el.style.borderLeft = 'none';
+        }
+        
+        updateSelectedCount();
+      });
+    });
+
+    function updateSelectedCount() {
+      const selectedCount = episodes.filter(ep => ep.selected).length;
+      document.getElementById('selected-count').textContent = selectedCount;
+    }
+
+    document.getElementById('download-selected').addEventListener('click', () => {
+      const selectedEpisodes = episodes.filter(ep => ep.selected);
+      if (selectedEpisodes.length === 0) {
+        alert('Selecione pelo menos um episódio para baixar');
+        return;
+      }
+      closeModal();
+      showQualityModal(seasonIndex, selectedEpisodes);
+    });
+
+    document.getElementById('download-all').addEventListener('click', () => {
+      closeModal();
+      showQualityModal(seasonIndex, episodes);
+    });
+
+    document.getElementById('close-modal').addEventListener('click', closeModal);
+  }
+
+  function showQualityModal(seasonIndex, episodes) {
     const modalContent = `
       <div style="text-align:center;margin-bottom:15px;position:relative;">
         <button id="close-modal" style="position:absolute;right:0;top:0;background:none;border:none;color:${themeColor};font-size:1.5em;cursor:pointer;">×</button>
         <p style="margin-bottom:20px;">Selecione a qualidade desejada:</p>
         <p style="font-size:12px;color:#aaa;margin:-15px 0 20px 0;">Se a página for redirecionada para um "404 not found" é porque o episódio tem algum erro e não pode ser baixado</p>
+        <p style="font-size:12px;color:#aaa;margin:-15px 0 20px 0;">Alguns navegadores podem bloquear downloads múltiplos. Se isso acontecer, você precisará permitir no navegador</p>
         <div style="display:flex;justify-content:center;gap:15px;">
           <button id="quality-sd" style="padding:10px 20px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;">SD (480p)</button>
           <button id="quality-hd" style="padding:10px 20px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;">HD (720p)</button>
@@ -2867,32 +2958,22 @@ const checkAndAddDownloadButtons = () => {
 
     showModal('Selecionar Qualidade', modalContent, null, true);
 
-    document.getElementById('quality-sd').addEventListener('click', () => startDownloads('SD', seasonIndex));
-    document.getElementById('quality-hd').addEventListener('click', () => startDownloads('HD', seasonIndex));
+    document.getElementById('quality-sd').addEventListener('click', () => startDownloads('SD', seasonIndex, episodes));
+    document.getElementById('quality-hd').addEventListener('click', () => startDownloads('HD', seasonIndex, episodes));
     document.getElementById('close-modal').addEventListener('click', closeModal);
   }
 
-  async function startDownloads(quality, seasonIndex) {
+  async function startDownloads(quality, seasonIndex, episodes) {
     const resultsContainer = document.querySelector('#results-container');
     resultsContainer.innerHTML = '<div style="text-align:center;padding:10px;"><div class="spinner"></div><p>Iniciando downloads...</p></div>';
     
-    let episodeLinks = [];
-    if (seasonIndex === 'all') {
-      document.querySelectorAll('.div_video_list a.lEp').forEach(link => {
-        episodeLinks.push(link);
-      });
-    } else {
-      const seasonSection = document.querySelector(`section.mt-3.mb-2[style*="background-color:#161616"]:nth-of-type(${parseInt(seasonIndex) + 1})`);
-      if (seasonSection) {
-        episodeLinks = Array.from(seasonSection.querySelectorAll('a.lEp'));
-      }
-    }
-
-    if (episodeLinks.length === 0) return;
-
-    for (const [index, episodeLink] of episodeLinks.entries()) {
-      const episodeNum = episodeLink.href.split('/').pop();
-      const episodeTitle = episodeLink.textContent.trim();
+    const downloadLinks = [];
+    
+    for (const [index, episode] of episodes.entries()) {
+      if (!episode.selected && seasonIndex !== 'all') continue;
+      
+      const episodeNum = episode.num;
+      const episodeTitle = episode.title;
       const downloadPageUrl = `https://animefire.plus/download/${animeSlug}/${episodeNum}`;
       
       try {
@@ -2926,14 +3007,13 @@ const checkAndAddDownloadButtons = () => {
           }
         }
         if (selectedButton && selectedButton.href) {
-          const downloadUrl = selectedButton.href;
-          const a = document.createElement('a');
-          a.href = downloadUrl;
-          a.download = `${animeSlug}-ep${episodeNum}-${quality.toLowerCase()}.mp4`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          addResultToModal(episodeTitle, 'success', `Download iniciado (${quality})`);
+          downloadLinks.push({
+            url: selectedButton.href,
+            filename: `${animeSlug}-ep${episodeNum}-${quality.toLowerCase()}.mp4`,
+            title: episodeTitle,
+            quality: selectedButton.textContent.trim()
+          });
+          addResultToModal(episodeTitle, 'success', `Link preparado (${quality})`);
         } else {
           addResultToModal(episodeTitle, 'failed', `Qualidade ${quality} não disponível`);
         }
@@ -2941,9 +3021,23 @@ const checkAndAddDownloadButtons = () => {
         addResultToModal(episodeTitle, 'failed', 'Erro ao processar');
       }
 
-      if (index < episodeLinks.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    if (downloadLinks.length > 0) {
+      resultsContainer.insertAdjacentHTML('beforeend', '<div style="text-align:center;margin-top:15px;"><button id="start-downloads" style="padding:10px 20px;background:' + themeColor + ';color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">Iniciar Downloads</button></div>');
+      
+      document.getElementById('start-downloads').addEventListener('click', () => {
+        downloadLinks.forEach(link => {
+          const a = document.createElement('a');
+          a.href = link.url;
+          a.download = link.filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          addResultToModal(link.title, 'success', `Download iniciado (${link.quality})`);
+        });
+      });
     }
   }
 
@@ -2984,7 +3078,7 @@ const checkAndAddDownloadButtons = () => {
       <div class="modal-header">
         <h3>${title}</h3>
       </div>
-      <div class="modal-content">
+      <div class="modal-content" id="results-container">
         ${content}
       </div>
     `;
@@ -2999,6 +3093,7 @@ const checkAndAddDownloadButtons = () => {
       #close-modal {font-weight:bold;padding:0 10px;}
       #close-modal:hover {color:#fff;}
       .spinner {border:3px solid rgba(${hexToRgb(themeColor)},0.3);border-radius:50%;border-top:3px solid ${themeColor};width:20px;height:20px;animation:spin 1s linear infinite;margin:0 auto 10px;}
+      .episode-item:hover {background:#444 !important;}
       @keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
     `;
 
