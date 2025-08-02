@@ -1807,9 +1807,11 @@ const bloqueadosHTML = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <style>
 body {
-  background-color: transparent;
+  background-color: #111;
   margin: 0;
   padding: 0;
+  color: #eee;
+  font-family: Arial, sans-serif;
 }
 
 .block-container {
@@ -1826,7 +1828,6 @@ body {
   max-width: 800px;
   max-height: 90vh;
   overflow: auto;
-  color: #eee;
 }
 
 .block-header {
@@ -2004,24 +2005,24 @@ body {
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const backButton = document.getElementById('backButton');
-  const addButton = document.getElementById('addButton');
-  const saveButton = document.getElementById('saveButton');
-  const userUrl = document.getElementById('userUrl');
-  const blockedList = document.getElementById('blockedList');
+document.addEventListener('DOMContentLoaded', function() {
+  var backButton = document.getElementById('backButton');
+  var addButton = document.getElementById('addButton');
+  var saveButton = document.getElementById('saveButton');
+  var userUrl = document.getElementById('userUrl');
+  var blockedList = document.getElementById('blockedList');
   
-  let blockedUsers = JSON.parse(localStorage.getItem('firedeluxe_bloqueados')) || [];
+  var blockedUsers = JSON.parse(localStorage.getItem('firedeluxe_bloqueados')) || [];
 
-  const renderBlockedUsers = () => {
+  function renderBlockedUsers() {
     if (blockedUsers.length === 0) {
       blockedList.innerHTML = '<div class="empty-message">Nenhum usuário bloqueado</div>';
       return;
     }
 
     blockedList.innerHTML = '';
-    blockedUsers.forEach((user, index) => {
-      const userElement = document.createElement('div');
+    blockedUsers.forEach(function(user, index) {
+      var userElement = document.createElement('div');
       userElement.className = 'blocked-user';
       userElement.innerHTML = (user.cover ? '<img src="' + user.cover + '" class="cover-image">' : '') +
         '<div class="user-header">' +
@@ -2035,67 +2036,71 @@ document.addEventListener('DOMContentLoaded', () => {
       blockedList.appendChild(userElement);
     });
 
-    document.querySelectorAll('.remove-button').forEach(button => {
-      button.addEventListener('click', (e) => {
-        const index = parseInt(e.target.getAttribute('data-index'));
+    document.querySelectorAll('.remove-button').forEach(function(button) {
+      button.addEventListener('click', function(e) {
+        var index = parseInt(e.target.getAttribute('data-index'));
         blockedUsers.splice(index, 1);
         renderBlockedUsers();
       });
     });
-  };
+  }
 
-  const fetchUserData = async (url) => {
-    try {
-      const response = await fetch(url);
-      const html = await response.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      
-      const profileDiv = doc.getElementById('divProfileInfo');
-      if (!profileDiv) return null;
+  function fetchUserData(url) {
+    return fetch(url)
+      .then(function(response) {
+        return response.text();
+      })
+      .then(function(html) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, 'text/html');
+        
+        var profileDiv = doc.getElementById('divProfileInfo');
+        if (!profileDiv) return null;
 
-      const coverDiv = profileDiv.querySelector('.divPimg');
-      const avatarImg = profileDiv.querySelector('.imgP');
-      const nameElement = profileDiv.querySelector('#checkUserName');
-      const bioElement = profileDiv.querySelector('#spanBio');
+        var coverDiv = profileDiv.querySelector('.divPimg');
+        var avatarImg = profileDiv.querySelector('.imgP');
+        var nameElement = profileDiv.querySelector('#checkUserName');
+        var bioElement = profileDiv.querySelector('#spanBio');
 
-      return {
-        url,
-        cover: coverDiv ? coverDiv.style.backgroundImage.replace('url("', '').replace('")', '') : null,
-        avatar: avatarImg ? avatarImg.src : null,
-        name: nameElement ? nameElement.textContent.trim() : null,
-        bio: bioElement ? bioElement.textContent.trim() : null
-      };
-    } catch (error) {
-      return null;
-    }
-  };
+        return {
+          url: url,
+          cover: coverDiv ? coverDiv.style.backgroundImage.replace('url("', '').replace('")', '') : null,
+          avatar: avatarImg ? avatarImg.src : null,
+          name: nameElement ? nameElement.textContent.trim() : null,
+          bio: bioElement ? bioElement.textContent.trim() : null
+        };
+      })
+      .catch(function(error) {
+        return null;
+      });
+  }
 
-  backButton.addEventListener('click', () => {
+  backButton.addEventListener('click', function() {
     location.reload();
   });
 
-  addButton.addEventListener('click', async () => {
-    const url = userUrl.value.trim();
+  addButton.addEventListener('click', function() {
+    var url = userUrl.value.trim();
     if (!url) return;
 
-    if (blockedUsers.some(user => user.url === url)) {
+    if (blockedUsers.some(function(user) { return user.url === url; })) {
       alert('Este usuário já está na lista de bloqueados.');
       return;
     }
 
-    const userData = await fetchUserData(url);
-    if (!userData) {
-      alert('Não foi possível obter informações do usuário. Verifique o URL.');
-      return;
-    }
+    fetchUserData(url).then(function(userData) {
+      if (!userData) {
+        alert('Não foi possível obter informações do usuário. Verifique o URL.');
+        return;
+      }
 
-    blockedUsers.push(userData);
-    renderBlockedUsers();
-    userUrl.value = '';
+      blockedUsers.push(userData);
+      renderBlockedUsers();
+      userUrl.value = '';
+    });
   });
 
-  saveButton.addEventListener('click', () => {
+  saveButton.addEventListener('click', function() {
     localStorage.setItem('firedeluxe_bloqueados', JSON.stringify(blockedUsers));
     alert('Lista de bloqueados salva com sucesso!');
   });
@@ -2106,7 +2111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </body>
 </html>`;
 
-const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_html')) || {};
+var dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_html')) || {};
 dados.bloqueados = bloqueadosHTML;
 localStorage.setItem('firedeluxe_codigos_html', JSON.stringify(dados));
 
