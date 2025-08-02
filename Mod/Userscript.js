@@ -1806,6 +1806,12 @@ const bloqueadosHTML = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <style>
+body {
+  background-color: transparent;
+  margin: 0;
+  padding: 0;
+}
+
 .block-container {
   position: fixed;
   top: 50%;
