@@ -4145,3 +4145,47 @@ const observer = new MutationObserver(() => {
 observer.observe(document, { childList: true, subtree: true });
 
 })();
+
+//Ocultar notificações/comentários/replys de usuários bloqueados
+(function() {
+    'use strict';
+
+(function() {
+    const blockedUsers = JSON.parse(localStorage.getItem('firedeluxe_bloqueados')) || [];
+    if (!blockedUsers.length) return;
+
+    const hideBlockedElements = () => {
+        blockedUsers.forEach(user => {
+            const userId = user.url.split('/').pop();
+
+            document.querySelectorAll('.us_reply[href*="/users/"], .usr_name_cmt[href*="/users/"]').forEach(el => {
+                if (el.getAttribute('href').includes(userId)) {
+                    el.closest('.cmt_reply_div, .cmt')?.style.setProperty('display', 'none', 'important');
+                }
+            });
+        });
+    };
+
+    const observer = new MutationObserver(hideBlockedElements);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const bell = document.querySelector('.dropdown_notification_bell');
+    if (bell) {
+        bell.addEventListener('click', () => {
+            setTimeout(() => {
+                blockedUsers.forEach(user => {
+                    const userId = user.url.split('/').pop();
+                    document.querySelectorAll('.noti_us').forEach(el => {
+                        if (el.textContent.trim() === user.name) {
+                            el.closest('.dropdown-item')?.style.setProperty('display', 'none', 'important');
+                        }
+                    });
+                });
+            }, 200);
+        });
+    }
+
+    hideBlockedElements();
+})();
+
+})();
