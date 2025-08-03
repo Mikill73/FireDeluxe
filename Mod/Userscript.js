@@ -4120,51 +4120,6 @@ initialize();
     checkForBell();
 })();
 
-//Deletar mensagens de divulgação do FireDeluxe
-(function() {
-    'use strict';
-
-(() => {
-    const targetText = "🟧 FireDeluxe 🟧";
-    const profileLink = "/users/988233449";
-    let executionCount = 0;
-    let profileMatch = false;
-    let observer;
-    let intervalId;
-
-    const checkProfileAndHideComments = () => {
-        const profileElement = document.querySelector('.meu-perfil');
-        if (profileElement && profileElement.getAttribute('href') === profileLink) {
-            profileMatch = true;
-            hideFireDeluxeComments();
-            
-            if (!observer) {
-                observer = new MutationObserver(hideFireDeluxeComments);
-                observer.observe(document.body, { childList: true, subtree: true });
-            }
-        } else if (!profileMatch) {
-            executionCount++;
-            if (executionCount >= 10) {
-                clearInterval(intervalId);
-            }
-        }
-    };
-
-    const hideFireDeluxeComments = () => {
-        document.querySelectorAll('.cmt, .cmt_reply_div').forEach(comment => {
-            if (comment.textContent.includes(targetText)) {
-                setTimeout(() => {
-                    comment.remove();
-                }, 200);
-            }
-        });
-    };
-
-    intervalId = setInterval(checkProfileAndHideComments, 1000);
-})();
-
-})();
-
 //Apagar episódios duplicados
 (function() {
     'use strict';
