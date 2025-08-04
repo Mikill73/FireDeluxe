@@ -563,7 +563,7 @@
                     name: 'Bloqueados',
                     storageKey: 'bloqueados',
                     type: 'html',
-                    info: '(AINDA NÂO ESTÀ PRONTO, NÂO USE) Bloqueie usuários com o FireDeluxe (o bloquear do site não funciona)'
+                    info: 'Bloqueie usuários com o FireDeluxe (o bloquear do site não funciona)'
                 }
             ]
         }
