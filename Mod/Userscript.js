@@ -2839,10 +2839,13 @@ const checkAndAddDownloadButtons = () => {
     const existingButton = section.querySelector('.download-season-btn');
     if (existingButton) return;
 
+    const seasonNumberMatch = seasonTitle.textContent.match(/Temporada (\d+)/i);
+    const seasonNumber = seasonNumberMatch ? seasonNumberMatch[1] : index + 1;
+
     const downloadSeasonBtn = document.createElement('button');
     downloadSeasonBtn.className = 'download-season-btn';
     downloadSeasonBtn.dataset.seasonIndex = index;
-    downloadSeasonBtn.textContent = `Baixar Temporada ${index + 1}`;
+    downloadSeasonBtn.textContent = `Baixar Temporada ${seasonNumber}`;
     downloadSeasonBtn.style.cssText = `padding:10px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;margin:10px auto;display:block;font-weight:bold;`;
     
     section.insertBefore(downloadSeasonBtn, episodesContainer);
