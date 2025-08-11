@@ -4004,6 +4004,15 @@ const formatTimeAgo = (dateString) => {
   return `${Math.floor(diff/31536000)} anos atrás`;
 };
 
+const updateTimeElements = () => {
+  document.querySelectorAll('.ep-dateModified').forEach(el => {
+    const dateModified = el.getAttribute('data-date-modified');
+    if (dateModified) {
+      el.textContent = formatTimeAgo(dateModified);
+    }
+  });
+};
+
 const updateHomePageEpisodes = (newEpisodes) => {
   const row = document.querySelector(".card-group .row");
   if (!row) return;
@@ -4044,6 +4053,7 @@ const updateLocalStorageEpisodes = async () => {
     if (newEpisodes.length > 0) {
       updateHomePageEpisodes(newEpisodes);
     }
+    updateTimeElements();
   }
   
   localStorage.setItem('firedeluxe_episodios_prev', JSON.stringify(data));
@@ -4062,6 +4072,8 @@ const checkForNewEpisodes = async () => {
     if (newEpisodes.length > 0) {
       addToQueue(newEpisodes.map(ep => ep.title));
     }
+  } else {
+    updateTimeElements();
   }
 };
 
@@ -4075,6 +4087,7 @@ const initialize = async () => {
     }
     
     setInterval(updateLocalStorageEpisodes, 30000);
+    setInterval(checkForNewEpisodes, 30000);
   }
 };
 
