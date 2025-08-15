@@ -4208,3 +4208,83 @@ observer.observe(document, { childList: true, subtree: true });
 })();
 
 })();
+
+//Botão de bloquear no FireDeluxe no perfil dos usuários
+(function() {
+    'use strict';
+(function() {
+  if (!window.location.href.includes('/users/')) return;
+
+  const checkElement = setInterval(() => {
+    const blockButton = document.querySelector('[data-action="block_user"]');
+    if (!blockButton) return;
+
+    clearInterval(checkElement);
+    
+    const newButton = blockButton.cloneNode(true);
+    newButton.innerHTML = `<svg style="height:16px;margin:-3px 8px 0 0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-ban fa-w-16"><path fill="currentColor" d="M256 8C119.034 8 8 119.033 8 256s111.034 248 248 248 248-111.034 248-248S392.967 8 256 8zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676zM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676z"></path></svg> Bloquear com o FireDeluxe`;
+    newButton.removeAttribute('data-action');
+    newButton.addEventListener('click', handleBlockAction);
+    blockButton.parentNode.insertBefore(newButton, blockButton.nextSibling);
+
+    if (isUserBlocked()) {
+      const unblockButton = blockButton.cloneNode(true);
+      unblockButton.innerHTML = `<svg style="height:16px;margin:-3px 8px 0 0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-ban fa-w-16"><path fill="currentColor" d="M256 8C119.034 8 8 119.033 8 256s111.034 248 248 248 248-111.034 248-248S392.967 8 256 8zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676zM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676z"></path></svg> Desbloquear do FireDeluxe`;
+      unblockButton.removeAttribute('data-action');
+      unblockButton.addEventListener('click', handleUnblockAction);
+      blockButton.parentNode.insertBefore(unblockButton, blockButton.nextSibling);
+    }
+  }, 1000);
+
+  setTimeout(() => clearInterval(checkElement), 10000);
+
+  function isUserBlocked() {
+    const blocked = JSON.parse(localStorage.getItem('firedeluxe_bloqueados') || '[]');
+    return blocked.some(user => user.url === window.location.href);
+  }
+
+  function handleBlockAction() {
+    const currentUrl = window.location.href;
+    const blocked = JSON.parse(localStorage.getItem('firedeluxe_bloqueados') || '[]');
+    
+    if (blocked.some(user => user.url === currentUrl)) return;
+
+    fetchUserData(currentUrl).then(userData => {
+      if (!userData) return;
+      blocked.push(userData);
+      localStorage.setItem('firedeluxe_bloqueados', JSON.stringify(blocked));
+      location.reload();
+    });
+  }
+
+  function handleUnblockAction() {
+    const currentUrl = window.location.href;
+    let blocked = JSON.parse(localStorage.getItem('firedeluxe_bloqueados') || '[]');
+    blocked = blocked.filter(user => user.url !== currentUrl);
+    localStorage.setItem('firedeluxe_bloqueados', JSON.stringify(blocked));
+    location.reload();
+  }
+
+  function fetchUserData(url) {
+    return fetch(url)
+      .then(response => response.text())
+      .then(html => {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const profileDiv = doc.getElementById('divProfileInfo');
+        if (!profileDiv) return null;
+        const coverDiv = profileDiv.querySelector('.divPimg');
+        const avatarImg = profileDiv.querySelector('.imgP');
+        const nameElement = profileDiv.querySelector('#checkUserName');
+        const bioElement = profileDiv.querySelector('#spanBio');
+        return {
+          url: url,
+          cover: coverDiv ? coverDiv.style.backgroundImage.replace('url("', '').replace('")', '') : null,
+          avatar: avatarImg ? avatarImg.src : null,
+          name: nameElement ? nameElement.textContent.trim() : null,
+          bio: bioElement ? bioElement.textContent.trim() : null
+        };
+      })
+      .catch(() => null);
+  }
+})();
+})();
