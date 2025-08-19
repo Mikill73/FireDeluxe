@@ -1697,39 +1697,44 @@ const codigoJS = `navigator.serviceWorker.getRegistrations().then(regs => {
   };
 
   const createMessageElement = (message) => {
-    const messageEl = document.createElement('div');
-    messageEl.style.cssText = 'display:flex;gap:10px;margin-bottom:15px';
+    const messageContainer = document.createElement('div');
+    messageContainer.style.cssText = 'display:flex;gap:10px;margin-bottom:15px';
 
     const avatar = document.createElement('img');
     avatar.src = message.avatar_url;
     avatar.style.cssText = 'width:40px;height:40px;border-radius:50%;object-fit:cover';
     avatar.onerror = () => { avatar.src = 'https://via.placeholder.com/40'; };
 
-    const content = document.createElement('div');
+    const messageContent = document.createElement('div');
+    messageContent.style.cssText = 'flex:1';
+
+    const messageBubble = document.createElement('div');
+    messageBubble.style.cssText = 'background-color:#2c3034;padding:12px;border-radius:12px;max-width:100%';
 
     const header = document.createElement('div');
-    header.style.cssText = 'display:flex;gap:10px;align-items:center';
+    header.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:5px';
 
     const username = document.createElement('span');
     username.textContent = message.username;
-    username.style.cssText = 'font-weight:bold;color:' + themeColor;
+    username.style.cssText = 'font-weight:bold;color:' + themeColor + ';font-size:14px';
 
     const time = document.createElement('span');
     time.textContent = message.created_at ? formatMessageTime(message.created_at) : 'Agora';
-    time.style.cssText = 'color:#999;font-size:0.8em';
+    time.style.cssText = 'color:#6c757d;font-size:12px';
 
     const text = document.createElement('div');
     text.textContent = message.content;
-    text.style.cssText = 'color:#eee;margin-top:5px;word-break:break-word';
+    text.style.cssText = 'color:#e9ecef;font-size:14px;line-height:1.4;word-break:break-word';
 
     header.appendChild(username);
     header.appendChild(time);
-    content.appendChild(header);
-    content.appendChild(text);
-    messageEl.appendChild(avatar);
-    messageEl.appendChild(content);
+    messageBubble.appendChild(header);
+    messageBubble.appendChild(text);
+    messageContent.appendChild(messageBubble);
+    messageContainer.appendChild(avatar);
+    messageContainer.appendChild(messageContent);
 
-    return messageEl;
+    return messageContainer;
   };
 
   const loadMessages = async () => {
