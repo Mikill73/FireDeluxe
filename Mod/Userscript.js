@@ -1618,6 +1618,12 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
 const codigoJS = `navigator.serviceWorker.getRegistrations().then(regs => {
   for (let reg of regs) reg.unregister();
 }).then(() => {
+  const userData = localStorage.getItem('firedeluxe_chat');
+  if (!userData) {
+    alert("Você precisa estar logado para usar o Chat");
+    return;
+  }
+
   const chatContainer = document.createElement('div');
   chatContainer.id = 'chat-container';
   chatContainer.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;max-width:600px;height:70%;max-height:600px;background-color:#212529;border:1px solid #444;border-radius:8px;box-shadow:0 0 30px rgba(0,0,0,0.8);display:flex;flex-direction:column;z-index:9999';
@@ -1752,8 +1758,6 @@ const codigoJS = `navigator.serviceWorker.getRegistrations().then(regs => {
     if (!content) return;
 
     const userData = localStorage.getItem('firedeluxe_chat');
-    if (!userData) return;
-
     const { imagem, nome } = JSON.parse(userData);
     const profileUrl = window.location.href;
 
@@ -4496,4 +4500,35 @@ observer.observe(document, { childList: true, subtree: true });
       .catch(() => null);
   }
 })();
+})();
+
+//Salvar nome e foto de perfil do usuário (para usar no chat do FireDeluxe)
+(function() {
+    'use strict';
+
+const img = document.querySelector("a.nav-link img.imgMN")?.src;
+
+let tentativas = 0;
+const maxTentativas = 10;
+
+const tentarBuscarPerfil = () => {
+  const perfilLink = document.querySelector("a.meu-perfil")?.getAttribute("href");
+  if (perfilLink) {
+    fetch(perfilLink)
+      .then(res => res.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const nome = doc.querySelector("#checkUserName")?.innerText.trim();
+        const valor = JSON.stringify({ img, nome });
+        document.cookie = `firedeluxe_chat=${encodeURIComponent(valor)}; path=/;`;
+      });
+  } else if (tentativas < maxTentativas) {
+    tentativas++;
+    setTimeout(tentarBuscarPerfil, 1000);
+  }
+};
+
+tentarBuscarPerfil()
+
 })();
