@@ -4427,6 +4427,38 @@ observer.observe(document, { childList: true, subtree: true });
 
 })();
 
+//Salvar nome e foto de perfil do usuário (para usar no chat do FireDeluxe)
+(function() {
+    'use strict';
+
+    const img = document.querySelector("a.nav-link img.imgMN")?.src;
+
+    let tentativas = 0;
+    const maxTentativas = 10;
+
+    function tentarBuscarPerfil() {
+        const perfilLink = document.querySelector("a.meu-perfil")?.getAttribute("href");
+        if (perfilLink) {
+            fetch(perfilLink)
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, "text/html");
+                    const nome = doc.querySelector("#checkUserName")?.innerText.trim();
+                    const valor = { img, nome };
+                    localStorage.setItem('firedeluxe_chat', JSON.stringify(valor));
+                });
+        } else if (tentativas < maxTentativas) {
+            tentativas++;
+            setTimeout(tentarBuscarPerfil, 1000);
+        } else {
+        }
+    }
+
+    tentarBuscarPerfil();
+
+})();
+
 //Botão de bloquear no FireDeluxe no perfil dos usuários
 (function() {
     'use strict';
@@ -4505,35 +4537,4 @@ observer.observe(document, { childList: true, subtree: true });
       .catch(() => null);
   }
 })();
-})();
-
-//Salvar nome e foto de perfil do usuário (para usar no chat do FireDeluxe)
-(function() {
-    'use strict';
-
-const img = document.querySelector("a.nav-link img.imgMN")?.src;
-
-let tentativas = 0;
-const maxTentativas = 10;
-
-const tentarBuscarPerfil = () => {
-  const perfilLink = document.querySelector("a.meu-perfil")?.getAttribute("href");
-  if (perfilLink) {
-    fetch(perfilLink)
-      .then(res => res.text())
-      .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-        const nome = doc.querySelector("#checkUserName")?.innerText.trim();
-        const valor = JSON.stringify({ img, nome });
-        document.cookie = `firedeluxe_chat=${encodeURIComponent(valor)}; path=/;`;
-      });
-  } else if (tentativas < maxTentativas) {
-    tentativas++;
-    setTimeout(tentarBuscarPerfil, 1000);
-  }
-};
-
-tentarBuscarPerfil()
-
 })();
