@@ -567,17 +567,6 @@ init();
                     info: 'Bloqueie usuários com o FireDeluxe (o bloquear do site não funciona)'
                 }
             ]
-        },
-        {
-            name: 'Funções',
-            buttons: [
-                {
-                    name: 'Chat',
-                    storageKey: 'chat',
-                    type: 'js',
-                    info: 'Fale com outros usuários de FireDeluxe'
-                }
-            ]
         }
     ];
 
@@ -1609,213 +1598,6 @@ const codigoJS = `
 const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
 dados.contribuição = codigoJS;
 localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
-})();
-
-//Código do botão Chat
-(function() {
-  'use strict';
-
-const codigoJS = `navigator.serviceWorker.getRegistrations().then(regs => {
-  for (let reg of regs) reg.unregister();
-}).then(() => {
-  const userData = localStorage.getItem('firedeluxe_chat');
-  if (!userData) {
-    alert("Você precisa estar logado para usar o Chat");
-    return;
-  }
-
-  const chatContainer = document.createElement('div');
-  chatContainer.id = 'chat-container';
-  chatContainer.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;max-width:600px;height:70%;max-height:600px;background-color:#212529;border:1px solid #444;border-radius:8px;box-shadow:0 0 30px rgba(0,0,0,0.8);display:flex;flex-direction:column;z-index:9999';
-
-  const fireDeluxeConfig = localStorage.getItem('firedeluxe_configuracoes');
-  const themeColor = fireDeluxeConfig ? JSON.parse(fireDeluxeConfig).themeColor || '#FFA500' : '#FFA500';
-
-  const chatHeader = document.createElement('div');
-  chatHeader.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:15px;border-bottom:1px solid #444';
-
-  const chatTitle = document.createElement('h3');
-  chatTitle.textContent = 'Chat';
-  chatTitle.style.cssText = 'margin:0;color:' + themeColor;
-
-  const closeButton = document.createElement('button');
-  closeButton.id = 'close-chat';
-  closeButton.textContent = '✕';
-  closeButton.style.cssText = 'background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer';
-
-  const chatMessages = document.createElement('div');
-  chatMessages.id = 'chat-messages';
-  chatMessages.style.cssText = 'flex:1;overflow-y:auto;padding:15px;scrollbar-width:thin;scrollbar-color:#444 #212529';
-
-  const chatInputArea = document.createElement('div');
-  chatInputArea.style.cssText = 'padding:15px;border-top:1px solid #444';
-
-  const messageInput = document.createElement('textarea');
-  messageInput.id = 'message-input';
-  messageInput.placeholder = 'Digite sua mensagem...';
-  messageInput.style.cssText = 'width:100%;padding:10px;background-color:#333;color:#fff;border:1px solid #444;border-radius:6px;margin-bottom:10px;resize:none';
-
-  const sendButton = document.createElement('button');
-  sendButton.id = 'send-button';
-  sendButton.textContent = 'Enviar';
-  sendButton.style.cssText = 'padding:10px 16px;background-color:#444;color:#fff;border:1px solid ' + themeColor + ';border-radius:6px;cursor:pointer;width:100%';
-
-  chatHeader.appendChild(chatTitle);
-  chatHeader.appendChild(closeButton);
-  chatInputArea.appendChild(messageInput);
-  chatInputArea.appendChild(sendButton);
-  chatContainer.appendChild(chatHeader);
-  chatContainer.appendChild(chatMessages);
-  chatContainer.appendChild(chatInputArea);
-  document.body.appendChild(chatContainer);
-
-  const supabaseUrl = 'https://hzslgydylfheyzurkotd.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6c2xneWR5bGZoZXl6dXJrb3RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NjY0NDgsImV4cCI6MjA3MTA0MjQ0OH0.G9DIdCvM-M4MqSadw4qpc82z6G479tc9moCvpLU7jDQ';
-  let supabaseClient;
-
-  const initSupabase = () => {
-    if (window.supabase) {
-      supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-      return true;
-    }
-    return false;
-  };
-
-  const formatMessageTime = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const yesterday = new Date(now);
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    if (date.toDateString() === now.toDateString()) {
-      return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return 'Ontem ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    } else {
-      return date.getDate() + '/' + (date.getMonth()+1) + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    }
-  };
-
-  const createMessageElement = (message) => {
-    const messageContainer = document.createElement('div');
-    messageContainer.style.cssText = 'display:flex;gap:10px;margin-bottom:15px';
-
-    const avatar = document.createElement('img');
-    avatar.src = message.avatar_url;
-    avatar.style.cssText = 'width:40px;height:40px;border-radius:50%;object-fit:cover';
-    avatar.onerror = () => { avatar.src = 'https://via.placeholder.com/40'; };
-
-    const messageContent = document.createElement('div');
-    messageContent.style.cssText = 'flex:1';
-
-    const messageBubble = document.createElement('div');
-    messageBubble.style.cssText = 'background-color:#2c3034;padding:12px;border-radius:12px;max-width:100%';
-
-    const header = document.createElement('div');
-    header.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:5px';
-
-    const username = document.createElement('span');
-    username.textContent = message.username;
-    username.style.cssText = 'font-weight:bold;color:' + themeColor + ';font-size:14px';
-
-    const time = document.createElement('span');
-    time.textContent = message.created_at ? formatMessageTime(message.created_at) : 'Agora';
-    time.style.cssText = 'color:#6c757d;font-size:12px';
-
-    const text = document.createElement('div');
-    text.textContent = message.content;
-    text.style.cssText = 'color:#e9ecef;font-size:14px;line-height:1.4;word-break:break-word';
-
-    header.appendChild(username);
-    header.appendChild(time);
-    messageBubble.appendChild(header);
-    messageBubble.appendChild(text);
-    messageContent.appendChild(messageBubble);
-    messageContainer.appendChild(avatar);
-    messageContainer.appendChild(messageContent);
-
-    return messageContainer;
-  };
-
-  const loadMessages = async () => {
-    if (!supabaseClient) return;
-
-    const { data } = await supabaseClient
-      .from('messages')
-      .select('*')
-      .order('created_at', { ascending: true });
-
-    chatMessages.innerHTML = '';
-    data.forEach(message => {
-      chatMessages.appendChild(createMessageElement(message));
-    });
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  };
-
-  const addMessageToChat = (messageData) => {
-    const messageElement = createMessageElement(messageData);
-    chatMessages.appendChild(messageElement);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  };
-
-  const sendMessage = async () => {
-    const content = messageInput.value.trim();
-    if (!content) return;
-
-    const userData = localStorage.getItem('firedeluxe_chat');
-    const { imagem, nome } = JSON.parse(userData);
-    const profileUrl = window.location.href;
-
-    const newMessage = {
-      username: nome,
-      content,
-      avatar_url: imagem,
-      profile_url: profileUrl,
-      created_at: new Date().toISOString()
-    };
-
-    addMessageToChat(newMessage);
-
-    await supabaseClient
-      .from('messages')
-      .insert([newMessage]);
-
-    messageInput.value = '';
-  };
-
-  sendButton.addEventListener('click', sendMessage);
-  messageInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  });
-
-  closeButton.addEventListener('click', () => {
-    chatContainer.style.display = 'none';
-  });
-
-  if (!document.querySelector('script[src*="supabase"]')) {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?nocache=' + new Date().getTime();
-    script.onload = () => {
-      if (initSupabase()) loadMessages();
-    };
-    document.head.appendChild(script);
-  } else {
-    const newScript = document.createElement('script');
-    newScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?nocache=' + new Date().getTime();
-    newScript.onload = () => {
-      if (initSupabase()) loadMessages();
-    };
-    document.head.appendChild(newScript);
-  }
-});`;
-
-const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
-dados.chat = codigoJS;
-localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
-
 })();
 
 //Código do botão Funcionalidades
@@ -3796,6 +3578,69 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
 
 })();
 */
+
+//Contar tempo gasto no site
+(function() {
+    'use strict';
+
+const dbName = "FireDeluxeRankDB";
+let db;
+const request = indexedDB.open(dbName, 1);
+request.onupgradeneeded = e => {
+    db = e.target.result;
+    if (!db.objectStoreNames.contains("timeData")) {
+        const store = db.createObjectStore("timeData", { keyPath: "id" });
+        store.createIndex("years", "years", { unique: false });
+        store.createIndex("months", "months", { unique: false });
+        store.createIndex("weeks", "weeks", { unique: false });
+        store.createIndex("days", "days", { unique: false });
+        store.createIndex("hours", "hours", { unique: false });
+        store.createIndex("minutes", "minutes", { unique: false });
+        store.createIndex("seconds", "seconds", { unique: false });
+    }
+};
+request.onsuccess = e => {
+    db = e.target.result;
+    setInterval(updateTime, 1000);
+};
+
+function updateTime() {
+    const transaction = db.transaction(["timeData"], "readwrite");
+    const store = transaction.objectStore("timeData");
+    const getRequest = store.get(1);
+    
+    getRequest.onsuccess = () => {
+        let data = getRequest.result || { id: 1, seconds: 0, minutes: 0, hours: 0, days: 0, weeks: 0, months: 0, years: 0 };
+        
+        data.seconds++;
+        
+        const timeUnits = [
+            { current: "seconds", next: "minutes", max: 60 },
+            { current: "minutes", next: "hours", max: 60 },
+            { current: "hours", next: "days", max: 24 },
+            { current: "days", next: "months", max: 30 },
+            { current: "months", next: "years", max: 12 }
+        ];
+        
+        for (const unit of timeUnits) {
+            if (data[unit.current] >= unit.max) {
+                data[unit.current] = 0;
+                data[unit.next]++;
+            } else {
+                break;
+            }
+        }
+        
+        if (data.days >= 7) {
+            data.weeks = Math.floor(data.days / 7);
+            data.days = data.days % 7;
+        }
+        
+        store.put(data);
+    };
+}
+
+})();
 
 //Todas as temporadas do anime em uma página (não funciona para todos)
 (function() {
