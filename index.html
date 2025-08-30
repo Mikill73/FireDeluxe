@@ -1,557 +1,1331 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FireDeluxe</title>
-    <link rel="icon" href="data:image/webp;base64,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" type="image/x-icon">
+    <title>Escola</title>
+    <meta name="description" content="Sistema de gerenciamento escolar com tarefas, horários, estudos e conteúdos">
     <style>
-        :root {
-            --primary-color: #FFA500;
-            --secondary-color: #222;
-            --border-color: #444;
-            --text-color: #eee;
-            --bg-color: #222;
-        }
-
-        body {
+        * {
             margin: 0;
             padding: 0;
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #222, #333);
+            color: #eee;
             min-height: 100vh;
-            line-height: 1.6;
+            padding: 20px;
         }
-
-        .header {
-            margin: 30px 0;
-            text-align: center;
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
-
-        .title-container {
+        
+        .abas {
+            display: flex;
+            margin-bottom: 25px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 5px;
+        }
+        
+        .aba {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .notificacao-contador {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            font-size: 12px;
+            font-weight: bold;
         }
-
-        .title-icon {
-            width: 70px;
-            height: 70px;
-        }
-
-        .title {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            text-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
-            margin: 0;
-        }
-
-        .subtitle {
-            color: var(--text-color);
-            font-size: 1.2rem;
-            margin-top: 5px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
-        }
-
-        .button-container {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .nav-button {
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #444, #555);
+        
+        .aba.ativa {
+            background: #444;
             color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
-
-        .nav-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
-            filter: drop-shadow(0 0 5px var(--primary-color));
+        
+        .aba:hover {
+            background: #3a3a3a;
+            color: #fff;
         }
-
-        .main-container {
-            width: 90%;
-            max-width: 800px;
-            background-color: var(--secondary-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+        
+        .conteudo-aba {
+            display: none;
+            background: rgba(51, 51, 51, 0.8);
             padding: 25px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
         }
-
-        .section-title {
-            color: var(--primary-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-top: 25px;
+        
+        .conteudo-aba.ativa {
+            display: block;
+            animation: fadeIn 0.4s ease;
         }
-
-        .step {
-            margin: 20px 0;
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .step-number {
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .warning-box {
-            background-color: rgba(255, 0, 0, 0.1);
-            border-left: 4px solid #f00;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 0 4px 4px 0;
-        }
-
-        .link {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: filter 0.2s;
-            display: inline-block;
-            margin-top: 10px;
-            padding: 8px 15px;
-            background-color: rgba(255, 165, 0, 0.1);
-            border-radius: 6px;
-        }
-
-        .link:hover {
-            text-decoration: underline;
-            background-color: rgba(255, 165, 0, 0.2);
-        }
-
-        .history-text {
-            margin: 15px 0;
-            text-align: justify;
-        }
-
-        .discord-link {
-            color: #7289DA;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .discord-link:hover {
-            text-decoration: underline;
-        }
-
-        .features-list {
-            margin: 20px 0;
-            padding-left: 20px;
-        }
-
-        .feature-item {
-            margin: 10px 0;
+        
+        .pesquisa-container {
+            margin-bottom: 20px;
             position: relative;
-            padding-left: 25px;
         }
-
-        .feature-main::before {
-            content: "●";
-            color: var(--primary-color);
-            position: absolute;
-            left: 0;
-            font-size: 1.2em;
+        
+        .pesquisa {
+            width: 100%;
+            padding: 12px 15px;
+            background: #444;
+            border: 1px solid #555;
+            border-radius: 8px;
+            color: #eee;
+            font-size: 16px;
         }
-
-        .feature-sub::before {
-            content: "○";
-            color: var(--primary-color);
-            position: absolute;
-            left: 0;
-            font-size: 1.2em;
+        
+        .pesquisa::placeholder {
+            color: #999;
         }
-
-        .feature-sub {
-            margin-left: 30px;
-        }
-
-        .feature-container {
-            margin-bottom: 15px;
-        }
-
-        .version-notice {
-            background-color: rgba(255, 165, 0, 0.1);
-            border-left: 4px solid var(--primary-color);
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 0 4px 4px 0;
-            font-size: 0.9em;
-        }
-
-        .version-notice .link {
-            margin-top: 0;
-            padding: 2px 5px;
-            font-size: 0.9em;
-        }
-
-        .feedback-container {
+        
+        .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
-
-        .feedback-card {
-            background-color: #333;
-            border-radius: 8px;
+        
+        .card {
+            background: #444;
+            border-radius: 10px;
             padding: 20px;
-            border-left: 4px solid var(--primary-color);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
         }
-
-        .feedback-card:hover {
+        
+        .card.nova-tarefa {
+            border: 2px solid #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        
+        .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
-
-        .feedback-title {
-            font-size: 1.2rem;
-            color: var(--primary-color);
+        
+        .card-titulo {
+            font-size: 18px;
+            font-weight: 600;
             margin-bottom: 10px;
+            color: #fff;
+            border-bottom: 1px solid #666;
+            padding-bottom: 8px;
         }
-
-        .feedback-content {
-            margin-bottom: 15px;
+        
+        .card-data {
+            color: #bbb;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .card-descricao {
+            flex: 1;
+            overflow-y: auto;
             color: #ddd;
+            line-height: 1.5;
+            padding-right: 5px;
+            white-space: pre-wrap;
         }
-
-        .feedback-user {
-            font-size: 0.9rem;
-            color: #7289DA;
+        
+        .card-descricao::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .card-descricao::-webkit-scrollbar-track {
+            background: #555;
+            border-radius: 3px;
+        }
+        
+        .card-descricao::-webkit-scrollbar-thumb {
+            background: #777;
+            край: 3px;
+        }
+        
+        .card-descricao::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+        
+        .card-acoes {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            background: #555;
+            color: #eee;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: #666;
+        }
+        
+        .btn-download {
+            background: #2c5aa0;
+        }
+        
+        .btn-download:hover {
+            background: #3a6cc4;
+        }
+        
+        .btn-visualizar {
+            background: #2a7d2a;
+        }
+        
+        .btn-visualizar:hover {
+            background: #339933;
+        }
+        
+        .btn-concluida {
+            background: #2a7d2a;
+        }
+        
+        .btn-concluida:hover {
+            background: #339933;
+        }
+        
+        .btn-desfazer {
+            background: #7d2a2a;
+        }
+        
+        .btn-desfazer:hover {
+            background: #993333;
+        }
+        
+        .vazio {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-style: italic;
+            grid-column: 1 / -1;
+        }
+        
+        .horario-dia {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #444;
+            border-radius: 10px;
+        }
+        
+        .horario-dia h3 {
+            margin-bottom: 15px;
+            color: #fff;
+            border-bottom: 1px solid #666;
+            padding-bottom: 10px;
+        }
+        
+        .aula-item {
             display: flex;
             align-items: center;
-            gap: 5px;
+            padding: 10px 0;
+            border-bottom: 1px solid #555;
         }
-
-        .feedback-user img {
-            width: 20px;
-            height: 20px;
+        
+        .aula-item:last-child {
+            border-bottom: none;
+        }
+        
+        .aula-numero {
+            width: 30px;
+            height: 30px;
+            background: #555;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
         }
-
-        .feedback-link {
-            display: inline-block;
-            margin-top: 10px;
+        
+        .aula-materia {
+            flex: 1;
+            color: #ddd;
+        }
+        
+        .conteudo-materia {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #444;
+            border-radius: 10px;
+        }
+        
+        .conteudo-materia h3 {
+            margin-bottom: 15px;
+            color: #fff;
+            border-bottom: 1px solid #666;
+            padding-bottom: 10px;
+        }
+        
+        .conteudo-lista {
+            list-style-type: none;
+        }
+        
+        .conteudo-item {
+            background: #555;
+            padding: 12px 12px 12px 35px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            color: #ddd;
+            position: relative;
+            white-space: pre-wrap;
+        }
+        
+        .conteudo-item:before {
+            content: "•";
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
             color: #aaa;
-            font-size: 0.8rem;
-            text-decoration: none;
         }
-
-        .feedback-link:hover {
-            text-decoration: underline;
-            color: var(--primary-color);
+        
+        .conteudo-item:last-child {
+            margin-bottom: 0;
         }
-
+        
+        .conteudo-vazio {
+            color: #999;
+            font-style: italic;
+            padding: 10px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.ativo {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-conteudo {
+            background: #444;
+            border-radius: 10px;
+            padding: 25px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .modal.ativo .modal-conteudo {
+            transform: scale(1);
+        }
+        
+        .modal-titulo {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+            border-bottom: 1px solid #666;
+            padding-bottom: 10px;
+        }
+        
+        .modal-data {
+            color: #bbb;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-descricao {
+            color: #ddd;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #555;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .modal-descricao::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .modal-descricao::-webkit-scrollbar-track {
+            background: #444;
+            border-radius: 4px;
+        }
+        
+        .modal-descricao::-webkit-scrollbar-thumb {
+            background: #777;
+            border-radius: 4px;
+        }
+        
+        .modal-descricao::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+        
+        .modal-fechar {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #722;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .modal-fechar:hover {
+            background: #933;
+        }
+        
+        .proxima-aula {
+            font-size: 12px;
+            color: #aaccaa;
+            margin-top: 5px;
+        }
+        
+        .tarefa-concluida {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .subtabs {
+            display: flex;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 3px;
+        }
+        
+        .subtab {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .subtab.ativa {
+            background: #3a3a3a;
+            color: #fff;
+        }
+        
+        .subtab:hover {
+            background: #444;
+            color: #fff;
+        }
+        
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+        
+        .chat-mensagens {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #444;
+            border-radius: 8px;
+        }
+        
+        .chat-mensagem {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: #555;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        
+        .chat-mensagem.propria {
+            background: #2c5aa0;
+            margin-left: auto;
+        }
+        
+        .chat-usuario {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #aaddff;
+        }
+        
+        .chat-conteudo {
+            color: #ddd;
+            word-wrap: break-word;
+        }
+        
+        .chat-form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            background: #444;
+            border: 1px solid #555;
+            border-radius: 8px;
+            color: #eee;
+        }
+        
+        .chat-input-nome {
+            width: 150px;
+            padding: 12px;
+            background: #444;
+            border: 1px solid #555;
+            border-radius: 8px;
+            color: #eee;
+        }
+        
+        .chat-botao {
+            padding: 12px 20px;
+            background: #2c5aa0;
+            color: #eee;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .chat-botao:hover {
+            background: #3a6cc4;
+        }
+        
         @media (max-width: 768px) {
-            .main-container {
-                width: 95%;
-                padding: 15px;
-            }
-
-            .title {
-                font-size: 2rem;
-            }
-
-            .button-container {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .feedback-container {
+            .grid-container {
                 grid-template-columns: 1fr;
+            }
+            
+            .abas {
+                flex-wrap: wrap;
+            }
+            
+            .aba {
+                flex: 1 0 50%;
+                margin-bottom: 5px;
+            }
+            
+            .modal-conteudo {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .chat-form {
+                flex-direction: column;
+            }
+            
+            .chat-input-nome {
+                width: 100%;
             }
         }
     </style>
 </head>
-
 <body>
-    <header class="header">
-        <div class="title-container">
-            <img class="title-icon" src="" alt="FireDeluxe Icon">
-            <h1 class="title">FireDeluxe</h1>
+    <div class="container">
+        
+        <div class="abas">
+            <button class="aba ativa" data-aba="horario">Horário</button>
+            <button class="aba" data-aba="tarefas" id="aba-tarefas">Tarefas</button>
+            <button class="aba" data-aba="estudos">Estudos</button>
+            <button class="aba" data-aba="conteudos">Conteúdos</button>
+            <button class="aba" data-aba="chat">Chat</button>
         </div>
-        <p class="subtitle">O Mod do AnimeFire</p>
-        <div class="button-container">
-            <button class="nav-button" onclick="showGuide()">Guia de Instalação</button>
-            <button class="nav-button" onclick="showFeatures()">Funcionalidades</button>
-            <button class="nav-button" onclick="showHistory()">História</button>
-            <button class="nav-button" onclick="showFeedbacks()">Feedbacks</button>
+        
+        <div id="horario" class="conteudo-aba ativa">
+            <div id="horario-aulas"></div>
         </div>
-    </header>
-
-    <main class="main-container">
-        <div id="guide-section">
-            <h2 class="section-title">Guia de Instalação Completo</h2>
-
-            <div class="warning-box">
-                <p><strong>Importante para mobile:</strong> Você precisará usar um navegador que suporte extensões, exemplo: Firefox ou Kiwi (se você usar o Kiwi em específico você precisa ir nas extensões, apertar para instalar extensões e procurar o Tampermonkey manualmente).</p>
+        
+        <div id="tarefas" class="conteudo-aba">
+            <div class="subtabs">
+                <button class="subtab ativa" data-subtab="pendentes">Pendentes</button>
+                <button class="subtab" data-subtab="concluidas">Concluídas</button>
             </div>
-
-            <div class="step">
-                <p><span class="step-number">1.</span> Instale o Tampermonkey (gerenciador de userscripts):</p>
-                <a href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=pt-BR" 
-                   class="link" 
-                   target="_blank">
-                   Instalar Tampermonkey (Chrome Web Store)
-                </a>
+            
+            <div class="pesquisa-container">
+                <input type="text" class="pesquisa" id="pesquisa-tarefas" placeholder="Pesquisar tarefas...">
             </div>
-
-            <div class="step">
-                <p><span class="step-number">2.</span> Instale o script do FireDeluxe:</p>
-                <a href="https://greasyfork.org/scripts/470618-firedeluxe/code/FireDeluxe.user.js" 
-                   class="link" 
-                   target="_blank">
-                   Instalar FireDeluxe
-                </a>
+            
+            <div class="grid-container" id="lista-tarefas"></div>
+        </div>
+        
+        <div id="estudos" class="conteudo-aba">
+            <div class="pesquisa-container">
+                <input type="text" class="pesquisa" id="pesquisa-estudos" placeholder="Pesquisar estudos...">
             </div>
-
-            <div class="step">
-                <p><span class="step-number">3.</span> Ative o modo de desenvolvedor nas extensões do seu navegador.</p>
-            </div>
-
-            <div class="step">
-                <p><span class="step-number">4.</span> Pronto! O FireDeluxe estará ativo automaticamente quando você acessar o Animefire.</p>
-            </div>
-
-            <div class="warning-box">
-                <p><strong>Dúvidas ou preocupações com segurança?</strong></p>
-                <p>Caso você ainda não confie totalmente no mod ou queira ver provas de sua segurança, entre em contato com <strong>mikill9150</strong> <a href="https://discord.gg/ZtwHK3Aqrz" class="link" target="_blank">Discord</a>.</p>
+            
+            <div class="grid-container" id="lista-estudos"></div>
+        </div>
+        
+        <div id="conteudos" class="conteudo-aba">
+            <div id="lista-conteudos"></div>
+        </div>
+        
+        <div id="chat" class="conteudo-aba">
+            <div class="chat-container">
+                <div class="chat-mensagens" id="chat-mensagens"></div>
+                <div class="chat-form">
+                    <input type="text" class="chat-input-nome" id="chat-nome" placeholder="Seu nome">
+                    <input type="text" class="chat-input" id="chat-mensagem" placeholder="Digite sua mensagem...">
+                    <button class="chat-botao" id="chat-enviar">Enviar</button>
+                </div>
             </div>
         </div>
-
-        <div id="features-section" style="display: none;">
-            <h2 class="section-title">Funcionalidades do FireDeluxe</h2>
-
-            <div class="version-notice">
-                <p><strong>Atenção:</strong> Estas funcionalidades são referentes à nova versão do FireDeluxe (após o renascimento em 2025). Para ver as funcionalidades antigas, acesse nosso <a href="https://discord.gg/ZtwHK3Aqrz" class="link" target="_blank">Discord</a>.</p>
-            </div>
-
-            <div class="features-list" id="features-list"></div>
-        </div>
-
-        <div id="history-section" style="display: none;">
-            <h2 class="section-title">A História do FireDeluxe</h2>
-
-            <div class="history-text">
-                <p>O FireDeluxe surgiu em 2022 durante um período em que havia muitos pontos a se reclamar no Animefire: excesso de anúncios, usuários mal-intencionados postando conteúdo inadequado (como gore e pornografia infantil) e vários erros técnicos no site.</p>
-
-                <p>O FireDeluxe começou como um userscript simples, com funções básicas como mudar o fundo do site e do chat. Com o tempo, evoluiu para incluir recursos avançados como automatização de mensagens, filtro de chat, bloqueio de usuários indesejados e muitas outras melhorias (você pode ver todas as atualizações no antigo canal do <a href="https://discord.gg/ZtwHK3Aqrz" class="discord-link" target="_blank">Discord</a> do FireDeluxe).</p>
-            </div>
-
-            <div class="history-text">
-                <p>O FireDeluxe se juntou às grandes comunidades do Animefire, começando no servidor "Bairro Animefire" (até seu encerramento) e depois migrando para o servidor do MrKalangot (figura bastante reconhecida na comunidade), onde reside até hoje em uma relação de apoio mútuo. Muitos usuários do FireDeluxe fazem parte desse servidor e vice-versa.</p>
-            </div>
-
-            <div class="history-text">
-                <p>Depois de anos de atualizações constantes, o desenvolvimento foi pausado devido ao alto consumo de tempo necessário. Mesmo sendo um projeto sem fins lucrativos, o criador precisou parar para focar em outros compromissos.</p>
-
-                <p>No entanto, em 2025, o FireDeluxe ressurgiu com o avanço das inteligências artificiais, que permitem gerar códigos de forma rápida (mesmo que às vezes com erros que precisam ser corrigidos manualmente). Combinando as habilidades do criador com a agilidade das IAs, o FireDeluxe ganhou nova vida, permitindo seu desenvolvimento sem consumir todo o tempo do criador, que pode assim focar em outros projetos enquanto mantém o userscript atualizado.</p>
+        
+        <div class="modal" id="modal">
+            <div class="modal-conteudo">
+                <div class="modal-fechar" id="modal-fechar">X</div>
+                <div class="modal-titulo" id="modal-titulo"></div>
+                <div class="modal-data" id="modal-data"></div>
+                <div class="modal-descricao" id="modal-descricao"></div>
+                <div class="card-acoes" id="modal-acoes"></div>
             </div>
         </div>
-
-        <div id="feedbacks-section" style="display: none;">
-            <h2 class="section-title">Feedbacks dos Usuários</h2>
-
-            <div class="feedback-container" id="feedback-container">
-            </div>
-        </div>
-    </main>
+    </div>
 
     <script>
-        const features = [
-          { id: 1, text: "Botão de login rápido", parentId: null },
-          { id: 2, text: "AdBlocker", parentId: null },
-          { id: 3, text: "Preview das informações dos animes na capa", parentId: null },
-          { id: 4, text: "Botão principal (Menu)", parentId: null },
-          { id: 5, text: "Botões secundários", parentId: 4 },
-          { id: 6, text: "Tooltip de cada botão", parentId: 5 },
-          { id: 7, text: "Configurações", parentId: 5 },
-          { id: 8, text: "Ativar ou desativar AdBlocker", parentId: 7 },
-          { id: 9, text: "Mudar imagem de fundo do Chat e do Site", parentId: 7 },
-          { id: 10, text: "Seletor de temas", parentId: 7 },
-          { id: 11, text: "Botão de cor aleátoria", parentId: 10 },
-          { id: 12, text: "Registrar email e senha para funções automáticas (opcional)", parentId: 7 },
-          { id: 16, text: "Ativar ou desativar divulgar FireDeluxe na bio", parentId: 7 },
-          { id: 19, text: "Ativar ou desativar todas as temporadas do anime em uma página", parentId: 7 },
-          { id: 17, text: "Formas de contribuir para o FireDeluxe", parentId: 5 },
-          { id: 21, text: "Botão para mostrar todas as funcionalidades do FireDeluxe", parentId: 5 },
-          { id: 13, text: "Verificador de versão", parentId: null },
-          { id: 14, text: "Baixar episódios", parentId: null },
-          { id: 15, text: "Confirmação de exclusão do histórico de episódios", parentId: null },
-          { id: 21, text: "Episódios duplicados removidos na página inicial", parentId: null },
-          { id: 22, text: "Função própria de bloquear (o do site não funciona)", parentId: null },
-          { id: 23, text: "Selecionar quais episódios", parentId: 14 },
-          { id: 24, text: "Baixar todos", parentId: 14 },
-          { id: 25, text: "Botão de bloquear no FireDeluxe no perfil dos usuários", parentId: null },
-          { id: 26, text: "Chat próprio para usuários de FireDeluxe", parentId: 5 }
-        ];
-
-        const feedbacks = [
-          {
-               title: "Boas funcionalidades",
-               content: "Dá pra ver as informações pelo menu 'i' na frente dos animes sem clicar nele, e também é muito bom que ele remove todos os anúncios do site. Mesmo eu usando o Brave, eu até desativo só pra usar a da extensão 🔥",
-               user: "paum7020",
-               link: "https://discord.com/channels/1079589710814527588/1394002812987375757/1394680087500161024"
-          },
-          {
-               title: "Script bem desenvolvido",
-               content: "Script bem desenvolvido, com foco na personalização visual da interface. A substituição dinâmica das cores é eficiente e não afeta o desempenho. Destaque para o uso inteligente de localStorage e a interface de configuração acessível. Ótima solução para usuários que buscam uma experiência mais agradável e customizável.",
-               user: "fabri7_xp",
-               link: "https://discord.com/channels/1079589710814527588/1394002812987375757/1395965577159381002"
-          },
-          {
-               title: "Sem título",
-               content: "Muito bom",
-               user: "mister123",
-               link: "https://discord.com/channels/1079589710814527588/1394002812987375757/1398816858198638754"
-          },
-          {
-               title: "Sem título",
-               content: "Bom demais, sem anúncios, além de várias funções boas",
-               user: "the_infinite_",
-               link: "https://discord.com/channels/1079589710814527588/1394002812987375757/1404273032834318337"
-          },
-          {
-               title: "Sem título",
-               content: "Tá funcionando, top [vídeo]",
-               user: "cristyankrl",
-               link: "https://discord.com/channels/1079589710814527588/1079589710814527591/1403824263269712002"
-          }
-        ];
-
-        function showGuide() {
-            document.getElementById('guide-section').style.display = 'block';
-            document.getElementById('features-section').style.display = 'none';
-            document.getElementById('history-section').style.display = 'none';
-            document.getElementById('feedbacks-section').style.display = 'none';
-        }
-
-        function showFeatures() {
-            document.getElementById('guide-section').style.display = 'none';
-            document.getElementById('features-section').style.display = 'block';
-            document.getElementById('history-section').style.display = 'none';
-            document.getElementById('feedbacks-section').style.display = 'none';
-            updateFeaturesList();
-        }
-
-        function showHistory() {
-            document.getElementById('guide-section').style.display = 'none';
-            document.getElementById('features-section').style.display = 'none';
-            document.getElementById('history-section').style.display = 'block';
-            document.getElementById('feedbacks-section').style.display = 'none';
-        }
-
-        function showFeedbacks() {
-            document.getElementById('guide-section').style.display = 'none';
-            document.getElementById('features-section').style.display = 'none';
-            document.getElementById('history-section').style.display = 'none';
-            document.getElementById('feedbacks-section').style.display = 'block';
-            updateFeedbacks();
-        }
-
-        function updateFeaturesList() {
-            const featuresList = document.getElementById('features-list');
-            featuresList.innerHTML = '';
-
-            const mainFeatures = features.filter(f => f.parentId === null);
-
-            mainFeatures.forEach(feature => {
-                const featureContainer = document.createElement('div');
-                featureContainer.className = 'feature-container';
-
-                const featureItem = document.createElement('div');
-                featureItem.className = 'feature-item feature-main';
-                featureItem.textContent = feature.text;
-                featureContainer.appendChild(featureItem);
-
-                addSubFeatures(feature.id, featureContainer, 1);
-
-                featuresList.appendChild(featureContainer);
-            });
-        }
-
-        function addSubFeatures(parentId, container, level) {
-            const subFeatures = features.filter(f => f.parentId === parentId);
-
-            subFeatures.forEach(subFeature => {
-                const subContainer = document.createElement('div');
-                subContainer.style.marginLeft = (level * 20) + 'px';
-
-                const subItem = document.createElement('div');
-                subItem.className = 'feature-item feature-sub';
-                subItem.textContent = subFeature.text;
-                subContainer.appendChild(subItem);
-
-                container.appendChild(subContainer);
-
-                addSubFeatures(subFeature.id, subContainer, level + 1);
-            });
-        }
-
-        function updateFeedbacks() {
-            const container = document.getElementById('feedback-container');
-            container.innerHTML = '';
-
-            feedbacks.forEach(feedback => {
-                const card = document.createElement('div');
-                card.className = 'feedback-card';
-
-                const title = document.createElement('h3');
-                title.className = 'feedback-title';
-                title.textContent = feedback.title;
-                card.appendChild(title);
-
-                const content = document.createElement('p');
-                content.className = 'feedback-content';
-                content.textContent = feedback.content;
-                card.appendChild(content);
-
-                const user = document.createElement('div');
-                user.className = 'feedback-user';
-                user.innerHTML = `${feedback.user}`;
-
-                card.appendChild(user);
-
-                if (feedback.link) {
-                    const link = document.createElement('a');
-                    link.className = 'feedback-link';
-                    link.href = feedback.link;
-                    link.target = '_blank';
-                    link.textContent = 'Ver feedback original';
-                    card.appendChild(link);
+        const baseURL = 'https://raw.githubusercontent.com/Mikill73/Escola/main/Arquivos';
+        const supabaseUrl = 'https://hzslgydylfheyzurkotd.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6c2xneWR5bGZoZXl6dXJrb3RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NjY0NDgsImV4cCI6MjA3MTA0MjQ0OH0.G9DIdCvM-M4MqSadw4qpc82z6G479tc9moCvpLU7jDQ';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        let tarefas = [];
+        let estudos = [];
+        let horario = {};
+        let conteudos = [];
+        let todasMaterias = [];
+        let tarefasStatus = JSON.parse(localStorage.getItem('tarefasStatus')) || {};
+        let subtabAtiva = 'pendentes';
+        let mensagensChat = [];
+        
+        document.querySelectorAll('.aba').forEach(aba => {
+            aba.addEventListener('click', () => {
+                document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
+                document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('ativa'));
+                
+                aba.classList.add('ativa');
+                document.getElementById(aba.dataset.aba).classList.add('ativa');
+                
+                if (aba.dataset.aba === 'tarefas') {
+                    marcarTarefasComoVistas();
+                    atualizarContadorNotificacoes();
+                    filtrarTarefas();
+                } else if (aba.dataset.aba === 'chat') {
+                    carregarMensagensChat();
                 }
-
+            });
+        });
+        
+        document.querySelectorAll('.subtab').forEach(subtab => {
+            subtab.addEventListener('click', () => {
+                document.querySelectorAll('.subtab').forEach(s => s.classList.remove('ativa'));
+                subtab.classList.add('ativa');
+                subtabAtiva = subtab.dataset.subtab;
+                filtrarTarefas();
+            });
+        });
+        
+        document.getElementById('pesquisa-tarefas').addEventListener('input', filtrarTarefas);
+        document.getElementById('pesquisa-estudos').addEventListener('input', filtrarEstudos);
+        
+        document.getElementById('modal-fechar').addEventListener('click', fecharModal);
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modal')) {
+                fecharModal();
+            }
+        });
+        
+        document.getElementById('chat-enviar').addEventListener('click', enviarMensagemChat);
+        document.getElementById('chat-mensagem').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                enviarMensagemChat();
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                fecharModal();
+            }
+        });
+        
+        function carregarMensagensChat() {
+            fetchMessages().then(mensagens => {
+                mensagensChat = mensagens || [];
+                renderizarMensagensChat();
+            });
+        }
+        
+        async function fetchMessages() {
+            const { data, error } = await supabaseClient
+                .from('messages')
+                .select('id, username, content')
+                .order('id', { ascending: true });
+            
+            if (error) console.error(error);
+            return data;
+        }
+        
+        async function sendMessage(username, content) {
+            const { data, error } = await supabaseClient
+                .from('messages')
+                .insert([{ username, content }])
+                .select('id, username, content');
+            
+            if (error) console.error(error);
+            return data;
+        }
+        
+        function renderizarMensagensChat() {
+            const container = document.getElementById('chat-mensagens');
+            container.innerHTML = '';
+            
+            const nomeUsuario = localStorage.getItem('chatUsername') || '';
+            
+            mensagensChat.forEach(mensagem => {
+                const mensagemDiv = document.createElement('div');
+                mensagemDiv.className = `chat-mensagem ${mensagem.username === nomeUsuario ? 'propria' : ''}`;
+                
+                mensagemDiv.innerHTML = `
+                    <div class="chat-usuario">${mensagem.username}</div>
+                    <div class="chat-conteudo">${mensagem.content}</div>
+                `;
+                
+                container.appendChild(mensagemDiv);
+            });
+            
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function enviarMensagemChat() {
+            const nomeInput = document.getElementById('chat-nome');
+            const mensagemInput = document.getElementById('chat-mensagem');
+            
+            const nome = nomeInput.value.trim();
+            const mensagem = mensagemInput.value.trim();
+            
+            if (!nome || !mensagem) return;
+            
+            localStorage.setItem('chatUsername', nome);
+            
+            sendMessage(nome, mensagem).then(novaMensagem => {
+                if (novaMensagem && novaMensagem[0]) {
+                    mensagensChat.push(novaMensagem[0]);
+                    renderizarMensagensChat();
+                    mensagemInput.value = '';
+                }
+            });
+        }
+        
+        function filtrarTarefas() {
+            const termo = document.getElementById('pesquisa-tarefas').value.toLowerCase();
+            const container = document.getElementById('lista-tarefas');
+            container.innerHTML = '';
+            
+            let tarefasFiltradas = subtabAtiva === 'pendentes' 
+                ? tarefas.filter(tarefa => !tarefasStatus[tarefa.id]?.concluida)
+                : tarefas.filter(tarefa => tarefasStatus[tarefa.id]?.concluida);
+            
+            tarefasFiltradas = tarefasFiltradas.filter(tarefa => 
+                tarefa.materia.toLowerCase().includes(termo) || 
+                tarefa.descricao.toLowerCase().includes(termo) ||
+                tarefa.data.toLowerCase().includes(termo)
+            );
+            
+            renderizarTarefas(tarefasFiltradas);
+        }
+        
+        function renderizarTarefas(listaTarefas) {
+            const container = document.getElementById('lista-tarefas');
+            
+            if (listaTarefas.length === 0) {
+                container.innerHTML = '<div class="vazio">Nenhuma tarefa encontrada</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            listaTarefas.forEach((tarefa) => {
+                const status = tarefasStatus[tarefa.id] || {};
+                const concluida = status.concluida || false;
+                const vista = status.vista || false;
+                const nova = !vista && !concluida;
+                
+                const card = document.createElement('div');
+                card.className = `card ${concluida ? 'tarefa-concluida' : ''} ${nova ? 'nova-tarefa' : ''}`;
+                
+                let dataFormatada = tarefa.data;
+                let proximaAulaInfo = '';
+                
+                if (tarefa.data.toLowerCase() === 'indefinido' || !tarefa.data) {
+                    dataFormatada = 'Data indefinida';
+                    const proximaAula = encontrarProximaAula(tarefa.materia);
+                    if (proximaAula) {
+                        proximaAulaInfo = `<div class="proxima-aula">Próxima aula: ${proximaAula.dia} (${proximaAula.periodo})</div>`;
+                    }
+                }
+                
+                const descricaoResumida = tarefa.descricao.length > 150 
+                    ? tarefa.descricao.substring(0, 150) + '...' 
+                    : tarefa.descricao;
+                
+                card.innerHTML = `
+                    <div class="card-titulo">${tarefa.materia} ${nova ? '<span style="color:#4CAF50;font-size:12px">(Nova)</span>' : ''}</div>
+                    <div class="card-data">${dataFormatada}</div>
+                    ${proximaAulaInfo}
+                    <div class="card-descricao">${descricaoResumida}</div>
+                    <div class="card-acoes">
+                        <button class="btn btn-visualizar" onclick="visualizarTarefa('${tarefa.id}')">Visualizar</button>
+                        ${!concluida ? 
+                            `<button class="btn btn-concluida" onclick="marcarTarefaConcluida('${tarefa.id}')">Concluir</button>` : 
+                            `<button class="btn btn-desfazer" onclick="desmarcarTarefaConcluida('${tarefa.id}')">Desfazer</button>`
+                        }
+                        <button class="btn btn-download" onclick="baixarTarefa('${tarefa.id}')">Baixar</button>
+                    </div>
+                `;
+                
                 container.appendChild(card);
             });
         }
-
-        window.onload = function() {
-            showGuide();
-            updateFeaturesList();
-            const icon = document.querySelector('link[rel="icon"]').href;
-            if (icon) {
-                document.querySelector('.title-icon').src = icon;
+        
+        function filtrarEstudos() {
+            const termo = document.getElementById('pesquisa-estudos').value.toLowerCase();
+            const container = document.getElementById('lista-estudos');
+            container.innerHTML = '';
+            
+            const estudosFiltrados = estudos.filter(estudo => 
+                estudo.materia.toLowerCase().includes(termo) || 
+                estudo.descricao.toLowerCase().includes(termo)
+            );
+            
+            renderizarEstudos(estudosFiltrados);
+        }
+        
+        function renderizarEstudos(listaEstudos = estudos) {
+            const container = document.getElementById('lista-estudos');
+            
+            if (listaEstudos.length === 0) {
+                container.innerHTML = '<div class="vazio">Nenhum estudo encontrado</div>';
+                return;
             }
-        };
+            
+            listaEstudos.forEach((estudo, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                const descricaoResumida = estudo.descricao.length > 150 
+                    ? estudo.descricao.substring(0, 150) + '...' 
+                    : estudo.descricao;
+                
+                card.innerHTML = `
+                    <div class="card-titulo">${estudo.materia}</div>
+                    <div class="card-descricao">${descricaoResumida}</div>
+                    <div class="card-acoes">
+                        <button class="btn btn-visualizar" onclick="visualizarEstudo(${index})">Visualizar</button>
+                        <button class="btn btn-download" onclick="baixarEstudo(${index})">Baixar TXT</button>
+                        ${estudo.arquivo ? '<button class="btn btn-download" onclick="baixarEstudoPDF(' + index + ')">Baixar PDF</button>' : ''}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        function visualizarTarefa(id) {
+            const tarefa = tarefas.find(t => t.id === id);
+            const status = tarefasStatus[id] || {};
+            const concluida = status.concluida || false;
+            
+            if (!status.vista && !concluida) {
+                tarefasStatus[id] = {...status, vista: true};
+                localStorage.setItem('tarefasStatus', JSON.stringify(tarefasStatus));
+                atualizarContadorNotificacoes();
+            }
+            
+            let dataFormatada = tarefa.data;
+            let proximaAulaInfo = '';
+            
+            if (tarefa.data.toLowerCase() === 'indefinido' || !tarefa.data) {
+                dataFormatada = 'Data indefinida';
+                const proximaAula = encontrarProximaAula(tarefa.materia);
+                if (proximaAula) {
+                    proximaAulaInfo = `<div class="proxima-aula">Próxima aula: ${proximaAula.dia} (${proximaAula.periodo})</div>`;
+                }
+            }
+            
+            document.getElementById('modal-titulo').innerHTML = `${tarefa.materia} ${concluida ? '(Concluída)' : ''}`;
+            document.getElementById('modal-data').innerHTML = dataFormatada + proximaAulaInfo;
+            document.getElementById('modal-descricao').innerHTML = tarefa.descricao;
+            
+            document.getElementById('modal-acoes').innerHTML = `
+                ${!concluida ? 
+                    `<button class="btn btn-concluida" onclick="marcarTarefaConcluida('${id}');fecharModal();">Marcar como Concluída</button>` : 
+                    `<button class="btn btn-desfazer" onclick="desmarcarTarefaConcluida('${id}');fecharModal();">Desfazer Conclusão</button>`
+                }
+                <button class="btn btn-download" onclick="baixarTarefa('${id}')">Baixar Tarefa</button>
+            `;
+            
+            abrirModal();
+        }
+        
+        function visualizarEstudo(index) {
+            const estudo = estudos[index];
+            
+            document.getElementById('modal-titulo').innerHTML = estudo.materia;
+            document.getElementById('modal-data').innerHTML = '';
+            document.getElementById('modal-descricao').innerHTML = estudo.descricao;
+            
+            document.getElementById('modal-acoes').innerHTML = `
+                <button class="btn btn-download" onclick="baixarEstudo(${index})">Baixar TXT</button>
+                ${estudo.arquivo ? '<button class="btn btn-download" onclick="baixarEstudoPDF(' + index + ')">Baixar PDF</button>' : ''}
+            `;
+            
+            abrirModal();
+        }
+        
+        function marcarTarefaConcluida(id) {
+            const status = tarefasStatus[id] || {};
+            
+            if (!status.concluida) {
+                tarefasStatus[id] = {...status, concluida: true, vista: true};
+                localStorage.setItem('tarefasStatus', JSON.stringify(tarefasStatus));
+                filtrarTarefas();
+                atualizarContadorNotificacoes();
+            }
+        }
+        
+        function desmarcarTarefaConcluida(id) {
+            const status = tarefasStatus[id] || {};
+            
+            if (status.concluida) {
+                tarefasStatus[id] = {...status, concluida: false};
+                localStorage.setItem('tarefasStatus', JSON.stringify(tarefasStatus));
+                filtrarTarefas();
+                atualizarContadorNotificacoes();
+            }
+        }
+        
+        function abrirModal() {
+            document.getElementById('modal').classList.add('ativo');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function fecharModal() {
+            document.getElementById('modal').classList.remove('ativo');
+            document.body.style.overflow = 'auto';
+        }
+        
+        function encontrarProximaAula(materia) {
+            if (!horario) return null;
+            
+            const diasSemana = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta'];
+            const hoje = new Date();
+            const diaAtual = hoje.getDay();
+            const horaAtual = hoje.getHours();
+            
+            let diaIndex = diaAtual === 0 ? 6 : diaAtual - 1;
+            
+            if (horaAtual >= 12 && diaIndex < 5) {
+                diaIndex++;
+            }
+            
+            for (let i = 0; i < 7; i++) {
+                const diaVerificar = (diaIndex + i) % 7;
+                if (diaVerificar >= 5) continue;
+                
+                const diaSemana = diasSemana[diaVerificar];
+                if (horario[diaSemana]) {
+                    const aulaIndex = horario[diaSemana].findIndex(aula => aula === materia);
+                    if (aulaIndex !== -1) {
+                        let nomeDia = '';
+                        switch(diaSemana) {
+                            case 'Segunda': nomeDia = 'Segunda-feira'; break;
+                            case 'Terca': nomeDia = 'Terça-feira'; break;
+                            case 'Quarta': nomeDia = 'Quarta-feira'; break;
+                            case 'Quinta': nomeDia = 'Quinta-feira'; break;
+                            case 'Sexta': nomeDia = 'Sexta-feira'; break;
+                        }
+                        
+                        let periodo = '';
+                        if (aulaIndex === 0) periodo = '1ª aula';
+                        else if (aulaIndex === 1) periodo = '2ª aula';
+                        else periodo = `${aulaIndex + 1}ª aula`;
+                        
+                        return { dia: nomeDia, periodo: periodo };
+                    }
+                }
+            }
+            
+            return null;
+        }
+        
+        function renderizarHorario() {
+            const container = document.getElementById('horario-aulas');
+            container.innerHTML = '';
+            
+            if (!horario || Object.keys(horario).length === 0) {
+                container.innerHTML = '<div class="vazio">Horário não configurado</div>';
+                return;
+            }
+            
+            const dias = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta'];
+            
+            dias.forEach(dia => {
+                if (horario[dia] && horario[dia].length > 0) {
+                    const diaDiv = document.createElement('div');
+                    diaDiv.className = 'horario-dia';
+                    
+                    let titulo = dia;
+                    if (dia === 'Segunda') titulo = 'Segunda-feira';
+                    else if (dia === 'Terca') titulo = 'Terça-feira';
+                    else if (dia === 'Quarta') titulo = 'Quarta-feira';
+                    else if (dia === 'Quinta') titulo = 'Quinta-feira';
+                    else if (dia === 'Sexta') titulo = 'Sexta-feira';
+                    
+                    diaDiv.innerHTML = `<h3>${titulo}</h3>`;
+                    
+                    horario[dia].forEach((materia, idx) => {
+                        const aulaItem = document.createElement('div');
+                        aulaItem.className = 'aula-item';
+                        aulaItem.innerHTML = `
+                            <div class="aula-numero">${idx + 1}</div>
+                            <div class="aula-materia">${materia}</div>
+                        `;
+                        diaDiv.appendChild(aulaItem);
+                    });
+                    
+                    container.appendChild(diaDiv);
+                }
+            });
+        }
+        
+        function extrairTodasMaterias() {
+            todasMaterias = [];
+            
+            if (horario) {
+                Object.values(horario).forEach(dia => {
+                    dia.forEach(materia => {
+                        if (materia && !todasMaterias.includes(materia)) {
+                            todasMaterias.push(materia);
+                        }
+                    });
+                });
+            }
+            
+            if (tarefas && tarefas.length > 0) {
+                tarefas.forEach(tarefa => {
+                    if (tarefa.materia && !todasMaterias.includes(tarefa.materia)) {
+                        todasMaterias.push(tarefa.materia);
+                    }
+                });
+            }
+            
+            if (estudos && estudos.length > 0) {
+                estudos.forEach(estudo => {
+                    if (estudo.materia && !todasMaterias.includes(estudo.materia)) {
+                        todasMaterias.push(estudo.materia);
+                    }
+                });
+            }
+        }
+        
+        function renderizarConteudos() {
+            const container = document.getElementById('lista-conteudos');
+            container.innerHTML = '';
+            
+            extrairTodasMaterias();
+            
+            if (todasMaterias.length === 0) {
+                container.innerHTML = '<div class="vazio">Nenhuma matéria encontrada</div>';
+                return;
+            }
+            
+            todasMaterias.forEach(materia => {
+                const materiaDiv = document.createElement('div');
+                materiaDiv.className = 'conteudo-materia';
+                materiaDiv.innerHTML = `<h3>${materia}</h3>`;
+                
+                const lista = document.createElement('ul');
+                lista.className = 'conteudo-lista';
+                
+                const materiaConteudos = conteudos.find(c => c.materia === materia);
+                
+                if (materiaConteudos) {
+                    const conteudosArray = materiaConteudos.conteudos || materiaConteudos.conteudo || [];
+                    
+                    if (Array.isArray(conteudosArray) && conteudosArray.length > 0 && conteudosArray.some(c => c.trim() !== '')) {
+                        conteudosArray.forEach(conteudo => {
+                            if (conteudo.trim() !== '') {
+                                const conteudoItem = document.createElement('li');
+                                conteudoItem.className = 'conteudo-item';
+                                conteudoItem.textContent = conteudo;
+                                lista.appendChild(conteudoItem);
+                            }
+                        });
+                    } else if (typeof conteudosArray === 'string' && conteudosArray.trim() !== '') {
+                        const conteudoItem = document.createElement('li');
+                        conteudoItem.className = 'conteudo-item';
+                        conteudoItem.textContent = conteudosArray;
+                        lista.appendChild(conteudoItem);
+                    } else {
+                        const vazio = document.createElement('div');
+                        vazio.className = 'conteudo-vazio';
+                        vazio.textContent = 'Nenhum conteúdo adicionado ainda';
+                        lista.appendChild(vazio);
+                    }
+                } else {
+                    const vazio = document.createElement('div');
+                    vazio.className = 'conteudo-vazio';
+                    vazio.textContent = 'Nenhum conteúdo adicionado ainda';
+                    lista.appendChild(vazio);
+                }
+                
+                materiaDiv.appendChild(lista);
+                container.appendChild(materiaDiv);
+            });
+        }
+        
+        function baixarTarefa(id) {
+            const tarefa = tarefas.find(t => t.id === id);
+            const texto = `Matéria: ${tarefa.materia}\nData de entrega: ${tarefa.data}\nDescrição: ${tarefa.descricao}`;
+            
+            const blob = new Blob([texto], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Tarefa - ${tarefa.materia}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+        
+        function baixarEstudo(index) {
+            const estudo = estudos[index];
+            const texto = `Matéria: ${estudo.materia}\nDescrição: ${estudo.descricao}`;
+            
+            const blob = new Blob([texto], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Estudo - ${estudo.materia}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+        
+        function baixarEstudoPDF(index) {
+            const estudo = estudos[index];
+            if (estudo.arquivo) {
+                const byteCharacters = atob(estudo.arquivo);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Estudo - ${estudo.materia}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            }
+        }
+        
+        function detectarNovasTarefas() {
+            const novasTarefas = [];
+            
+            tarefas.forEach(tarefa => {
+                if (!tarefasStatus.hasOwnProperty(tarefa.id)) {
+                    novasTarefas.push(tarefa.id);
+                }
+            });
+            
+            return novasTarefas.length;
+        }
+        
+        function atualizarContadorNotificacoes() {
+            const contador = document.getElementById('aba-tarefas').querySelector('.notificacao-contador');
+            const novasTarefas = tarefas.filter(tarefa => {
+                const status = tarefasStatus[tarefa.id] || {};
+                return !status.vista && !status.concluida;
+            }).length;
+            
+            if (novasTarefas > 0) {
+                if (!contador) {
+                    const novoContador = document.createElement('div');
+                    novoContador.className = 'notificacao-contador';
+                    novoContador.textContent = novasTarefas;
+                    document.getElementById('aba-tarefas').appendChild(novoContador);
+                } else {
+                    contador.textContent = novasTarefas;
+                }
+            } else if (contador) {
+                contador.remove();
+            }
+        }
+        
+        function marcarTarefasComoVistas() {
+            let atualizado = false;
+            
+            tarefas.forEach(tarefa => {
+                const status = tarefasStatus[tarefa.id] || {};
+                
+                if (!status.vista && !status.concluida) {
+                    tarefasStatus[tarefa.id] = {...status, vista: true};
+                    atualizado = true;
+                }
+            });
+            
+            if (atualizado) {
+                localStorage.setItem('tarefasStatus', JSON.stringify(tarefasStatus));
+                atualizarContadorNotificacoes();
+                filtrarTarefas();
+            }
+        }
+        
+        function limparLocalStorageAntigo() {
+            localStorage.removeItem('tarefasConcluidas');
+            localStorage.removeItem('ultimasTarefas');
+            localStorage.removeItem('tarefasVistas');
+        }
+        
+        async function carregarDados() {
+            try {
+                limparLocalStorageAntigo();
+                
+                const [tarefasData, estudosData, horarioData, conteudosData] = await Promise.all([
+                    fetchDados('Tarefas'),
+                    fetchDados('Estudos'),
+                    fetchDados('Horário'),
+                    fetchDados('Conteúdos')
+                ]);
+                
+                if (tarefasData) {
+                    tarefas = tarefasData.map(t => ({...t, id: t.id || Date.now().toString() + Math.random().toString(36).substr(2, 9)}));
+                }
+                if (estudosData) estudos = estudosData;
+                if (horarioData) horario = horarioData;
+                if (conteudosData) conteudos = conteudosData;
+                
+                const nomeUsuario = localStorage.getItem('chatUsername') || '';
+                if (nomeUsuario) {
+                    document.getElementById('chat-nome').value = nomeUsuario;
+                }
+                
+                const numeroNovasTarefas = detectarNovasTarefas();
+                atualizarContadorNotificacoes();
+                
+                renderizarHorario();
+                filtrarTarefas();
+                renderizarEstudos();
+                renderizarConteudos();
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            }
+        }
+        
+        async function fetchDados(arquivo) {
+            try {
+                const response = await fetch(`${baseURL}/${encodeURIComponent(arquivo)}`);
+                
+                if (response.ok) {
+                    return await response.json();
+                }
+                return null;
+            } catch (error) {
+                return null;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', carregarDados);
     </script>
 </body>
 </html>
