@@ -4385,3 +4385,39 @@ observer.observe(document, { childList: true, subtree: true });
   }
 })();
 })();
+
+//Botão de Assistir Dublado/Legendado nas páginas dos animes
+(function() {
+    'use strict';
+
+const href = window.location.href;
+if (href.includes('animes')) {
+    const config = localStorage.getItem('firedeluxe_configuracoes');
+    const themeColor = config ? JSON.parse(config).themeColor : '#ffffff';
+    
+    if (href.includes('dublado')) {
+        const legendadoUrl = href.replace('-dublado-', '-');
+        const btn = document.createElement('button');
+        btn.className = 'watch-legendado-btn';
+        btn.textContent = 'Assistir Legendado';
+        btn.style.cssText = `padding:10px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;margin:10px auto;display:block;font-weight:bold;`;
+        btn.onclick = () => window.location.href = legendadoUrl;
+        const target = document.querySelector('h2.tEp.py-3.mb-0');
+        if (target) target.parentNode.insertBefore(btn, target);
+    } else {
+        const dubladoUrl = href.replace('-todos-os-episodios', '-dublado-todos-os-episodios');
+        fetch(dubladoUrl, { method: 'HEAD' }).then(response => {
+            if (response.ok) {
+                const btn = document.createElement('button');
+                btn.className = 'watch-dublado-btn';
+                btn.textContent = 'Assistir Dublado';
+                btn.style.cssText = `padding:10px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;margin:10px auto;display:block;font-weight:bold;`;
+                btn.onclick = () => window.location.href = dubladoUrl;
+                const target = document.querySelector('h2.tEp.py-3.mb-0');
+                if (target) target.parentNode.insertBefore(btn, target);
+            }
+        }).catch(() => {});
+    }
+}
+
+})();
