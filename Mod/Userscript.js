@@ -3662,48 +3662,51 @@ function setCookie(name, value, days) {
 }
 
 if (!getCookie("firedeluxe_rank_atualizado")) {
-    const dbName = "FireDeluxeRankDB";
-    const request = indexedDB.open(dbName, 1);
+    const userData = JSON.parse(localStorage.getItem('firedeluxe_chat') || '{}');
     
-    request.onsuccess = function(e) {
-        const db = e.target.result;
-        const transaction = db.transaction(["timeData"], "readonly");
-        const store = transaction.objectStore("timeData");
-        const getRequest = store.get(1);
+    if (userData.nome) {
+        const dbName = "FireDeluxeRankDB";
+        const request = indexedDB.open(dbName, 1);
         
-        getRequest.onsuccess = function() {
-            if (getRequest.result) {
-                const timeData = getRequest.result;
-                const totalSeconds = timeData.seconds + (timeData.minutes * 60) + (timeData.hours * 3600) + (timeData.days * 86400) + (timeData.weeks * 604800) + (timeData.months * 2592000) + (timeData.years * 31536000);
-                const userData = JSON.parse(localStorage.getItem('firedeluxe_chat') || '{}');
-                
-                fetch(`${supabaseUrl}/rest/v1/user_time_tracking`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': supabaseKey,
-                        'Authorization': `Bearer ${supabaseKey}`,
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify({
-                        name: userData.nome || 'Usuário Desconhecido',
-                        seconds: timeData.seconds,
-                        minutes: timeData.minutes,
-                        hours: timeData.hours,
-                        days: timeData.days,
-                        weeks: timeData.weeks,
-                        months: timeData.months,
-                        years: timeData.years,
-                        total_seconds: totalSeconds
-                    })
-                }).then(response => {
-                    if (response.ok) {
-                        setCookie("firedeluxe_rank_atualizado", "true", 5);
-                    }
-                });
-            }
+        request.onsuccess = function(e) {
+            const db = e.target.result;
+            const transaction = db.transaction(["timeData"], "readonly");
+            const store = transaction.objectStore("timeData");
+            const getRequest = store.get(1);
+            
+            getRequest.onsuccess = function() {
+                if (getRequest.result) {
+                    const timeData = getRequest.result;
+                    const totalSeconds = timeData.seconds + (timeData.minutes * 60) + (timeData.hours * 3600) + (timeData.days * 86400) + (timeData.weeks * 604800) + (timeData.months * 2592000) + (timeData.years * 31536000);
+                    
+                    fetch(`${supabaseUrl}/rest/v1/user_time_tracking`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': supabaseKey,
+                            'Authorization': `Bearer ${supabaseKey}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({
+                            name: userData.nome,
+                            seconds: timeData.seconds,
+                            minutes: timeData.minutes,
+                            hours: timeData.hours,
+                            days: timeData.days,
+                            weeks: timeData.weeks,
+                            months: timeData.months,
+                            years: timeData.years,
+                            total_seconds: totalSeconds
+                        })
+                    }).then(response => {
+                        if (response.ok) {
+                            setCookie("firedeluxe_rank_atualizado", "true", 5);
+                        }
+                    });
+                }
+            };
         };
-    };
+    }
 }
 
 })();
