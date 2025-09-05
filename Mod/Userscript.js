@@ -3679,8 +3679,8 @@ if (!getCookie("firedeluxe_rank_atualizado")) {
                     const timeData = getRequest.result;
                     const totalSeconds = timeData.seconds + (timeData.minutes * 60) + (timeData.hours * 3600) + (timeData.days * 86400) + (timeData.weeks * 604800) + (timeData.months * 2592000) + (timeData.years * 31536000);
                     
-                    fetch(`${supabaseUrl}/rest/v1/user_time_tracking`, {
-                        method: 'POST',
+                    fetch(`${supabaseUrl}/rest/v1/user_time_tracking?name=eq.${encodeURIComponent(userData.nome)}`, {
+                        method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
                             'apikey': supabaseKey,
@@ -3688,7 +3688,6 @@ if (!getCookie("firedeluxe_rank_atualizado")) {
                             'Prefer': 'return=minimal'
                         },
                         body: JSON.stringify({
-                            name: userData.nome,
                             seconds: timeData.seconds,
                             minutes: timeData.minutes,
                             hours: timeData.hours,
@@ -3696,7 +3695,8 @@ if (!getCookie("firedeluxe_rank_atualizado")) {
                             weeks: timeData.weeks,
                             months: timeData.months,
                             years: timeData.years,
-                            total_seconds: totalSeconds
+                            total_seconds: totalSeconds,
+                            last_updated: new Date().toISOString()
                         })
                     }).then(response => {
                         if (response.ok) {
