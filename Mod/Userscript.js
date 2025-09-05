@@ -3675,6 +3675,7 @@ if (!getCookie("firedeluxe_rank_atualizado")) {
             if (getRequest.result) {
                 const timeData = getRequest.result;
                 const totalSeconds = timeData.seconds + (timeData.minutes * 60) + (timeData.hours * 3600) + (timeData.days * 86400) + (timeData.weeks * 604800) + (timeData.months * 2592000) + (timeData.years * 31536000);
+                const userData = JSON.parse(localStorage.getItem('firedeluxe_chat') || '{}');
                 
                 fetch(`${supabaseUrl}/rest/v1/user_time_tracking`, {
                     method: 'POST',
@@ -3685,6 +3686,7 @@ if (!getCookie("firedeluxe_rank_atualizado")) {
                         'Prefer': 'return=minimal'
                     },
                     body: JSON.stringify({
+                        name: userData.nome || 'Usuário Desconhecido',
                         seconds: timeData.seconds,
                         minutes: timeData.minutes,
                         hours: timeData.hours,
@@ -4342,31 +4344,28 @@ observer.observe(document, { childList: true, subtree: true });
 (function() {
     'use strict';
 
-    const img = document.querySelector("a.nav-link img.imgMN")?.src;
+let tentativas = 0;
+const maxTentativas = 10;
 
-    let tentativas = 0;
-    const maxTentativas = 10;
-
-    function tentarBuscarPerfil() {
-        const perfilLink = document.querySelector("a.meu-perfil")?.getAttribute("href");
-        if (perfilLink) {
-            fetch(perfilLink)
-                .then(res => res.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, "text/html");
-                    const nome = doc.querySelector("#checkUserName")?.innerText.trim();
-                    const valor = { img, nome };
-                    localStorage.setItem('firedeluxe_chat', JSON.stringify(valor));
-                });
-        } else if (tentativas < maxTentativas) {
-            tentativas++;
-            setTimeout(tentarBuscarPerfil, 1000);
-        } else {
-        }
+function tentarBuscarPerfil() {
+    const perfilLink = document.querySelector("a.meu-perfil")?.getAttribute("href");
+    if (perfilLink) {
+        fetch(perfilLink)
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+                const nome = doc.querySelector("#checkUserName")?.innerText.trim();
+                const valor = { nome };
+                localStorage.setItem('firedeluxe_chat', JSON.stringify(valor));
+            });
+    } else if (tentativas < maxTentativas) {
+        tentativas++;
+        setTimeout(tentarBuscarPerfil, 1000);
     }
+}
 
-    tentarBuscarPerfil();
+tentarBuscarPerfil();
 
 })();
 
