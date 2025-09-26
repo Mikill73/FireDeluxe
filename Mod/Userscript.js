@@ -4489,3 +4489,93 @@ if (href.includes('animes')) {
 }
 
 })();
+
+//Welcome do botão principal (alguns usuários não sabiam onde configurar)
+(function() {
+    'use strict';
+
+    const welcomeCookie = document.cookie.split('; ').find(row => row.startsWith('firedeluxe_welcome='));
+if (!welcomeCookie || welcomeCookie.split('=')[1] !== 'true') {
+    const THEME_COLOR = localStorage.getItem('firedeluxe_configuracoes') ? JSON.parse(localStorage.getItem('firedeluxe_configuracoes')).themeColor || '#FFA500' : '#FFA500';
+    
+    const overlay = document.createElement('div');
+    Object.assign(overlay.style, {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        zIndex: '9998',
+        pointerEvents: 'none'
+    });
+    
+    const tooltip = document.createElement('div');
+    Object.assign(tooltip.style, {
+        position: 'fixed',
+        top: '15px',
+        left: '70px',
+        background: '#222',
+        border: `1px solid ${THEME_COLOR}`,
+        borderRadius: '8px',
+        padding: '15px',
+        color: '#EEE',
+        zIndex: '9999',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+        maxWidth: '250px',
+        pointerEvents: 'none'
+    });
+    
+    const arrow = document.createElement('div');
+    Object.assign(arrow.style, {
+        position: 'absolute',
+        right: '100%',
+        top: '20px',
+        width: '0',
+        height: '0',
+        borderRight: `10px solid ${THEME_COLOR}`,
+        borderTop: '8px solid transparent',
+        borderBottom: '8px solid transparent'
+    });
+    
+    const arrowInner = document.createElement('div');
+    Object.assign(arrowInner.style, {
+        position: 'absolute',
+        right: '-9px',
+        top: '1px',
+        width: '0',
+        height: '0',
+        borderRight: '9px solid #222',
+        borderTop: '7px solid transparent',
+        borderBottom: '7px solid transparent'
+    });
+    
+    const content = document.createElement('div');
+    Object.assign(content.style, {
+        fontWeight: 'bold',
+        fontSize: '14px',
+        textAlign: 'center',
+        color: '#FFF'
+    });
+    content.textContent = 'Esse é o botão principal do FireDeluxe!';
+    
+    tooltip.appendChild(arrow);
+    tooltip.appendChild(arrowInner);
+    tooltip.appendChild(content);
+    
+    const closeWelcome = () => {
+        document.body.removeChild(overlay);
+        document.body.removeChild(tooltip);
+        document.cookie = 'firedeluxe_welcome=true; max-age=31536000; path=/';
+        mainButton.removeEventListener('click', closeWelcome);
+    };
+    
+    const mainButton = document.getElementById('menuPrincipal');
+    if (mainButton) {
+        document.body.appendChild(overlay);
+        document.body.appendChild(tooltip);
+        mainButton.addEventListener('click', closeWelcome);
+    }
+}
+    
+})();
