@@ -490,6 +490,7 @@ init();
     mainButton.style.cursor = 'pointer';
     mainButton.style.filter = 'drop-shadow(0 0 3px ' + THEME_COLOR + ')';
     mainButton.style.transition = 'all 0.2s ease';
+    mainButton.id = "menuPrincipal";
 
     mainButton.onmouseenter = () => {
         mainButton.style.filter = 'drop-shadow(0 0 6px ' + THEME_COLOR + ')';
