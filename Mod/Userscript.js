@@ -163,7 +163,6 @@ function init() {
 }
 
 init();
-
 })();
 
 //Verificar versão
