@@ -4330,37 +4330,47 @@ observer.observe(document, { childList: true, subtree: true });
                 blockedUsers.forEach(user => {
                     const userId = user.url.split('/').pop();
                     document.querySelectorAll('.noti_us').forEach(el => {
-                        if (el.textContent.trim() === user.name) {
-                            el.closest('.dropdown-item')?.style.setProperty('display', 'none', 'important');
-                        }
-                    });
-                });
-            }, 200);
-        });
-    }
-
-    hideBlockedElements();
-})();
-
-})();
-
-//Salvar nome e foto de perfil do usuÃ¡rio (para usar no chat do FireDeluxe)
+                        if (el.textContent.trim() === user.name)//Salvar nome e foto de perfil do usuário (para usar no chat do FireDeluxe)
 (function() {
     'use strict';
 
-let tentativas = 0;
-const maxTentativas = 10;
-
-function tentarBuscarPerfil() {
-    const perfilLink = document.querySelector("a.meu-perfil")?.getAttribute("href");
-    if (perfilLink) {
-        fetch(perfilLink)
-            .then(res => res.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, "text/html");
-                const nome = doc.querySelector("#checkUserName")?.innerText.trim();
-                const valor = { nome };
+    let tentativas = 0;
+    const maxTentativas = 10;
+    
+    function tentarBuscarPerfil() {
+        const perfilLink = document.querySelector("a.meu-perfil")?.getAttribute("href");
+        
+        if (perfilLink) {
+            fetch(perfilLink)
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, "text/html");
+                    const nome = doc.querySelector("#checkUserName")?.innerText.trim();
+                    
+                    if (nome) {
+                        const storedData = localStorage.getItem('firedeluxe_chat');
+                        
+                        if (storedData) {
+                            const storedValor = JSON.parse(storedData);
+                            if (storedValor.nome !== nome) {
+                                const valor = { nome };
+                                localStorage.setItem('firedeluxe_chat', JSON.stringify(valor));
+                            }
+                        } else {
+                            const valor = { nome };
+                            localStorage.setItem('firedeluxe_chat', JSON.stringify(valor));
+                        }
+                    }
+                });
+        } else if (tentativas < maxTentativas) {
+            tentativas++;
+            setTimeout(tentarBuscarPerfil, 1000);
+        }
+    }
+    
+    tentarBuscarPerfil();
+})();valor = { nome };
                 localStorage.setItem('firedeluxe_chat', JSON.stringify(valor));
             });
     } else if (tentativas < maxTentativas) {
