@@ -13,156 +13,157 @@
 (function() {
     'use strict';
 
-    const configStr = localStorage.getItem('firedeluxe_configuracoes');
-    let config;
-    if (configStr) {
-        try {
-            config = JSON.parse(configStr);
-        } catch {}
+const configStr = localStorage.getItem('firedeluxe_configuracoes');
+let config;
+if (configStr) {
+    try {
+        config = JSON.parse(configStr);
+    } catch {}
+}
+
+const shouldBlockAds = !config || config.adblocker === 'on';
+
+const adPatterns = {
+    scripts: [
+        'thumbmark', 'af.js', 'aclib.js', 'displayvertising.com',
+        'acscdn.com/script/suv5.js', 'acscdn.com/script/banner.js',
+        'adsco.re', 'organicowner.com', 'auwwmwkduhcfqolda',
+        'cloudflareinsights.com', 'popper.js/1.11.0/umd/popper.min.js'
+    ],
+    meta: [
+        'admaven-placement', 'a.validate.01'
+    ],
+    links: [
+        'youradexchange.com', 'acscdn.com', 'c.adsco.re', 'displayvertising.com',
+        'adexchangeclear.com', 'organicowner.com'
+    ],
+    elements: [
+        '#page-mask', '.ad-box', '#dontfoid', 'div.ad-box',
+        'iframe[src="javascript:false"][width="0"][height="0"][style="display: none;"]',
+        'a[href*="adexchangeclear.com/ad/visit.php?al="][style*="display: none"][style*="left: -1000px"]',
+        'a[href*="organicowner.com"]',
+        'div[style*="Adblock detectado"]',
+        'div[style="text-align: center; padding-top: 48vh; font-size: 4vw; position: fixed; display: block; width: 100%; height: 100%; inset: 0px; background-color: rgba(0, 0, 0, 0); z-index: 300000;"]',
+        'link[rel="dns-prefetch"][href*="adexchangeclear.com"]'
+    ],
+    iframeStyles: {
+        position: 'absolute',
+        top: '-1000px',
+        left: '-1000px',
+        visibility: 'hidden'
     }
-    
-    const shouldBlockAds = !config || config.adblocker === 'on';
-    
-    const adPatterns = {
-        scripts: [
-            'thumbmark', 'af.js', 'aclib.js', 'displayvertising.com',
-            'acscdn.com/script/suv5.js', 'acscdn.com/script/banner.js',
-            'adsco.re', 'organicowner.com', 'auwwmwkduhcfqolda',
-            'cloudflareinsights.com', 'popper.js/1.11.0/umd/popper.min.js'
-        ],
-        meta: [
-            'admaven-placement', 'a.validate.01'
-        ],
-        links: [
-            'youradexchange.com', 'acscdn.com', 'c.adsco.re', 'displayvertising.com',
-            'adexchangeclear.com', 'organicowner.com'
-        ],
-        elements: [
-            '#page-mask', '.ad-box', '#dontfoid', 'div.ad-box',
-            'iframe[src="javascript:false"][width="0"][height="0"][style="display: none;"]',
-            'a[href*="adexchangeclear.com/ad/visit.php?al="][style*="display: none"][style*="left: -1000px"]',
-            'a[href*="organicowner.com"]',
-            'div[style*="Adblock detectado"]',
-            'div[style="text-align: center; padding-top: 48vh; font-size: 4vw; position: fixed; display: block; width: 100%; height: 100%; inset: 0px; background-color: rgba(0, 0, 0, 0); z-index: 300000;"]',
-            'link[rel="dns-prefetch"][href*="adexchangeclear.com"]'
-        ],
-        iframeStyles: {
-            position: 'absolute',
-            top: '-1000px',
-            left: '-1000px',
-            visibility: 'hidden'
+};
+
+const blockedDomains = ['displayvertising.com', 'youradexchange.com', 'adsco.re', 'adexchangeclear.com', 'organicowner.com'];
+
+function matchesStyles(element, styles) {
+    return Object.entries(styles).every(([prop, value]) => {
+        return window.getComputedStyle(element).getPropertyValue(prop) === value;
+    });
+}
+
+function removeElements() {
+    if (!shouldBlockAds) return;
+
+    adPatterns.scripts.forEach(pattern => {
+        document.querySelectorAll(`script[src*="${pattern}"]`).forEach(e => e.remove());
+    });
+
+    adPatterns.meta.forEach(pattern => {
+        document.querySelectorAll(`meta[name="${pattern}"]`).forEach(e => e.remove());
+    });
+
+    adPatterns.links.forEach(pattern => {
+        document.querySelectorAll(`link[href*="${pattern}"]`).forEach(e => e.remove());
+    });
+
+    adPatterns.elements.forEach(selector => {
+        document.querySelectorAll(selector).forEach(e => e.remove());
+    });
+
+    document.querySelectorAll('iframe').forEach(iframe => {
+        if (matchesStyles(iframe, adPatterns.iframeStyles)) iframe.remove();
+    });
+
+    document.querySelectorAll('script').forEach(script => {
+        const content = script.textContent;
+        if (content.includes('showAdAlert') || 
+            content.includes('site_url') || 
+            content.includes('aclib.runPop') || 
+            content.trim().startsWith(`(function(options){`)) {
+            script.remove();
         }
+    });
+}
+
+function cleanStorage() {
+    document.cookie.split(';').forEach(cookie => {
+        const name = cookie.split('=')[0].trim();
+        if (name.startsWith('PopAds')) {
+            document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
+        }
+    });
+
+    ['_spop_popfired', '_spop_popfired_expires', '_spoplastOpenAt', '__tlopundefined'].forEach(key => {
+        localStorage.removeItem(key);
+    });
+}
+
+function blockWindowOpen() {
+    const originalOpen = window.open;
+    window.open = function(url, ...args) {
+        if (typeof url === 'string' && blockedDomains.some(d => url.includes(d))) return null;
+        return originalOpen.call(window, url, ...args);
     };
-    
-    const blockedDomains = ['displayvertising.com', 'youradexchange.com', 'adsco.re', 'adexchangeclear.com', 'organicowner.com'];
-    
-    function matchesStyles(element, styles) {
-        return Object.entries(styles).every(([prop, value]) => {
-            return window.getComputedStyle(element).getPropertyValue(prop) === value;
-        });
-    }
-    
-    function removeElements() {
-        if (!shouldBlockAds) return;
-    
-        adPatterns.scripts.forEach(pattern => {
-            document.querySelectorAll(`script[src*="${pattern}"]`).forEach(e => e.remove());
-        });
-    
-        adPatterns.meta.forEach(pattern => {
-            document.querySelectorAll(`meta[name="${pattern}"]`).forEach(e => e.remove());
-        });
-    
-        adPatterns.links.forEach(pattern => {
-            document.querySelectorAll(`link[href*="${pattern}"]`).forEach(e => e.remove());
-        });
-    
-        adPatterns.elements.forEach(selector => {
-            document.querySelectorAll(selector).forEach(e => e.remove());
-        });
-    
-        document.querySelectorAll('iframe').forEach(iframe => {
-            if (matchesStyles(iframe, adPatterns.iframeStyles)) iframe.remove();
-        });
-    
-        document.querySelectorAll('script').forEach(script => {
-            const content = script.textContent;
-            if (content.includes('showAdAlert') || 
-                content.includes('site_url') || 
-                content.includes('aclib.runPop') || 
-                content.trim().startsWith(`(function(options){`)) {
-                script.remove();
-            }
-        });
-    }
-    
-    function cleanStorage() {
-        document.cookie.split(';').forEach(cookie => {
-            const name = cookie.split('=')[0].trim();
-            if (name.startsWith('PopAds')) {
-                document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
-            }
-        });
-    
-        ['_spop_popfired', '_spop_popfired_expires', '_spoplastOpenAt', '__tlopundefined'].forEach(key => {
-            localStorage.removeItem(key);
-        });
-    }
-    
-    function blockWindowOpen() {
-        const originalOpen = window.open;
-        window.open = function(url, ...args) {
-            if (typeof url === 'string' && blockedDomains.some(d => url.includes(d))) return null;
-            return originalOpen.call(window, url, ...args);
-        };
-    }
-    
-    function blockHistoryChanges() {
-        const blockURL = (url) => {
-            return typeof url === 'string' && blockedDomains.some(d => url.includes(d));
-        };
-    
-        const originalPushState = history.pushState;
-        history.pushState = function(state, title, url) {
-            if (blockURL(url)) return;
-            return originalPushState.apply(history, arguments);
-        };
-    
-        const originalReplaceState = history.replaceState;
-        history.replaceState = function(state, title, url) {
-            if (blockURL(url)) return;
-            return originalReplaceState.apply(history, arguments);
-        };
-    }
-    
-    function setupObservers() {
-        const observer = new MutationObserver(() => {
-            removeElements();
-            document.querySelectorAll('iframe').forEach(iframe => {
-                if (blockedDomains.some(d => iframe.src.includes(d))) iframe.remove();
-            });
-        });
-    
-        observer.observe(document.documentElement, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            characterData: true
-        });
-    }
-    
-    function init() {
-        window.showAdAlert = function() {};
-        window.chromeadblocked = false;
-    
+}
+
+function blockHistoryChanges() {
+    const blockURL = (url) => {
+        return typeof url === 'string' && blockedDomains.some(d => url.includes(d));
+    };
+
+    const originalPushState = history.pushState;
+    history.pushState = function(state, title, url) {
+        if (blockURL(url)) return;
+        return originalPushState.apply(history, arguments);
+    };
+
+    const originalReplaceState = history.replaceState;
+    history.replaceState = function(state, title, url) {
+        if (blockURL(url)) return;
+        return originalReplaceState.apply(history, arguments);
+    };
+}
+
+function setupObservers() {
+    const observer = new MutationObserver(() => {
         removeElements();
-        cleanStorage();
-        blockWindowOpen();
-        blockHistoryChanges();
-        setupObservers();
-    }
-    
-    init();
+        document.querySelectorAll('iframe').forEach(iframe => {
+            if (blockedDomains.some(d => iframe.src.includes(d))) iframe.remove();
+        });
+    });
+
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true
+    });
+}
+
+function init() {
+    window.showAdAlert = function() {};
+    window.chromeadblocked = false;
+
+    removeElements();
+    cleanStorage();
+    blockWindowOpen();
+    blockHistoryChanges();
+    setupObservers();
+}
+
+init();
+
 })();
 
 //Verificar versão
@@ -4330,47 +4331,37 @@ observer.observe(document, { childList: true, subtree: true });
                 blockedUsers.forEach(user => {
                     const userId = user.url.split('/').pop();
                     document.querySelectorAll('.noti_us').forEach(el => {
-                        if (el.textContent.trim() === user.name)//Salvar nome e foto de perfil do usu�rio (para usar no chat do FireDeluxe)
+                        if (el.textContent.trim() === user.name) {
+                            el.closest('.dropdown-item')?.style.setProperty('display', 'none', 'important');
+                        }
+                    });
+                });
+            }, 200);
+        });
+    }
+
+    hideBlockedElements();
+})();
+
+})();
+
+//Salvar nome e foto de perfil do usuário (para usar no chat do FireDeluxe)
 (function() {
     'use strict';
 
-    let tentativas = 0;
-    const maxTentativas = 10;
-    
-    function tentarBuscarPerfil() {
-        const perfilLink = document.querySelector("a.meu-perfil")?.getAttribute("href");
-        
-        if (perfilLink) {
-            fetch(perfilLink)
-                .then(res => res.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, "text/html");
-                    const nome = doc.querySelector("#checkUserName")?.innerText.trim();
-                    
-                    if (nome) {
-                        const storedData = localStorage.getItem('firedeluxe_chat');
-                        
-                        if (storedData) {
-                            const storedValor = JSON.parse(storedData);
-                            if (storedValor.nome !== nome) {
-                                const valor = { nome };
-                                localStorage.setItem('firedeluxe_chat', JSON.stringify(valor));
-                            }
-                        } else {
-                            const valor = { nome };
-                            localStorage.setItem('firedeluxe_chat', JSON.stringify(valor));
-                        }
-                    }
-                });
-        } else if (tentativas < maxTentativas) {
-            tentativas++;
-            setTimeout(tentarBuscarPerfil, 1000);
-        }
-    }
-    
-    tentarBuscarPerfil();
-})();valor = { nome };
+let tentativas = 0;
+const maxTentativas = 10;
+
+function tentarBuscarPerfil() {
+    const perfilLink = document.querySelector("a.meu-perfil")?.getAttribute("href");
+    if (perfilLink) {
+        fetch(perfilLink)
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+                const nome = doc.querySelector("#checkUserName")?.innerText.trim();
+                const valor = { nome };
                 localStorage.setItem('firedeluxe_chat', JSON.stringify(valor));
             });
     } else if (tentativas < maxTentativas) {
