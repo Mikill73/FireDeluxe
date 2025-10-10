@@ -461,7 +461,7 @@ init();
         return `#${RR}${GG}${BB}`;
     }
 
-    ch//Botão Principal
+//BotÃ£o Principal
 (function() {
     'use strict';
 
@@ -529,13 +529,13 @@ init();
     
     const columnsData = [
         {
-            name: 'Informações',
+            name: 'Informaï¿½ï¿½es',
             buttons: [
                 {
-                    name: 'Contribuição',
-                    storageKey: 'contribuição',
+                    name: 'Contribuiï¿½ï¿½o',
+                    storageKey: 'contribuiï¿½ï¿½o',
                     type: 'js',
-                    info: 'Formas de contribuir ou agradecer (não inclui uso monetário)'
+                    info: 'Formas de contribuir ou agradecer (nï¿½o inclui uso monetï¿½rio)'
                 },
                 {
                     name: 'Funcionalidades',
@@ -546,19 +546,19 @@ init();
             ]
         },
         {
-            name: 'Funções',
+            name: 'Funï¿½ï¿½es',
             buttons: [
                 {
-                    name: 'Configurações',
+                    name: 'Configuraï¿½ï¿½es',
                     storageKey: 'configuracoes',
                     type: 'html',
-                    info: 'Configura diversas funções do FireDeluxe, incluindo aparência, comportamentos e preferências.'
+                    info: 'Configura diversas funï¿½ï¿½es do FireDeluxe, incluindo aparï¿½ncia, comportamentos e preferï¿½ncias.'
                 },
                 {
                     name: 'Bloqueados',
                     storageKey: 'bloqueados',
                     type: 'html',
-                    info: 'Bloqueie usuários com o FireDeluxe (o bloquear do site não funciona)'
+                    info: 'Bloqueie usuï¿½rios com o FireDeluxe (o bloquear do site nï¿½o funciona)'
                 }
             ]
         }
@@ -584,7 +584,7 @@ init();
         try {
             const storageName = type === 'html' ? 'firedeluxe_codigos_html' : 'firedeluxe_codigos_js';
             const storage = JSON.parse(localStorage.getItem(storageName)) || {};
-            return storage[key] || `alert('Código ${key} não encontrado no storage ${storageName}');`;
+            return storage[key] || `alert('Cï¿½digo ${key} nï¿½o encontrado no storage ${storageName}');`;
         } catch (e) {
             return `console.error('Erro ao acessar storage:', ${e});`;
         }
@@ -780,7 +780,7 @@ init();
                 new Function(btnData.content)();
             }
         } catch (e) {
-            console.error('Erro ao executar botão:', e);
+            console.error('Erro ao executar botï¿½o:', e);
         }
     }
     
