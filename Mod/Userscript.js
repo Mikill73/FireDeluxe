@@ -13,159 +13,160 @@
 (function() {
     'use strict';
 
-    const configStr = localStorage.getItem('firedeluxe_configuracoes');
-    let config;
-    if (configStr) {
-        try {
-            config = JSON.parse(configStr);
-        } catch {}
+const configStr = localStorage.getItem('firedeluxe_configuracoes');
+let config;
+if (configStr) {
+    try {
+        config = JSON.parse(configStr);
+    } catch {}
+}
+
+const shouldBlockAds = !config || config.adblocker === 'on';
+
+const adPatterns = {
+    scripts: [
+        'thumbmark', 'af.js', 'aclib.js', 'displayvertising.com',
+        'acscdn.com/script/suv5.js', 'acscdn.com/script/banner.js',
+        'adsco.re', 'organicowner.com', 'auwwmwkduhcfqolda',
+        'cloudflareinsights.com', 'popper.js/1.11.0/umd/popper.min.js'
+    ],
+    meta: [
+        'admaven-placement', 'a.validate.01'
+    ],
+    links: [
+        'youradexchange.com', 'acscdn.com', 'c.adsco.re', 'displayvertising.com',
+        'adexchangeclear.com', 'organicowner.com'
+    ],
+    elements: [
+        '#page-mask', '.ad-box', '#dontfoid', 'div.ad-box',
+        'iframe[src="javascript:false"][width="0"][height="0"][style="display: none;"]',
+        'a[href*="adexchangeclear.com/ad/visit.php?al="][style*="display: none"][style*="left: -1000px"]',
+        'a[href*="organicowner.com"]',
+        'div[style*="Adblock detectado"]',
+        'div[style="text-align: center; padding-top: 48vh; font-size: 4vw; position: fixed; display: block; width: 100%; height: 100%; inset: 0px; background-color: rgba(0, 0, 0, 0); z-index: 300000;"]',
+        'link[rel="dns-prefetch"][href*="adexchangeclear.com"]'
+    ],
+    iframeStyles: {
+        position: 'absolute',
+        top: '-1000px',
+        left: '-1000px',
+        visibility: 'hidden'
     }
-    
-    const shouldBlockAds = !config || config.adblocker === 'on';
-    
-    const adPatterns = {
-        scripts: [
-            'thumbmark', 'af.js', 'aclib.js', 'displayvertising.com',
-            'acscdn.com/script/suv5.js', 'acscdn.com/script/banner.js',
-            'adsco.re', 'organicowner.com', 'auwwmwkduhcfqolda',
-            'cloudflareinsights.com', 'popper.js/1.11.0/umd/popper.min.js'
-        ],
-        meta: [
-            'admaven-placement', 'a.validate.01'
-        ],
-        links: [
-            'youradexchange.com', 'acscdn.com', 'c.adsco.re', 'displayvertising.com',
-            'adexchangeclear.com', 'organicowner.com'
-        ],
-        elements: [
-            '#page-mask', '.ad-box', '#dontfoid', 'div.ad-box',
-            'iframe[src="javascript:false"][width="0"][height="0"][style="display: none;"]',
-            'a[href*="adexchangeclear.com/ad/visit.php?al="][style*="display: none"][style*="left: -1000px"]',
-            'a[href*="organicowner.com"]',
-            'div[style*="Adblock detectado"]',
-            'div[style="text-align: center; padding-top: 48vh; font-size: 4vw; position: fixed; display: block; width: 100%; height: 100%; inset: 0px; background-color: rgba(0, 0, 0, 0); z-index: 300000;"]',
-            'link[rel="dns-prefetch"][href*="adexchangeclear.com"]'
-        ],
-        iframeStyles: {
-            position: 'absolute',
-            top: '-1000px',
-            left: '-1000px',
-            visibility: 'hidden'
+};
+
+const blockedDomains = ['displayvertising.com', 'youradexchange.com', 'adsco.re', 'adexchangeclear.com', 'organicowner.com'];
+
+function matchesStyles(element, styles) {
+    return Object.entries(styles).every(([prop, value]) => {
+        return window.getComputedStyle(element).getPropertyValue(prop) === value;
+    });
+}
+
+function removeElements() {
+    if (!shouldBlockAds) return;
+
+    adPatterns.scripts.forEach(pattern => {
+        document.querySelectorAll(`script[src*="${pattern}"]`).forEach(e => e.remove());
+    });
+
+    adPatterns.meta.forEach(pattern => {
+        document.querySelectorAll(`meta[name="${pattern}"]`).forEach(e => e.remove());
+    });
+
+    adPatterns.links.forEach(pattern => {
+        document.querySelectorAll(`link[href*="${pattern}"]`).forEach(e => e.remove());
+    });
+
+    adPatterns.elements.forEach(selector => {
+        document.querySelectorAll(selector).forEach(e => e.remove());
+    });
+
+    document.querySelectorAll('iframe').forEach(iframe => {
+        if (matchesStyles(iframe, adPatterns.iframeStyles)) iframe.remove();
+    });
+
+    document.querySelectorAll('script').forEach(script => {
+        const content = script.textContent;
+        if (content.includes('showAdAlert') || 
+            content.includes('site_url') || 
+            content.includes('aclib.runPop') || 
+            content.trim().startsWith(`(function(options){`)) {
+            script.remove();
         }
+    });
+}
+
+function cleanStorage() {
+    document.cookie.split(';').forEach(cookie => {
+        const name = cookie.split('=')[0].trim();
+        if (name.startsWith('PopAds')) {
+            document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
+        }
+    });
+
+    ['_spop_popfired', '_spop_popfired_expires', '_spoplastOpenAt', '__tlopundefined'].forEach(key => {
+        localStorage.removeItem(key);
+    });
+}
+
+function blockWindowOpen() {
+    const originalOpen = window.open;
+    window.open = function(url, ...args) {
+        if (typeof url === 'string' && blockedDomains.some(d => url.includes(d))) return null;
+        return originalOpen.call(window, url, ...args);
     };
-    
-    const blockedDomains = ['displayvertising.com', 'youradexchange.com', 'adsco.re', 'adexchangeclear.com', 'organicowner.com'];
-    
-    function matchesStyles(element, styles) {
-        return Object.entries(styles).every(([prop, value]) => {
-            return window.getComputedStyle(element).getPropertyValue(prop) === value;
-        });
-    }
-    
-    function removeElements() {
-        if (!shouldBlockAds) return;
-    
-        adPatterns.scripts.forEach(pattern => {
-            document.querySelectorAll(`script[src*="${pattern}"]`).forEach(e => e.remove());
-        });
-    
-        adPatterns.meta.forEach(pattern => {
-            document.querySelectorAll(`meta[name="${pattern}"]`).forEach(e => e.remove());
-        });
-    
-        adPatterns.links.forEach(pattern => {
-            document.querySelectorAll(`link[href*="${pattern}"]`).forEach(e => e.remove());
-        });
-    
-        adPatterns.elements.forEach(selector => {
-            document.querySelectorAll(selector).forEach(e => e.remove());
-        });
-    
-        document.querySelectorAll('iframe').forEach(iframe => {
-            if (matchesStyles(iframe, adPatterns.iframeStyles)) iframe.remove();
-        });
-    
-        document.querySelectorAll('script').forEach(script => {
-            const content = script.textContent;
-            if (content.includes('showAdAlert') || 
-                content.includes('site_url') || 
-                content.includes('aclib.runPop') || 
-                content.trim().startsWith(`(function(options){`)) {
-                script.remove();
-            }
-        });
-    }
-    
-    function cleanStorage() {
-        document.cookie.split(';').forEach(cookie => {
-            const name = cookie.split('=')[0].trim();
-            if (name.startsWith('PopAds')) {
-                document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
-            }
-        });
-    
-        ['_spop_popfired', '_spop_popfired_expires', '_spoplastOpenAt', '__tlopundefined'].forEach(key => {
-            localStorage.removeItem(key);
-        });
-    }
-    
-    function blockWindowOpen() {
-        const originalOpen = window.open;
-        window.open = function(url, ...args) {
-            if (typeof url === 'string' && blockedDomains.some(d => url.includes(d))) return null;
-            return originalOpen.call(window, url, ...args);
-        };
-    }
-    
-    function blockHistoryChanges() {
-        const blockURL = (url) => {
-            return typeof url === 'string' && blockedDomains.some(d => url.includes(d));
-        };
-    
-        const originalPushState = history.pushState;
-        history.pushState = function(state, title, url) {
-            if (blockURL(url)) return;
-            return originalPushState.apply(history, arguments);
-        };
-    
-        const originalReplaceState = history.replaceState;
-        history.replaceState = function(state, title, url) {
-            if (blockURL(url)) return;
-            return originalReplaceState.apply(history, arguments);
-        };
-    }
-    
-    function setupObservers() {
-        const observer = new MutationObserver(() => {
-            removeElements();
-            document.querySelectorAll('iframe').forEach(iframe => {
-                if (blockedDomains.some(d => iframe.src.includes(d))) iframe.remove();
-            });
-        });
-    
-        observer.observe(document.documentElement, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            characterData: true
-        });
-    }
-    
-    function init() {
-        window.showAdAlert = function() {};
-        window.chromeadblocked = false;
-    
+}
+
+function blockHistoryChanges() {
+    const blockURL = (url) => {
+        return typeof url === 'string' && blockedDomains.some(d => url.includes(d));
+    };
+
+    const originalPushState = history.pushState;
+    history.pushState = function(state, title, url) {
+        if (blockURL(url)) return;
+        return originalPushState.apply(history, arguments);
+    };
+
+    const originalReplaceState = history.replaceState;
+    history.replaceState = function(state, title, url) {
+        if (blockURL(url)) return;
+        return originalReplaceState.apply(history, arguments);
+    };
+}
+
+function setupObservers() {
+    const observer = new MutationObserver(() => {
         removeElements();
-        cleanStorage();
-        blockWindowOpen();
-        blockHistoryChanges();
-        setupObservers();
-    }
-    
-    init();
+        document.querySelectorAll('iframe').forEach(iframe => {
+            if (blockedDomains.some(d => iframe.src.includes(d))) iframe.remove();
+        });
+    });
+
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true
+    });
+}
+
+function init() {
+    window.showAdAlert = function() {};
+    window.chromeadblocked = false;
+
+    removeElements();
+    cleanStorage();
+    blockWindowOpen();
+    blockHistoryChanges();
+    setupObservers();
+}
+
+init();
+
 })();
 
-//Verificar versÃ£o
+//Verificar versão
 (function() {
     'use strict';
 
@@ -190,14 +191,14 @@
 
             if (latestVersion && cookieValue !== latestVersion) {
                 showModal(
-                    'AtualizaÃ§Ã£o DisponÃ­vel', 
-                    `<div class="update-message">Uma nova versÃ£o estÃ¡ disponÃ­vel:</div>
+                    'Atualização Disponível', 
+                    `<div class="update-message">Uma nova versão está disponível:</div>
                     <div class="version-container">
-                        <strong>Sua versÃ£o:</strong> <span class="version-text">${cookieValue}</span><br>
-                        <strong>Nova versÃ£o:</strong> <span class="version-text">${latestVersion}</span>
+                        <strong>Sua versão:</strong> <span class="version-text">${cookieValue}</span><br>
+                        <strong>Nova versão:</strong> <span class="version-text">${latestVersion}</span>
                     </div>
                     <div class="manual-update-container">
-                        <div class="manual-update-warning">Caso o botÃ£o de Atualizar nÃ£o funcione:</div>
+                        <div class="manual-update-warning">Caso o botão de Atualizar não funcione:</div>
                         <div class="link-container">
                             <input type="text" value="https://update.greasyfork.org/scripts/470618/FireDeluxe.user.js" readonly class="update-link">
                             <button class="copy-button">Copiar</button>
@@ -208,17 +209,17 @@
                 );
             }
         } catch (error) {
-            console.error('Erro ao verificar versÃ£o:', error);
-            showModal('Erro', '<div class="error-message">Ocorreu um erro ao verificar a versÃ£o atual.</div>');
+            console.error('Erro ao verificar versão:', error);
+            showModal('Erro', '<div class="error-message">Ocorreu um erro ao verificar a versão atual.</div>');
         }
     }
 
     function showUpdateAlert() {
         showModal(
-            'AtualizaÃ§Ã£o Recomendada', 
-            `<div class="update-message">Uma atualizaÃ§Ã£o do FireDeluxe estÃ¡ disponÃ­vel.</div>
+            'Atualização Recomendada', 
+            `<div class="update-message">Uma atualização do FireDeluxe está disponível.</div>
             <div class="manual-update-container">
-                <div class="manual-update-warning">Caso o botÃ£o de Atualizar nÃ£o funcione:</div>
+                <div class="manual-update-warning">Caso o botão de Atualizar não funcione:</div>
                 <div class="link-container">
                     <input type="text" value="https://update.greasyfork.org/scripts/470618/FireDeluxe.user.js" readonly class="update-link">
                     <button class="copy-button">Copiar</button>
@@ -463,7 +464,7 @@
     checkVersion();
 })();
 
-//BotÃ£o Principal
+//Botão Principal
 (function() {
     'use strict';
 
@@ -526,18 +527,18 @@
 
     const columnsData = [
         {
-            name: 'InformaÃ§Ãµes',
+            name: 'Informações',
             buttons: [
                 {
-                    name: 'ContribuiÃ§Ã£o',
-                    storageKey: 'contribuiÃ§Ã£o',
+                    name: 'Contribuição',
+                    storageKey: 'contribuição',
                     type: 'js',
-                    info: 'Formas de contribuir ou agradecer (nÃ£o inclui uso monetÃ¡rio)'
+                    info: 'Formas de contribuir ou agradecer (não inclui uso monetário)'
                 }
             ]
         },
         {
-            name: 'InformaÃ§Ãµes',
+            name: 'Informações',
             buttons: [
                 {
                     name: 'Funcionalidades',
@@ -548,24 +549,24 @@
             ]
         },
         {
-            name: 'FunÃ§Ãµes',
+            name: 'Funções',
             buttons: [
                 {
-                    name: 'ConfiguraÃ§Ãµes',
+                    name: 'Configurações',
                     storageKey: 'configuracoes',
                     type: 'html',
-                    info: 'Configura diversas funÃ§Ãµes do FireDeluxe, incluindo aparÃªncia, comportamentos e preferÃªncias.'
+                    info: 'Configura diversas funções do FireDeluxe, incluindo aparência, comportamentos e preferências.'
                 }
             ]
         },
         {
-            name: 'FunÃ§Ãµes',
+            name: 'Funções',
             buttons: [
                 {
                     name: 'Bloqueados',
                     storageKey: 'bloqueados',
                     type: 'html',
-                    info: 'Bloqueie usuÃ¡rios com o FireDeluxe (o bloquear do site nÃ£o funciona)'
+                    info: 'Bloqueie usuários com o FireDeluxe (o bloquear do site não funciona)'
                 }
             ]
         }
@@ -591,7 +592,7 @@
         try {
             const storageName = type === 'html' ? 'firedeluxe_codigos_html' : 'firedeluxe_codigos_js';
             const storage = JSON.parse(localStorage.getItem(storageName)) || {};
-            return storage[key] || `alert('CÃ³digo ${key} nÃ£o encontrado no storage ${storageName}');`;
+            return storage[key] || `alert('Código ${key} não encontrado no storage ${storageName}');`;
         } catch (e) {
             return `console.error('Erro ao acessar storage:', ${e});`;
         }
@@ -737,7 +738,7 @@
                 new Function(btnData.content)();
             }
         } catch (e) {
-            console.error('Erro ao executar botÃ£o:', e);
+            console.error('Erro ao executar botão:', e);
         }
     }
 
@@ -767,7 +768,7 @@
     }
 })();
 
-//CÃ³digo do botÃ£o ConfiguraÃ§Ãµes
+//Código do botão Configurações
 (function() {
     'use strict';
 
@@ -777,7 +778,7 @@ const configuracoesHTML = `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConfiguraÃ§Ãµes</title>
+    <title>Configurações</title>
     <style>
         body {
             background-color: #222;
@@ -1023,11 +1024,11 @@ const configuracoesHTML = `
 <body>
     <div class="settings-panel" id="settingsPanel">
         <div class="settings-header">
-            <h2 class="settings-title">ConfiguraÃ§Ãµes</h2>
+            <h2 class="settings-title">Configurações</h2>
         </div>
 
         <div class="settings-section">
-            <h3 class="section-title">ConfiguraÃ§Ãµes de AutomaÃ§Ã£o</h3>
+            <h3 class="section-title">Configurações de Automação</h3>
             <div class="settings-row">
                 <label class="settings-label">Email da conta principal:</label>
                 <input type="email" class="settings-input" id="automationEmail" placeholder="Seu email no AnimeFire">
@@ -1037,18 +1038,18 @@ const configuracoesHTML = `
                 <input type="password" class="settings-input" id="automationPassword" placeholder="Sua senha no AnimeFire">
             </div>
             <div class="warning-text">
-                <strong>AtenÃ§Ã£o:</strong> Estas credenciais sÃ£o necessÃ¡rias apenas para funÃ§Ãµes avanÃ§adas de automaÃ§Ã£o do FireDeluxe. 
-                Se vocÃª nÃ£o confia totalmente no FireDeluxe, pode deixar em branco.
+                <strong>Atenção:</strong> Estas credenciais são necessárias apenas para funções avançadas de automação do FireDeluxe. 
+                Se você não confia totalmente no FireDeluxe, pode deixar em branco.
             </div>
             <div class="info-text">
-                Sua experiÃªncia normal no FireDeluxe nÃ£o serÃ¡ afetada se vocÃª nÃ£o preencher estes campos.
+                Sua experiência normal no FireDeluxe não será afetada se você não preencher estes campos.
             </div>
         </div>
 
         <div class="settings-section">
             <h3 class="section-title">AdBlock</h3>
             <div class="settings-row">
-                <label class="settings-label">Bloquear anÃºncios:</label>
+                <label class="settings-label">Bloquear anúncios:</label>
                 <label class="switch">
                     <input type="checkbox" id="adblockerToggle">
                     <span class="slider"></span>
@@ -1059,7 +1060,7 @@ const configuracoesHTML = `
         <div class="settings-section">
             <h3 class="section-title">Divulgar o FireDeluxe</h3>
             <div class="settings-row">
-                <label class="settings-label">Permitir divulgaÃ§Ã£o:</label>
+                <label class="settings-label">Permitir divulgação:</label>
                 <label class="switch">
                     <input type="checkbox" id="divulgarToggle">
                     <span class="slider"></span>
@@ -1073,17 +1074,17 @@ const configuracoesHTML = `
         <div class="settings-section">
             <h3 class="section-title">Carregar Todas as Temporadas</h3>
             <div class="settings-row">
-                <label class="settings-label">Ativar funÃ§Ã£o:</label>
+                <label class="settings-label">Ativar função:</label>
                 <label class="switch">
                     <input type="checkbox" id="allSeasonsToggle">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="info-text">
-                Quando ativado, tenta carregar todas as temporadas de um anime em uma Ãºnica pÃ¡gina. Uma tela de carregamento serÃ¡ exibida durante o processo.
+                Quando ativado, tenta carregar todas as temporadas de um anime em uma única página. Uma tela de carregamento será exibida durante o processo.
             </div>
             <div class="warning-text">
-                Esta funÃ§Ã£o nÃ£o funciona para todos os animes e pode aumentar o tempo de carregamento.
+                Esta função não funciona para todos os animes e pode aumentar o tempo de carregamento.
             </div>
         </div>
 
@@ -1093,7 +1094,7 @@ const configuracoesHTML = `
                 <label class="settings-label">Cor do Tema:</label>
                 <div class="color-picker-container">
                     <input type="color" class="settings-input" id="themeColor" value="#FFA500" style="width: 70px; height: 40px; padding: 0;">
-                    <button class="random-color-btn" id="randomColorBtn">AleatÃ³rio</button>
+                    <button class="random-color-btn" id="randomColorBtn">Aleatório</button>
                     <button class="remove-btn" id="removeThemeColor">Remover</button>
                 </div>
             </div>
@@ -1111,18 +1112,18 @@ const configuracoesHTML = `
                 <input type="file" class="settings-input" id="siteBgImage" accept="image/*">
             </div>
             <div class="info-text">
-                Formatos aceitos: JPG, PNG, WEBP e GIF. A imagem serÃ¡ convertida para Data URL.
+                Formatos aceitos: JPG, PNG, WEBP e GIF. A imagem será convertida para Data URL.
                 Prefira imagens PNG com tamanho inferior a 2MB para melhor desempenho.
             </div>
             <div class="error-text" id="siteBgError">
-                NÃ£o foi possÃ­vel carregar a imagem. O arquivo pode ser muito grande (>5MB). 
+                Não foi possível carregar a imagem. O arquivo pode ser muito grande (>5MB). 
                 Tente usar uma imagem menor ou em formato PNG.
             </div>
             <div class="settings-button-group">
                 <button class="remove-btn" id="removeSiteBg">Remover Imagem</button>
             </div>
             <div class="preview-container" id="siteBgPreviewContainer" style="display: none;">
-                <h4 class="preview-title">PrÃ©via do Fundo do Site:</h4>
+                <h4 class="preview-title">Prévia do Fundo do Site:</h4>
                 <img src="" class="preview-image" id="siteBgPreview">
             </div>
         </div>
@@ -1134,25 +1135,25 @@ const configuracoesHTML = `
                 <input type="file" class="settings-input" id="chatBgImage" accept="image/*">
             </div>
             <div class="info-text">
-                Formatos aceitos: JPG, PNG, WEBP e GIF. A imagem serÃ¡ convertida para Data URL.
+                Formatos aceitos: JPG, PNG, WEBP e GIF. A imagem será convertida para Data URL.
                 Prefira imagens PNG com tamanho inferior a 2MB para melhor desempenho.
             </div>
             <div class="error-text" id="chatBgError">
-                NÃ£o foi possÃ­vel carregar a imagem. O arquivo pode ser muito grande (>5MB). 
+                Não foi possível carregar a imagem. O arquivo pode ser muito grande (>5MB). 
                 Tente usar uma imagem menor ou em formato PNG.
             </div>
             <div class="settings-button-group">
                 <button class="remove-btn" id="removeChatBg">Remover Imagem</button>
             </div>
             <div class="preview-container" id="chatBgPreviewContainer" style="display: none;">
-                <h4 class="preview-title">PrÃ©via do Fundo do Chat:</h4>
+                <h4 class="preview-title">Prévia do Fundo do Chat:</h4>
                 <img src="" class="preview-image" id="chatBgPreview">
             </div>
         </div>
 
         <div class="settings-button-group" style="justify-content: flex-end; margin-top: 20px;">
             <button class="secondary-button" id="saveSettings">Salvar e Fechar</button>
-            <button class="primary-button" id="resetSettings">Redefinir PadrÃµes</button>
+            <button class="primary-button" id="resetSettings">Redefinir Padrões</button>
         </div>
     </div>
     <script>
@@ -1326,7 +1327,7 @@ const configuracoesHTML = `
         });
 
         document.getElementById('resetSettings').addEventListener('click', function() {
-            if (confirm('Tem certeza que deseja redefinir todas as configuraÃ§Ãµes para os valores padrÃ£o?')) {
+            if (confirm('Tem certeza que deseja redefinir todas as configurações para os valores padrão?')) {
                 localStorage.removeItem('firedeluxe_configuracoes');
                 themeColor = '#FFA500';
                 document.getElementById('themeColor').value = themeColor;
@@ -1362,7 +1363,7 @@ localStorage.setItem('firedeluxe_codigos_html', JSON.stringify(dados));
 
 })();
 
-//CÃ³digo do botÃ£o ContribuiÃ§Ãµes
+//Código do botão Contribuições
 (function() {
   'use strict';
 
@@ -1383,7 +1384,7 @@ const codigoJS = `
 
     const title = document.createElement('h3');
     title.className = 'modal-title';
-    title.textContent = 'Formas de ContribuiÃ§Ã£o';
+    title.textContent = 'Formas de Contribuição';
     title.style.margin = '0';
 
     const closeButton = document.createElement('button');
@@ -1410,7 +1411,7 @@ const codigoJS = `
     container.appendChild(header);
 
     const description = document.createElement('p');
-    description.textContent = 'Aqui estÃ£o algumas formas de contribuir ou agradecer pelo FireDeluxe:';
+    description.textContent = 'Aqui estão algumas formas de contribuir ou agradecer pelo FireDeluxe:';
     description.style.margin = '0 0 15px 0';
     description.style.color = '#ccc';
     container.appendChild(description);
@@ -1418,7 +1419,7 @@ const codigoJS = `
     const contribuicoes = [
         {
             titulo: 'Entrar no servidor de Discord do FireDeluxe',
-            descricao: 'Junte-se Ã  nossa comunidade no Discord para dar sugestÃµes, feedbacks, reportar bugs ou ajudar outros usuÃ¡rios.',
+            descricao: 'Junte-se à nossa comunidade no Discord para dar sugestões, feedbacks, reportar bugs ou ajudar outros usuários.',
             link: 'https://discord.gg/ZtwHK3Aqrz',
             botaoTexto: 'Acessar Discord',
             icone: 'data:image/webp;base64,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',
@@ -1426,31 +1427,31 @@ const codigoJS = `
         },
         {
             titulo: 'Entrar no maior servidor de Discord do AnimeFire',
-            descricao: 'Servidor de um usuÃ¡rio influente, MrKalangot, atualmente o maior relacionado ao site',
+            descricao: 'Servidor de um usuário influente, MrKalangot, atualmente o maior relacionado ao site',
             link: 'https://discord.gg/PTnkFaNR8Y',
             botaoTexto: 'Acessar Discord',
             icone: 'data:image/webp;base64,UklGRowDAABXRUJQVlA4TIADAAAvNgAOEF/BqI0kR57lzy7x2OfuhabBuJEkJ3UGiIP8I+Pv7TBoJClSgX8pSMMA3NOM20hStLvH9L78o7oYmKm7R7roc7+EYMjFUXxYQUUTJkAYPjyKRLoFw6fqsQGiakWCNoC68LXACySplIA/VWP1p/xRTznf+/1G9E4zOuu573S0l61lGSDWtu0kOgSRZE5IEHPA23+D/P/BmQYi+j8BGr+btfqfq2D/196fTlIJq790u96/6rfA7s+c6oesN8C7/I1285Jjj+QvvItSzuce1e8u2VXutSH5WTl9auDGwPVH2/iloUtT8Zutf9Xg2BT9pAxKDb5hDr4/uPozDd9Y+Iz3if3nCNkfOLDW8IcHsaEb7Rz47xE2wDoEvO9oGQeNGAFVAsQau4HLCC0QPHJgPlpOJOvDYQHkSoHdWLeAwjZrLbcAaL8hcB1rD7VtFX9MM2ClFphq7Ck8bAe2hhqIPzoA1ThvPWEil6T3mIB/URdCpnG7ewWpwxKe0icBv5GO4L9G0rmAhUMGtZ4J+CdJERQau5nDyiGExS4Er5FUgfeyVEO+VQSF7YY5qCQpgYWs68MAHSdOG8tOklqgtTXsBmx8WNky01L9JcSyvwlObrsAFpZHYEi6XhdC4aAJ8cdp7UFq2dL37+o3QOUyhbXTagITS244yrgGbi4R+A+XeQQ8DR+vl8o8Ax4uIbB3SedAZWjoXywZcHFoAWKHR1oAB8O+N5M1BVa2b0YAXG3lqgJiw6J3ss0B9qZuibcEtrbF9gnQ9jJgIvu6x/wmqZnC/AgsLR//pimw7CXA0uFkgDiZANQNkFm2sbQHvKekFNg7fGOTOVVvauriQnoFwErSCtg4qHYKbyqByLTjKmkOeDepBAoXFQ7xRSqAqeEVppLUAqRfdRPInVTGhnj/kRQBuSGn7ikH2EtHCL9O0rUq67v6J4BDb08i49UDgkZaQDvA8Zv0SklVELQmFQD+WV3Ocqwd/adUe6xk7aYAYauu8O7jVEEvkUqP+GPTLQTwSum06sYoPfrb7zrAu8i19ugv3/q+h3UFxvCcQlDKvQx6TLadBjcR5okPbDX0GPRgsr87dVWKc7DV8CY0AMm6fn2l9+W4DHH3K415m1r6nu8xPLpo3K7wHMYMDh+Nfs1/kJ3103YejBLkJ/38tZ8OitZ3/c1HVeTRxAu8MMqL8qlRAQ==',
             usarImagem: true
         },
         {
-            titulo: 'Dar uma sugestÃ£o de funÃ§Ã£o no Discord',
-            descricao: 'DÃª a sua sugestÃ£o no Discord do FireDeluxe, qualquer coisa!',
-            icone: 'ð¡'
+            titulo: 'Dar uma sugestão de função no Discord',
+            descricao: 'Dê a sua sugestão no Discord do FireDeluxe, qualquer coisa!',
+            icone: '💡'
         },
         {
             titulo: 'Deixar um feedback sobre o FireDeluxe no Discord',
-            descricao: 'Avalie o userscript no Discord, o seu feedback vai aparecer no site para novos usuÃ¡rios verem!',
-            icone: 'â­'
+            descricao: 'Avalie o userscript no Discord, o seu feedback vai aparecer no site para novos usuários verem!',
+            icone: '⭐'
         },
         {
             titulo: 'Reportar erros',
-            descricao: 'Percebeu qualquer erro no cÃ³digo? Algo que nÃ£o estÃ¡ funcionando corretamente? Ã sÃ³ reportar o erro no discord',
-            icone: 'ð¨'
+            descricao: 'Percebeu qualquer erro no código? Algo que não está funcionando corretamente? É só reportar o erro no discord',
+            icone: '🚨'
         },
         {
-            titulo: 'VÃ­deo do FireDeluxe',
-            descricao: 'Crie um vÃ­deo do AnimeFire e promova o FireDeluxe, poste no YouTube e outras redes sociais',
-            icone: 'ð¬'
+            titulo: 'Vídeo do FireDeluxe',
+            descricao: 'Crie um vídeo do AnimeFire e promova o FireDeluxe, poste no YouTube e outras redes sociais',
+            icone: '🎬'
         }
     ];
 
@@ -1597,11 +1598,11 @@ const codigoJS = `
 `;
 
 const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
-dados.contribuiÃ§Ã£o = codigoJS;
+dados.contribuição = codigoJS;
 localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
 })();
 
-//CÃ³digo do botÃ£o Funcionalidades
+//Código do botão Funcionalidades
 (function() {
   'use strict';
 
@@ -1742,7 +1743,7 @@ const codigoJS = `(() => {
 
         const closeButton = document.createElement('button');
         closeButton.className = 'close-button';
-        closeButton.textContent = 'â';
+        closeButton.textContent = '✕';
         closeButton.onclick = () => document.body.removeChild(container);
 
         header.appendChild(title);
@@ -1763,7 +1764,7 @@ const codigoJS = `(() => {
 
                 const icon = document.createElement('span');
                 icon.className = 'feature-icon';
-                icon.innerHTML = level === 0 ? 'â' : 'â';
+                icon.innerHTML = level === 0 ? '●' : '○';
 
                 const text = document.createElement('span');
                 text.className = 'feature-text';
@@ -1799,7 +1800,7 @@ localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
 
 })();
 
-//CÃ³digo do botÃ£o Bloqueados
+//Código do botão Bloqueados
 (function() {
   'use strict';
 
@@ -1984,12 +1985,12 @@ body {
 <body>
 <div class="block-container">
   <div class="block-header">
-    <h2 class="block-title">Bloquear UsuÃ¡rios</h2>
+    <h2 class="block-title">Bloquear Usuários</h2>
     <button id="backButton" class="secondary-button">Voltar</button>
   </div>
 
   <div class="warning-message">
-    VocÃª nÃ£o vai poder ver as mensagens desse usuÃ¡rio nos comentÃ¡rios e as notificaÃ§Ãµes vÃ£o ser ocultadas
+    Você não vai poder ver as mensagens desse usuário nos comentários e as notificações vão ser ocultadas
   </div>
 
   <div class="input-container">
@@ -1998,7 +1999,7 @@ body {
   </div>
 
   <div class="blocked-list" id="blockedList">
-    <div class="empty-message">Nenhum usuÃ¡rio bloqueado</div>
+    <div class="empty-message">Nenhum usuário bloqueado</div>
   </div>
 
   <div class="user-actions">
@@ -2018,7 +2019,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function renderBlockedUsers() {
     if (blockedUsers.length === 0) {
-      blockedList.innerHTML = '<div class="empty-message">Nenhum usuÃ¡rio bloqueado</div>';
+      blockedList.innerHTML = '<div class="empty-message">Nenhum usuário bloqueado</div>';
       return;
     }
 
@@ -2029,7 +2030,7 @@ document.addEventListener('DOMContentLoaded', function() {
       userElement.innerHTML = (user.cover ? '<img src="' + user.cover + '" class="cover-image">' : '') +
         '<div class="user-header">' +
         (user.avatar ? '<img src="' + user.avatar + '" class="user-avatar">' : '') +
-        '<h3 class="user-name">' + (user.name || 'UsuÃ¡rio sem nome') + '</h3>' +
+        '<h3 class="user-name">' + (user.name || 'Usuário sem nome') + '</h3>' +
         '</div>' +
         (user.bio ? '<p class="user-bio">' + user.bio + '</p>' : '') +
         '<div class="user-actions">' +
@@ -2086,13 +2087,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!url) return;
 
     if (blockedUsers.some(function(user) { return user.url === url; })) {
-      alert('Este usuÃ¡rio jÃ¡ estÃ¡ na lista de bloqueados.');
+      alert('Este usuário já está na lista de bloqueados.');
       return;
     }
 
     fetchUserData(url).then(function(userData) {
       if (!userData) {
-        alert('NÃ£o foi possÃ­vel obter informaÃ§Ãµes do usuÃ¡rio. Verifique o URL.');
+        alert('Não foi possível obter informações do usuário. Verifique o URL.');
         return;
       }
 
@@ -2296,7 +2297,7 @@ window.addEventListener('resize', aplicarImagensFundo);
 
 })();
 
-//Login RÃ¡pido
+//Login Rápido
 (function() {
     'use strict';
 
@@ -2396,7 +2397,7 @@ function showWarningModal(message) {
 const originalBtn = document.querySelector('button[name="login"]');
 if (originalBtn) {
   const autoBtn = originalBtn.cloneNode(true);
-  autoBtn.textContent = 'Login RÃ¡pido';
+  autoBtn.textContent = 'Login Rápido';
   autoBtn.style.marginTop = '10px';
   autoBtn.style.fontSize = '30px';
 
@@ -2417,7 +2418,7 @@ if (originalBtn) {
       const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes') || '{}');
 
       if (!config.email || !config.senha) {
-        showWarningModal('VocÃª precisa ter o email e senha da conta principal registrados na configuraÃ§Ã£o para usar essa funÃ§Ã£o.');
+        showWarningModal('Você precisa ter o email e senha da conta principal registrados na configuração para usar essa função.');
         return;
       }
 
@@ -2444,7 +2445,7 @@ if (originalBtn) {
 
 })();
 
-//PrÃ©view das informaÃ§Ãµes dos animes
+//Préview das informações dos animes
 (function() {
     'use strict';
 
@@ -2546,8 +2547,8 @@ function initAnimePreview() {
                     const animeData = {
                         generos: [...doc.querySelectorAll('.spanGeneros')].map(el => el.textContent.trim()).join(', ') || 'N/A',
                         temporada: getInfo('Temporada:'),
-                        estudio: getInfo('EstÃºdios:'),
-                        episodios: getInfo('EpisÃ³dios:'),
+                        estudio: getInfo('Estúdios:'),
+                        episodios: getInfo('Episódios:'),
                         status: getInfo('Status do Anime:'),
                         ano: getInfo('Ano:')
                     };
@@ -2630,11 +2631,11 @@ function createOverlay(container, animeData, title, themeColor) {
     overlay.innerHTML = `
         <div style="margin-bottom:10px;font-size:14px;font-weight:bold;color:${themeColor};width:100%;text-align:center;text-shadow:0 0 8px ${themeColor}40">${formatText(title || '', 26)}</div>
         <div style="display:flex;flex-direction:column;gap:6px;width:100%">
-            <div><strong style="color:${themeColor}">GÃªneros:</strong><br>${formatText(animeData.generos, 40)}</div>
-            <div><strong style="color:${themeColor}">EpisÃ³dios:</strong> ${animeData.episodios}</div>
+            <div><strong style="color:${themeColor}">Gêneros:</strong><br>${formatText(animeData.generos, 40)}</div>
+            <div><strong style="color:${themeColor}">Episódios:</strong> ${animeData.episodios}</div>
             <div><strong style="color:${themeColor}">Temporada:</strong> ${formatText(animeData.temporada, 15)}</div>
             <div><strong style="color:${themeColor}">Status:</strong> ${formatText(animeData.status, 15)}</div>
-            <div><strong style="color:${themeColor}">EstÃºdio:</strong> ${formatText(animeData.estudio, 20)}</div>
+            <div><strong style="color:${themeColor}">Estúdio:</strong> ${formatText(animeData.estudio, 20)}</div>
             <div><strong style="color:${themeColor}">Ano:</strong> ${animeData.ano}</div>
         </div>
     `;
@@ -2672,7 +2673,7 @@ window.addEventListener('beforeunload', () => {
 
 })();
 
-//ConfirmaÃ§Ã£o de exclusÃ£o do histÃ³rico (pedido de um usuÃ¡rio)
+//Confirmação de exclusão do histórico (pedido de um usuário)
 (function() {
     'use strict';
     
@@ -2693,10 +2694,10 @@ document.querySelector('form[action="https://animefire.plus/proc/delete_historic
     modal.innerHTML = `
         <div class="modal-panel" style="border-color: ${themeColor}">
             <div class="modal-header">
-                <h3 style="color: ${themeColor}">Confirmar aÃ§Ã£o</h3>
+                <h3 style="color: ${themeColor}">Confirmar ação</h3>
             </div>
             <div class="modal-content">
-Tem certeza de que deseja apagar todo o histÃ³rico? (Obs.: o site apaga todas as informaÃ§Ãµes ao limpar o histÃ³rico, incluindo as configuraÃ§Ãµes do FireDeluxe salvas. EntÃ£o, revise as configuraÃ§Ãµes do FireDeluxe apÃ³s apagar o histÃ³rico.)
+Tem certeza de que deseja apagar todo o histórico? (Obs.: o site apaga todas as informações ao limpar o histórico, incluindo as configurações do FireDeluxe salvas. Então, revise as configurações do FireDeluxe após apagar o histórico.)
             </div>
             <div class="modal-buttons">
                 <button class="confirm-button" style="background-color: ${themeColor}">Confirmar</button>
@@ -2737,7 +2738,7 @@ Tem certeza de que deseja apagar todo o histÃ³rico? (Obs.: o site apaga todas 
     
 })();
 
-//Curtir comentÃ¡rios de divulgaÃ§Ã£o do FireDeluxe (para destacar o comentÃ¡rio)
+//Curtir comentários de divulgação do FireDeluxe (para destacar o comentário)
 (function() {
     'use strict';
 
@@ -2800,7 +2801,7 @@ Tem certeza de que deseja apagar todo o histÃ³rico? (Obs.: o site apaga todas 
     }
 })();
 
-//BotÃ£o de baixar todos os episÃ³dios
+//Botão de baixar todos os episódios
 (function() {
     'use strict';
 
@@ -2896,9 +2897,9 @@ const checkAndAddDownloadButtons = () => {
 
     const modalContent = `
       <div style="text-align:center;margin-bottom:15px;position:relative;">
-        <button id="close-modal" style="position:absolute;right:0;top:0;background:none;border:none;color:${themeColor};font-size:1.5em;cursor:pointer;">Ã</button>
-        <p style="margin-bottom:20px;">Clique nos episÃ³dios que deseja baixar:</p>
-        <p style="font-size:12px;color:${themeColor};margin-bottom:15px;">EpisÃ³dios selecionados: <span id="selected-count">0</span></p>
+        <button id="close-modal" style="position:absolute;right:0;top:0;background:none;border:none;color:${themeColor};font-size:1.5em;cursor:pointer;">×</button>
+        <p style="margin-bottom:20px;">Clique nos episódios que deseja baixar:</p>
+        <p style="font-size:12px;color:${themeColor};margin-bottom:15px;">Episódios selecionados: <span id="selected-count">0</span></p>
         <div style="max-height:300px;overflow-y:auto;margin-bottom:15px;border:1px solid #333;border-radius:4px;padding:10px;">
           ${episodesList}
         </div>
@@ -2909,7 +2910,7 @@ const checkAndAddDownloadButtons = () => {
       </div>
     `;
 
-    showModal('Selecionar EpisÃ³dios', modalContent);
+    showModal('Selecionar Episódios', modalContent);
 
     const episodeElements = document.querySelectorAll('.episode-item');
     episodeElements.forEach(el => {
@@ -2936,7 +2937,7 @@ const checkAndAddDownloadButtons = () => {
     document.getElementById('download-selected').addEventListener('click', () => {
       const selectedEpisodes = episodes.filter(ep => ep.selected);
       if (selectedEpisodes.length === 0) {
-        alert('Selecione pelo menos um episÃ³dio para baixar');
+        alert('Selecione pelo menos um episódio para baixar');
         return;
       }
       closeModal();
@@ -2954,10 +2955,10 @@ const checkAndAddDownloadButtons = () => {
   function showQualityModal(seasonIndex, episodes) {
     const modalContent = `
       <div style="text-align:center;margin-bottom:15px;position:relative;">
-        <button id="close-modal" style="position:absolute;right:0;top:0;background:none;border:none;color:${themeColor};font-size:1.5em;cursor:pointer;">Ã</button>
+        <button id="close-modal" style="position:absolute;right:0;top:0;background:none;border:none;color:${themeColor};font-size:1.5em;cursor:pointer;">×</button>
         <p style="margin-bottom:20px;">Selecione a qualidade desejada:</p>
-        <p style="font-size:12px;color:#aaa;margin:-15px 0 20px 0;">Se a pÃ¡gina for redirecionada para um "404 not found" Ã© porque o episÃ³dio tem algum erro e nÃ£o pode ser baixado</p>
-        <p style="font-size:12px;color:#aaa;margin:-15px 0 20px 0;">Alguns navegadores podem bloquear downloads mÃºltiplos. Se isso acontecer, vocÃª precisarÃ¡ permitir no navegador</p>
+        <p style="font-size:12px;color:#aaa;margin:-15px 0 20px 0;">Se a página for redirecionada para um "404 not found" é porque o episódio tem algum erro e não pode ser baixado</p>
+        <p style="font-size:12px;color:#aaa;margin:-15px 0 20px 0;">Alguns navegadores podem bloquear downloads múltiplos. Se isso acontecer, você precisará permitir no navegador</p>
         <div style="display:flex;justify-content:center;gap:15px;">
           <button id="quality-sd" style="padding:10px 20px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;">SD (480p)</button>
           <button id="quality-hd" style="padding:10px 20px;background:${themeColor};color:#000;border:none;border-radius:4px;cursor:pointer;">HD (720p)</button>
@@ -2992,7 +2993,7 @@ const checkAndAddDownloadButtons = () => {
         const response = await fetch(downloadPageUrl);
         
         if (response.redirected && response.url.includes('404')) {
-          addResultToModal(episodeTitle, 'failed', 'Erro: PÃ¡gina nÃ£o encontrada (404)');
+          addResultToModal(episodeTitle, 'failed', 'Erro: Página não encontrada (404)');
           continue;
         }
 
@@ -3002,7 +3003,7 @@ const checkAndAddDownloadButtons = () => {
         
         const qualityContainer = doc.querySelector('.d-flex[style="flex-direction:column"]');
         if (!qualityContainer) {
-          addResultToModal(episodeTitle, 'failed', 'Estrutura de download nÃ£o encontrada');
+          addResultToModal(episodeTitle, 'failed', 'Estrutura de download não encontrada');
           continue;
         }
 
@@ -3012,9 +3013,9 @@ const checkAndAddDownloadButtons = () => {
           const fallbackQuality = quality === 'HD' ? 'SD' : 'HD';
           selectedButton = Array.from(qualityButtons).find(btn => btn.textContent.trim() === fallbackQuality && btn.href);
           if (selectedButton) {
-            addResultToModal(episodeTitle, 'success', `Qualidade ${quality} indisponÃ­vel, baixando ${fallbackQuality}`);
+            addResultToModal(episodeTitle, 'success', `Qualidade ${quality} indisponível, baixando ${fallbackQuality}`);
           } else {
-            addResultToModal(episodeTitle, 'failed', `Nenhuma qualidade disponÃ­vel`);
+            addResultToModal(episodeTitle, 'failed', `Nenhuma qualidade disponível`);
             continue;
           }
         }
@@ -3027,7 +3028,7 @@ const checkAndAddDownloadButtons = () => {
           });
           addResultToModal(episodeTitle, 'success', `Link preparado (${quality})`);
         } else {
-          addResultToModal(episodeTitle, 'failed', `Qualidade ${quality} nÃ£o disponÃ­vel`);
+          addResultToModal(episodeTitle, 'failed', `Qualidade ${quality} não disponível`);
         }
       } catch (error) {
         addResultToModal(episodeTitle, 'failed', 'Erro ao processar');
@@ -3060,7 +3061,7 @@ const checkAndAddDownloadButtons = () => {
     }
 
     const color = status === 'success' ? '#4CAF50' : '#F44336';
-    const icon = status === 'success' ? 'â' : 'â';
+    const icon = status === 'success' ? '✓' : '✗';
 
     const resultItem = `
       <div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #333;">
@@ -3155,7 +3156,7 @@ const checkIntervalId = setInterval(() => {
 
 })();
 
-//Se parar em um dowload com o episÃ³dio com erro, volta para a pÃ¡gina anterior, onde estÃ¡ sendo realizado o dowload de todos os eps (Ã© uma funÃ§Ã£o pro botÃ£o de baixar todos os eps)
+//Se parar em um dowload com o episódio com erro, volta para a página anterior, onde está sendo realizado o dowload de todos os eps (é uma função pro botão de baixar todos os eps)
 (function() {
     'use strict';
 
@@ -3191,7 +3192,7 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
   modalContent.style.color = 'white';
 
   const message = document.createElement('p');
-  message.textContent = 'Junte-se Ã  nossa vibrante comunidade no Discord! AnimeFire Ã© um servidor criado por fÃ£s, para fÃ£s, onde vocÃª pode discutir seus animes favoritos, fazer amigos e ficar por dentro das novidades.';
+  message.textContent = 'Junte-se à nossa vibrante comunidade no Discord! AnimeFire é um servidor criado por fãs, para fãs, onde você pode discutir seus animes favoritos, fazer amigos e ficar por dentro das novidades.';
   message.style.marginBottom = '20px';
 
   const buttonContainer = document.createElement('div');
@@ -3240,7 +3241,7 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
 
 })();
 
-//FireDeluxe na biografia (caso a configuraÃ§Ã£o esteja ativa)
+//FireDeluxe na biografia (caso a configuração esteja ativa)
 (function() {
     'use strict';
 
@@ -3287,7 +3288,7 @@ if (!document.cookie.includes('firedeluxe_discord_modal')) {
     }
 })();
 
-//Notificar o usuÃ¡rio de mensagens novas, sem recarregar a pÃ¡gina
+//Notificar o usuário de mensagens novas, sem recarregar a página
 /*
 (function() {
     'use strict';
@@ -3712,7 +3713,7 @@ if (!getCookie("firedeluxe_rank_atualizado")) {
 
 })();
 
-//Todas as temporadas do anime em uma pÃ¡gina (nÃ£o funciona para todos)
+//Todas as temporadas do anime em uma página (não funciona para todos)
 (function() {
     'use strict';
 
@@ -4034,7 +4035,7 @@ if (matchResult && shouldRunAllSeasons()) {
 
 })();
 
-//Aviso de novos episÃ³dios e adiÃ§Ã£o dos mesmos sem reiniciar a pÃ¡gina
+//Aviso de novos episódios e adição dos mesmos sem reiniciar a página
 (function() {
     'use strict';
 
@@ -4081,7 +4082,7 @@ const showNotification = (title) => {
   notification.style.backgroundColor = `${themeColor}40`;
   notification.style.border = `1px solid ${themeColor}`;
   notification.style.color = '#fff';
-  notification.textContent = `Novo episÃ³dio: ${title}`;
+  notification.textContent = `Novo episódio: ${title}`;
   
   document.body.appendChild(notification);
   isNotificationActive = true;
@@ -4131,12 +4132,12 @@ const formatTimeAgo = (dateString) => {
   const now = new Date();
   const diff = Math.floor((now - date) / 1000);
   
-  if (diff < 60) return `${diff} segundos atrÃ¡s`;
-  if (diff < 3600) return `${Math.floor(diff/60)} minutos atrÃ¡s`;
-  if (diff < 86400) return `${Math.floor(diff/3600)} horas atrÃ¡s`;
-  if (diff < 2592000) return `${Math.floor(diff/86400)} dias atrÃ¡s`;
-  if (diff < 31536000) return `${Math.floor(diff/2592000)} meses atrÃ¡s`;
-  return `${Math.floor(diff/31536000)} anos atrÃ¡s`;
+  if (diff < 60) return `${diff} segundos atrás`;
+  if (diff < 3600) return `${Math.floor(diff/60)} minutos atrás`;
+  if (diff < 86400) return `${Math.floor(diff/3600)} horas atrás`;
+  if (diff < 2592000) return `${Math.floor(diff/86400)} dias atrás`;
+  if (diff < 31536000) return `${Math.floor(diff/2592000)} meses atrás`;
+  return `${Math.floor(diff/31536000)} anos atrás`;
 };
 
 const updateTimeElements = () => {
@@ -4230,7 +4231,7 @@ initialize();
 
 })();
 
-//Agradecimento nas notificaÃ§Ãµes
+//Agradecimento nas notificações
 (function() {
     'use strict';
 
@@ -4245,7 +4246,7 @@ function addNotification() {
     if (!cardGroup || document.getElementById(NOTIFICATION_ID)) return;
     const themeColor = localStorage.getItem('firedeluxe_configuracoes') ? JSON.parse(localStorage.getItem('firedeluxe_configuracoes')).themeColor : '#BB0BD1';
 
-    const notificationHTML = '<hr class="rmvLinha_cmt_msg my-0" data-tema-processado="true"><a id="' + NOTIFICATION_ID + '" class="dropdown-item px-2 py-2" href="https://animefire.plus/animes/dantalian-no-shoka/11#cmt-1072284" style="white-space:unset !important" data-tema-processado="true"><div class="d-flex" data-tema-processado="true"><div style="width:115px" data-tema-processado="true"><img class="img_cmt_noti mr-2" src="data:image/webp;base64,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" data-tema-processado="true"></div><div class="spanTextNT" style="width:100%;display:flex;flex-direction:column;justify-content:space-between" data-tema-processado="true"><div style="overflow:hidden;text-align:left" data-tema-processado="true"><div class="d-flex" data-tema-processado="true"><div data-tema-processado="true"><span class="mr-2 noti_us" data-tema-processado="true" style="color: ' + themeColor + ';">FireDeluxe</span><span class="span_rspd" data-tema-processado="true">respondeu:</span></div></div><span class="reply_noti_span my-2 noti_texto_1" style="line-height:18px;display:block;word-wrap:break-word;overflow-wrap:break-word;white-space:normal" data-tema-processado="true">Obrigado por utilizar o FireDeluxe, clique aqui para marcar presenÃ§a</span></div><div class="d-flex justify-content-between" style="margin-bottom:-3px" data-tema-processado="true"><span class="span_icon_lk_noti" data-tema-processado="true"><img class="mr-1" src="https://animefire.plus/img/icons/link.png" data-tema-processado="true"><span class="slug_reply_1" data-tema-processado="true">dantalian-no-shoka/11</span></span><span class="pl-2 noti_data d-flex" data-tema-processado="true" style="color: ' + themeColor + ';">4 anos atrÃ¡s</span></div></div></div></a>';
+    const notificationHTML = '<hr class="rmvLinha_cmt_msg my-0" data-tema-processado="true"><a id="' + NOTIFICATION_ID + '" class="dropdown-item px-2 py-2" href="https://animefire.plus/animes/dantalian-no-shoka/11#cmt-1072284" style="white-space:unset !important" data-tema-processado="true"><div class="d-flex" data-tema-processado="true"><div style="width:115px" data-tema-processado="true"><img class="img_cmt_noti mr-2" src="data:image/webp;base64,UklGRnwbAABXRUJQVlA4THAbAAAvX8AXECq89/8vd2xld8dt3M64a8bd5Y5PMneSjFsy2b6fvZ/tFr3A331n9n6eZz+ZP+C3kODuTsrgsMs55a6nDM413F1nrVS4Za3TnRKHDD63TIe7cyTBuX7DogsdpwwOQ7dxaLNOxSlxdwvudqWajpXBg82aRbkp3d3lurtkLTqH63dPu6kgdGHRpcUZWne34Fy3MiUOu0PK4EyNHWlxdwuuR3BJGZynPt3OKXFm4e5yrL1+b43k4C4bJxXShtvhUNmVXNwlg6fG2X8Ba+3mGi6lOwSp7pJGbdvZSPm9tr1j22vb9s7atm3btm3b3h2bne0ozbRJvu+maFt7mkxXmfkFpzjUoG08b7RpkQ8Z9xkJtG2bdlPbth1btW3btm3btm3bttv/f+zkm3nv3bsgSJLctulzjgeAAI7hBQDfKB6wDu+6zxyepfa4Ehi5g1QBFeP8f7Pwsh/pNQemg0kKyj5SM9md0RfceSAxz1rHzWQbSUF5R+qX+hPLyXJuyIgIaLE7DxdICio40nUWonItV+0kXHEnIsTCwtL1sDhOUlDukQlJQflnLYUqjCEpqACigo2HtfiOXhHjkWARooDxtFjWrBx5zFR+WLO4fzIoX91ha5KCiqIkkq/2uBJXbR0iHCI0fCQ8AJ4jKmVarluPHEgKypHfZRxq069YWTJ0OWgJ1FxmL4PKsPKcRYxFiEaARICCj4MSE/RzlEUlRwbzNJz61hlz3Fyu1WbIEhiSmaMsKgXletNOhABCBAIEMBIejlZryAbvR6qEijSchFc3nkI2YOub2cug0uy8YBaj4SMQwODC2DOMgqt17vzOs/refaiWbXXo2OvY9XYx31VDjAldIawGBx8FFw4XCgyFAycXQtL9OD9t8lYkBeVrv0Zvcjj2dmG2atOyAKMCbsM6PD0q4RwYHAhsKDoeEg4KSGvdhbymvt5pLqdhTfKLDy86LApL9QCr0q3WbQUERAA8OGwwGh0MB0bAQdN2F9nrjUo237QUJvyIbjRKjFOh02uPzsYKcCS9GZsGMweKlouACQfKi6ZD8La/UXd0Pt7N+tdSvx8eYALYtVxXbHpWCweM2WyGIEBQOAiYaGpFZ2O8CUlBOZvNq5d4lvxxNx5CR6jU6L6P5DMBQIafOc0MgUmH4LAQ9L6rH3nTa6vldK278UtrPlXNMqliEpQTMsN5UNLS0tKSNQlcAMjWOmetMqngLd9tvqRa7i6/y557uoMmoIqCHlN/ES0r5aSxqYFoYINhQ9Cqb4ONo2qfQ3/veK0/qZzibnzRqO/efzwloJLG0/NZYgIr5TwlRAVEjZ9Za+Gh4GBos6He6g1q9NsPcNe/KHLrD0th95k3UE2vK/yGlIAQCQwhjUXFqDRzdEYqF4PtBX4Vf0X8khBZ0Sf7QfGLRuPqyapuy5ClNa4rMG3yqFHxftEZMTwMTp/8ZxPedsWMuegOgu84Pb++JCkoj4rKd1h1ksgopRgEcNImX8qlpPm9WUYcH4PLn6DfGN5/3f6suuTBZ9xtX93z+iUhQEVdDuEjYhwyNIkwmMmTR002GzJSBVgo/7xhLM5qDtoNcRcfpBc/sNtvD6na06SKqCgrw6WsS4pky1wwo+icGMWiJv50YRipfCyUf8GAB+QdV2i5Gj35imvxF+esdScVgIoqdl52myjDIILDh5Lmkojju948PqBxgsmJcVZd6jpdfvifIfh+zfGSuromXnjxha6b5TagKtsL5JIcjwwg8WLiW67cri/Xed6NTs2ocdFGLhIumv6P4SnAVcXOm26u4io8+Yhc/eQo2CiprfJxJ9CiS4ZFiiInmUZN+V6L3nPXGFVL8DPn8GAEwWg67mtO4LvT0P/Ev168cOcDazyuT6l8nNefms6QEblyIZzTZdJAN5hWyHPqN3t1VIalKyU6hw8jLOj5mi8tl+GqTnQxxkO+4cUTd/ODVjp82QSoaGMuX+03GQEJmkQ/Mg1OiSRu0hjnNJmSksiFsh0YyQNV67cZjCeSggox/rX/PLnhyRPG98vPEFWVbL5oKTU7TYZDhMKSzoDQasdhL1hm4Hf1O1aE4GN4CNYCGVpdFU9Vemz7usurdOWKnAet59eLVV4T7S/wS26ckWLJ1TGh0KAUaz5tCZYZ9BV+rSRCkm1kwiBn6TQ8p7Xe6Y1968UdN264yod8K7RUSOVQCVQFGg3ryPSb4kZEAECwILDg9P2J/+rBGHqGT5WiCQ1jQnhV2yv0BsBRMd9JgLu8SS9uyLlAj4m6GWgHGu3r48fcNUdV0XTY1Gy/QBmeXOJxqIKLswVgzjrDWmIZpQQg9M1YUNgoag7djsRT29XV+ttz54aUHrsT7AxqLuSv53/O9y4Pl0E2V91hTX5Bb5XTsq4YFgwmgh53yN1lAKg9Jh13DWKAUMOJ0/Ot9ctwNBaKiXoPLsjokdPTcEI2BdWQF+GzFx9pMLQaiTxM3Y/RE3I6fmAnajoU53xuuQkAQJ87cNeNQF5oBgPOGvbXh0w4Kh6QhMuNq+bFBVfOSEUvigXNo1ANeRY/unEHjn0YJiEp1WzZjKd7RYLn0PkAmVQkNmP34wEAs9QZV4TV6HTDs5PAj2Bo2o1r3dVyyXG5Kxdc6RER4eVFM3oVOuiJfyPjhqt8Uqt/NghpRXX+Zf4ICIgwTAiCUHQ8Vp0MAQA0nJLOdKXFDYtPxgu331nvwXXJG/rGvHPnjCsdYjqGfTHfAKoBD+wrOVekXHC4BjeVu97UZstxh5CAEI9vzDb6fOXf7hUAsLFhn/RXD1rkaEL/hG7xxl3habZqqKxYu7r3K6VlRbvT+Dy6QU/tm4uW0MFWo0M5+er994N4Rqv+thBDEoRmWAokzNl4WAsAAMq0XLeWiijcCTxYACS1tIlOx+N6ylW+46aLhAsyOr6KT6DDpmozukHP9LvtTuQTqdx320/RvJHzRmy1dYjxnCofxZ+4ZJrkgr6TAIUk7K/T2570uOPJ+9Z+r+TrsXiZufyoxghNFpRL5ZzZsAAPF0eDqeksdE4v7OeLXBTG0PFIfVRB0ZB5Iyg3ZkgIiDHshA3gkmMyivhNQhSSKOA6rCs3L8KTFjcsEzim0YpGzhsBvJT0W7cawf4K3HwtOZEH4OOp3H3dA30p4eVeTAde120MTYJ4PQCmqn22/bmF3ibBsa6856NbnLFY8DwSKOi0He+RE3iXBxNg6HWFXQO4qdkzHQ8A0LNSu8StHFiAZcXSLZZNUM1Vb1RDxpVNC9AQsAlaPqeBFziEjrtPe8WGU4UYXiL2CxlWZynVdNFc6bwDzutMX3eDK11U4cAkDD82g/NZegAuTWC7uK7h0MdfesnQVUNU1Xof+kqIXHmKJdPxHnnYdku5jWPRRiFA3kvsOZWTHyzFI5fNgKKWS6rl+32XPBjA4Qa/o0dRs/ex765UUKXTdiqpLCoFQFGfRaDEvGjnu67xqxfxTUJRddxLDiz6PaF8OMToqOzjSkzhIYBt3lWh46qj8tkalNGlnLErjiuHhRVl2606ABQ1+pT9WV+e3/PXGVfErlLn3eQ5ag/rAFC2+aalhDOuBNY1ZfX8DQb10JAUlMfln///A98T+jEbSknkwUnM0cLCiBqDd8OAknrRxZjtPvemb8Ppj/o3Fs29umqf3YxXtzcLY1ah/WZosaBpSwBq9N4PENNz7JsWoBHTks9p5oWmaMAiSGh02qa/57i2fNJbFsIIg8GwYTClkE0WpUuAEpKCcjl/cl+uQYrj0LlYmswrFqBnP+RlfOPBE8fTcHYZrCq23/Yt12Y5FIBa/Q/DVz/2vC98tmdF02zRaemMvOM6gmguhJPmQYiGwHx71xP1qWWUlY5aNhWbvXbsEgxTeIbT5mw0rI2u/SayVc4bd9V89nE+VuXb73qV6bAYBUCNQYdRElpkWPJ4AB9QpumysQKEDhr0Gb7fYGhYNAeCmQNmMpMGBpQBb+V7UlVUCCjrcVwclxL5kNgHGvJefQ5BV63vtp+UMx5E4BLnKd1k2QSjih12fSr22kwAoNbg/eiJ64rlooCxoB0r+TxmXjzTi4DE3fj5mceZN0fJhvQCDYd1kcpqKCum3dlLhJ9D67XleoCuZJNFi/s/47jBv+DvJGyq9cpGVeixHQtAjcH70SI8PxPOQXKhtcccJqNovDBffEUbij5dczyLhvilGbpWKnRZ90CszW79Q6Ie6PlKt0jaYDBHg0E9KT2P8WAQQMtl1Spsakef5pTtuhsOQPWBuxEiAjsRAFw+G02r1fVaZCQFZe/7QX3+9t34mc1+yQwwu2+z5bjDhKTTrmbfxBMWozgHjuqc89QaVUEzYicSG1FzxfNCX8gstLb8zoP6mNQb38wv13k/GIAq/faDv20n4UGfaHuOXUKW32Vej2E3WQE5fvHmaM2nDf4r/50SQDL4s/62aGzuA1HivAHLITpbVVRO7AjKpvNyr6jjwfqoCYt262FH6VabrgCUablozSNwwrmZ2+j/Xn1EVm96OouHJiXML9JsDWbYwVMifNYEIFmM4whZv52b+4kOt+AxwGCu+qPqYhHEld9uQCbbYbIwvet0zF47ewAek2sGbSd7VkMIqBZrXAzx8153+P04g9lsNlz17tvtKveZEBUOTcJ5Msh1BaRyUPS+au5jMb+UwAvJAKJSttFmS7kDy7bj8Kz7ks9p1mD4tGfZgkuAho+EYCNgmkYUDkjCETc6Sr62xkTHm626tTjnqswvA4jKdln0WHEnMUHn4HjNPMCi/vR0xqlOCM1OzCTn6kxSeVQcQyXunPQ07goAPTnFJayQq17w9WxGp+ORlGqTtD9+PgIuBAiMWZPwpA1m5XMAsqqDt2N4OFIJNpxvd3wl3psw9M6gd+rDbYgBjisnjKCjqDpgMxBdsdBVQ+f4R6oeANDtGr3zrb6Za3lS27P8PJJGC/Kl3x6YE5mesKBTIsQujKLm6M14GEOuRfcRDJtx3TO60q2SthyhhS8LSaAuI4ID0OMcu4iu9pR6ru198w4AABoszVZ9gK96n9twSXHxkxB0uVRfDQoMs2p1p7BzgKLqwO1oNoYYSzAVyu5tb5G7qPXuaoNiqI6PhnBK5snrg6Foif+gZLq0xdDo7e7G5y024V0jlO+x7sXBkrsdluRcC1s6ifSNwX+UPvMIck5XuzglFzIPAU3ZTsvuhxxkCdY8Dh1Oqw3FVj1KAWt/i9yN/Xa6lVoKekwCXOxESeZCMf4JG0chv3kk6ncg60dH5T6H/goNp2vaLQSIUC/IQNF6XbUZoU5iFVu7+nTNVs3u2+0/HkK/KMESVkyzaIKDIRgsCbL9wePRhRHntP1d8uDQ3yjY/uHx6TJ9v1a/OFC0uqALrTMun4im5pB8BNf+Xv1QhUXU4QP59IVGy1qYKPxnKJmtNCoL6UYNfDM/a9Y2Skctm6KXr84qOKYRmiwdEXTQ/T+yzyWiZk1Nipa5bGoKxIcnBR6BzejVeND5wvGKxqALYqHoeoKeRNP7vn/k/Ln/rrgGNFp2WPUeFsvi22BLL8u333ZWMnPNUVWWYbSIsDAOhKXpVrDtA6BGt/v40b0Tf5eTQUTEnQPLMKr9U/K8xvDtqDvN/vRSkctmTeYWC11+wV+RdHL8TozB5FyS8WWgxcZ0F6HTqdko+r2Rn1D8Md9xV1uvwZuAgkJB4yi6KbWIiKDL/3G76/y2XgnbMJr6CAyGab2fszd6dDbT9jOZSIisaGNGxMO/RPh8z3dMfBm49PtZ9EM2LUIRaPiTZmv3GwFouCRbfVdEoJqNhJ7qE1F02NxsFxlP8YBKHT4oThjUPnu+/GuB7W2W0onWrFVQBZZu1SQuhOT0j2i/rzoMkCgVLcOsysqEoj3daK0uMylqwk52Er7SlT/YCUclvhkNDDlHZbw1APXnHhZei3pD6vdga941AzlLpuVshFLeEpWnQqNV6boVkgLiMn+98wl6Vmkw6apz+L5ZevCCzZYVGwGGaLK+2Piqm0s2p2sJImbPMeGxLxHqs+fEdDoYuqHUyn22/QEAjZam6x46IpCYxtODer+IWm6utwnMB2vYQLYCJfO4DXwgoQUPwCdmLTFMI6hKtX7fj+LLAtsJvqtrabWs2ojFIQyOg2gGjKnWdI2RIDKDkvYsRJASqNMywQyD0nJDtlkPAGi9tdw3es9GYhpfD+pspVE5xBMhnnpzupofZInAJAxhAto9xc9vI8onST2f3UV2Ta+gxeZy23/kZrKkYBstVx43A0wrKE11zn1qNMEaXUKm2qjTajXnsQuyYLLlzmJfCADAZHuH3P2T7RCZ73EFSG9Cul/klyXiBfn1+QPSgVOm66IXJEF+oRjJwweMhvWgPpOCYs0WrTjSyNS1MEzOe3S/TK8BTFGp264n+b8znwINxlqydDrCkm5NtjLA0GEMU4Wz3uzDfIVDf4mhqSo5yGIk3oOnefckpARFxlWTmi9qDkiHIF4v7POL/NpJhBQgKomHZcg380PhlsiMPl/pj5iYG72rPp/kj/1he5nHfebt+BLeMoWTn0tDsPt93tW9r2Wf985AQi4BT9crzbWCHlN/xQlYosmsyQfEBBozv50ar2OAslmrTMrTU7sEmXzC+PdmQN4SKwxeDoMlSN/Q0IfPvaJmq8o1CllU7L8ZxBYgiAUfGnK0yr0CbLFMpZ67nl2v8ZtkS2tkEnBB4wxAwUGXQQ7J9hm2D9gTm1nZPIQKqfPh6vih7zmCCLqNwa/kR2X7s7+ubnjwxF2+aDC6GItSJ/b9SX75Pnzo3UWtAJcEj8JisbGeT/iLCI5UPBCXQPkO204AYwyvlPP7TUIKR8yaF4mcNSsSumz2wLdkQirC4SJvn7IdIxHERmF7nJ5Q1nBKPtNDPOQHsmNv+iVQcp23RdIGNkDLk6CQonj41CnUBBejUDbkcxo0oP035rhvvZ72u/BeHC93dtqPD03MzTDo7ur464xJJyjfHRLZrm6ZeOIp3svq3dPeAEVIl7PVhSmx7/vwUSf8AfaPxVOFqrZq381ArsMpt/a31NgQMxY3RYKSUKHWuW8w9M20wY/DkVYW9V8EKyriMfOCs7sML/keN244P45PN4aa3DfRLcb4hbEvsZIIzRt9QIe9ZP/+AACmWtHbMVzdKyvCZitKt1i3wcvYAa/1Ozc6TjjboM1iwHD6a/7PUFzvWIkh1oMHMnlFUHizF/eY+mNIr9rw7SietDI86iVeQoDCF5ZOtlxTrgtR2I2oFmfkc8H+mrkZgtPXmiwrVq4uxeOTaNAu/dZtN9VbFSc0M8brLlAuL7jKOy1mnuYCDPZnd4XeuI2XCIj6noCVuNLJZuuLjQpz6f6cEvtYrv5QS4Qvm+Cjar/tAJ49eD4k6ghyjNqpbMNpCrX5aFZcMLjR48GVvTo9CS/GAoBl2RySKGOnxL7Ewz98QN7xdz7ZnFPYuGarOi3X47K+NvhD+3ESHm5SpJ3dpxrAh2OINqTTIAz5Bb/3BwCYn5fZJ5+VjJ4Nw1ltasHGw1oYU3xWlmbdU2Lf9+5CxQC5/9H7BXv9JApTrHKvbb828+RSveo2wLd25ntZafg2GG9lgaFCaDo3mz98jGwG7oaK1Ojw5Iw7PVtxFWdRpcOmK+Ykqw09jOQaTvWNCr27f84O/w9ypkmt1G3dU2FWLTxWVSE2ww+jhCW9Z3dCAD4Sg99TQtT40amAdKFsFCzWdT89JBdR3L07ERktYtGKFnOrhQAzfZNlxaovkwD4HFeiEE5U1BdCphGtth/3rHk3wSHmLIdKdNpPDwtFK15xpYDsNzNPTvNj0mB/t3qgLxw4DqN8M98/zouWO/sQoXSyyy6yd38qJLq/Njuq3WxpZFJ22Jazs30CYBTD0nRyrdH7sUuo/NWybVbtyTFWP3FKrIXQciCkjRsXz6TG/sHpWbvN+XaWjbny3HG4YbgXsfT0OEqOb0ylXJf5abbUMjBxy1v+5+Pazkukwhicf8OfWkN3w1W6A6wvEbVsan+XP+AKL4RYJvhkaK0QmPj4yfHxUy0Jez6Xv5jwUN0OsaOqDuUyLTYetxwyE8JVbyjsY7KzHz7vZ06PEuN1TWfnczH/mf1toOcddv+I51sgVW3RJt9BZHxkfLLZsKHjuruUb//bzvvpYZKC8qk+TW2mpbOpdpm1uSztEWw5MTT74a9cRkBMB1/rPHbn2eXKvVb93tqEalLxkHlEmw3VZnKSi+cTONXx4RkcGGwoVn//yDuIvINk6+keQWJiymiObpSWy4+r9XisA+W7r3sPy5fWGzWeblhiSqBPeJ4ciwjLVwmJsKzO0vc5f9l0WbGqTKdl542OUUrqci++9shsbM9T9Cw90cVeNh/Hb/t+IQ+BRau5A39/BjUMKh75DpKtVoPxzaxsOGzVOmoO3g/WA1xibs///ew/s68MJAkQDIslMOXho2JjYxeYj49lnTAOtiMonMLe1v8z/Oj7Un3o/Ui9trvJH9s/FC/7vhLvXRJ8LFttXTzTa6cnwnPobxSbRBBGa/J0/8i/oVJB4QSFCn+rWaObetUH7RwL+jVfe8ErTqnZ9nInTQcVQhBMGI0JarV6O9uJiYv7whU+4GX/dmPHf6EbG/9U4yf4JkXogjXpkf7TqZz4m0feO5kTr0OjInm4v2NAYQkQHY81J2evgUrjeQOrVMuk3cDf8P9IH1oXYSQsRIKRIAh1zOWPiD+J802NUxO6YE36Hfj/2AXf049Nv+AL3sGPTb8DazILykE7p0Hi14QAXGMfTVef1lMKte1aFkwgiATCaDTqCIKwWCwWtUUdYbHotFZrcmTk3/zY6+xguv/0HdCosWZRwLwqtUjbW20qt85VHhUHuMccDYd12x1tTlJ0o/747hdfPFg3IjRag8Go02m1Rp32dM3J1shHfmT/Q3odMhXTp/szaFiVCub36KYW3c+Ty9fkPXdY8znNvFrvqw6Ti8D+1gwE9/44m8v6O81UjUY7IgwGg8FqtpqTD+mQHnkH133ddBoo1Kx62BQ4dM24up7G54v4jkNNALdA30zrL86XDYjhOroEaHCoMF51fTQwm/u7rPOYOlWj1WqtIyLZ/7qv+zy+//9PnALhNOkAQxJ0XPNVp3X5nAYNvPm5iy0031Me6JfE412EEBQYR3uaN7o+OoSfX9/Sf/d3WZqpU6/6PP7/ZWg07GJ9n/ZcTGEEOcOltD/UHC/VZtV+DPDeUKiSikbMGtdZsF/S5VZ9v38aT6EKEFQkVAT7oyPY/UEf9D73+TjrO+xPe7qbpSGhCy2HZqrUXg/Ek6YryjXzLwFGmjilfE4Dr7J9V/3qLsxWtDxSH+t4tbne84345JThUmlFwUZXg4NuC05asbc7ZeuMfj+lrsuD5kmHc/h8o+XHjZUG7Adek8K1MhwA" data-tema-processado="true"></div><div class="spanTextNT" style="width:100%;display:flex;flex-direction:column;justify-content:space-between" data-tema-processado="true"><div style="overflow:hidden;text-align:left" data-tema-processado="true"><div class="d-flex" data-tema-processado="true"><div data-tema-processado="true"><span class="mr-2 noti_us" data-tema-processado="true" style="color: ' + themeColor + ';">FireDeluxe</span><span class="span_rspd" data-tema-processado="true">respondeu:</span></div></div><span class="reply_noti_span my-2 noti_texto_1" style="line-height:18px;display:block;word-wrap:break-word;overflow-wrap:break-word;white-space:normal" data-tema-processado="true">Obrigado por utilizar o FireDeluxe, clique aqui para marcar presença</span></div><div class="d-flex justify-content-between" style="margin-bottom:-3px" data-tema-processado="true"><span class="span_icon_lk_noti" data-tema-processado="true"><img class="mr-1" src="https://animefire.plus/img/icons/link.png" data-tema-processado="true"><span class="slug_reply_1" data-tema-processado="true">dantalian-no-shoka/11</span></span><span class="pl-2 noti_data d-flex" data-tema-processado="true" style="color: ' + themeColor + ';">4 anos atrás</span></div></div></div></a>';
 
     cardGroup.insertAdjacentHTML('afterbegin', notificationHTML);
 }
@@ -4274,7 +4275,7 @@ checkForBell();
     
 })();
 
-//Apagar episÃ³dios duplicados
+//Apagar episódios duplicados
 (function() {
     'use strict';
 
@@ -4300,7 +4301,7 @@ observer.observe(document, { childList: true, subtree: true });
 
 })();
 
-//Ocultar notificaÃ§Ãµes/comentÃ¡rios/replys de usuÃ¡rios bloqueados
+//Ocultar notificações/comentários/replys de usuários bloqueados
 (function() {
     'use strict';
 
@@ -4344,7 +4345,7 @@ observer.observe(document, { childList: true, subtree: true });
 
 })();
 
-//Salvar nome e foto de perfil do usuÃ¡rio (para usar no chat do FireDeluxe)
+//Salvar nome e foto de perfil do usuário (para usar no chat do FireDeluxe)
 (function() {
     'use strict';
 
@@ -4373,7 +4374,7 @@ tentarBuscarPerfil();
 
 })();
 
-//BotÃ£o de bloquear no FireDeluxe no perfil dos usuÃ¡rios
+//Botão de bloquear no FireDeluxe no perfil dos usuários
 (function() {
     'use strict';
 (function() {
@@ -4453,7 +4454,7 @@ tentarBuscarPerfil();
 })();
 })();
 
-//BotÃ£o de Assistir Dublado/Legendado nas pÃ¡ginas dos animes
+//Botão de Assistir Dublado/Legendado nas páginas dos animes
 (function() {
     'use strict';
 
@@ -4489,7 +4490,7 @@ if (href.includes('animes')) {
 
 })();
 
-//Welcome do botÃ£o principal (alguns usuÃ¡rios nÃ£o sabiam onde configurar)
+//Welcome do botão principal (alguns usuários não sabiam onde configurar)
 (function() {
     'use strict';
 
@@ -4556,7 +4557,7 @@ if (!welcomeCookie || welcomeCookie.split('=')[1] !== 'true') {
         textAlign: 'center',
         color: '#FFF'
     });
-    content.textContent = 'Esse Ã© o botÃ£o principal do FireDeluxe!';
+    content.textContent = 'Esse é o botão principal do FireDeluxe!';
     
     tooltip.appendChild(arrow);
     tooltip.appendChild(arrowInner);
