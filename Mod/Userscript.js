@@ -1046,6 +1046,20 @@ const configuracoesHTML = `
         </div>
 
         <div class="settings-section">
+            <h3 class="section-title">Intervalo entre Downloads</h3>
+            <div class="settings-row">
+                <label class="settings-label">Tempo (minutos):</label>
+                <input type="number" class="settings-input" id="downloadInterval" min="3" max="30" value="5">
+            </div>
+            <div class="info-text">
+                Define o intervalo entre downloads automáticos de episódios. Mínimo: 3 minutos, Máximo: 30 minutos.
+            </div>
+            <div class="warning-text">
+                Esta configuração é usada pela função de download automático de múltiplos episódios.
+            </div>
+        </div>
+
+        <div class="settings-section">
             <h3 class="section-title">AdBlock</h3>
             <div class="settings-row">
                 <label class="settings-label">Bloquear anúncios:</label>
@@ -1207,6 +1221,10 @@ const configuracoesHTML = `
                 if (settings.senha) {
                     document.getElementById('automationPassword').value = settings.senha;
                 }
+
+                if (settings.downloadInterval) {
+                    document.getElementById('downloadInterval').value = settings.downloadInterval;
+                }
             }
         }
 
@@ -1311,6 +1329,9 @@ const configuracoesHTML = `
         });
 
         document.getElementById('saveSettings').addEventListener('click', function() {
+            const downloadInterval = document.getElementById('downloadInterval').value;
+            const intervalValue = Math.min(30, Math.max(3, parseInt(downloadInterval) || 5));
+            
             const settings = {
                 themeColor: themeColor,
                 siteBgImage: siteBgDataUrl,
@@ -1319,7 +1340,8 @@ const configuracoesHTML = `
                 divulgar: document.getElementById('divulgarToggle').checked ? 'on' : 'off',
                 allSeasons: document.getElementById('allSeasonsToggle').checked ? 'on' : 'off',
                 email: document.getElementById('automationEmail').value,
-                senha: document.getElementById('automationPassword').value
+                senha: document.getElementById('automationPassword').value,
+                downloadInterval: intervalValue
             };
             localStorage.setItem('firedeluxe_configuracoes', JSON.stringify(settings));
             window.location.reload();
@@ -1346,6 +1368,7 @@ const configuracoesHTML = `
                 document.getElementById('allSeasonsToggle').checked = false;
                 document.getElementById('automationEmail').value = '';
                 document.getElementById('automationPassword').value = '';
+                document.getElementById('downloadInterval').value = '5';
                 window.location.reload();
             }
         });
@@ -1354,6 +1377,7 @@ const configuracoesHTML = `
     </script>
 </body>
 </html>
+
 `;
 
 const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_html')) || {};
@@ -3162,7 +3186,59 @@ Tem certeza de que deseja apagar todo o histórico? (Obs.: o site apaga todas as
     }, checkInterval);
 })();
 
-//Se parar em um dowload com o episódio com erro, volta para a página anterior, onde está sendo realizado o dowload de todos os eps (é uma função pro botão de baixar todos os eps)
+//Função para baixar os episódios salvos
+(function() {
+    'use strict';
+
+const startAutoDownload = () => {
+  const downloadQueue = JSON.parse(localStorage.getItem('firedeluxe_downloads') || '[]');
+  const lastDownloadTime = parseInt(localStorage.getItem('firedeluxe_last_download') || '0');
+  const currentTime = Date.now();
+  
+  const settings = JSON.parse(localStorage.getItem('firedeluxe_configuracoes') || '{}');
+  const downloadInterval = (settings.downloadInterval || 5) * 60 * 1000;
+
+  if (currentTime - lastDownloadTime < downloadInterval) {
+    return;
+  }
+
+  if (downloadQueue.length === 0) return;
+
+  const episodeNumbers = downloadQueue.map(item => {
+    const epMatch = item.filename.match(/ep(\d+)/);
+    return epMatch ? parseInt(epMatch[1]) : 999;
+  });
+
+  const minEpisode = Math.min(...episodeNumbers);
+  const closestToEpisode1 = downloadQueue.find(item => {
+    const epMatch = item.filename.match(/ep(\d+)/);
+    return epMatch && parseInt(epMatch[1]) === minEpisode;
+  });
+
+  if (!closestToEpisode1) return;
+
+  try {
+    const a = document.createElement('a');
+    a.href = closestToEpisode1.url;
+    a.download = closestToEpisode1.filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    const updatedQueue = downloadQueue.filter(item => item.url !== closestToEpisode1.url);
+    localStorage.setItem('firedeluxe_downloads', JSON.stringify(updatedQueue));
+    localStorage.setItem('firedeluxe_last_download', currentTime.toString());
+  } catch (error) {
+  }
+};
+
+setInterval(startAutoDownload, 60000);
+startAutoDownload();
+    
+})();
+
+//Se parar em um dowload com o episódio com erro, volta para a página anterior, onde está sendo realizado o dowload de todos os eps (é uma função pro botão de 
+baixar todos os eps)
 (function() {
     'use strict';
 
