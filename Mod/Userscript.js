@@ -3291,8 +3291,7 @@ startAutoDownload();
     
 })();
 
-//Se parar em um dowload com o episódio com erro, volta para a página anterior, onde está sendo realizado o dowload de todos os eps (é uma função pro botão de 
-baixar todos os eps)
+//Se parar em um dowload com o episódio com erro, volta para a página anterior, onde está sendo realizado o dowload de todos os eps (é uma função pro botão de baixar todos os eps)
 (function() {
     'use strict';
 
