@@ -1270,7 +1270,7 @@
                     }
     
                     if (settings.adsBloqueados) {
-                        document.getElementById('adblockCounter').textContent = 'Anúncios bloqueados nesta sessão: ' + settings.adsBloqueados;
+                        document.getElementById('adblockCounter').textContent = 'Elementos de anúncios removidos: ' + settings.adsBloqueados;
                     }
                 }
             }
