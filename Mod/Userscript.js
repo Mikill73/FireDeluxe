@@ -62,27 +62,51 @@
         });
     }
     
+    function updateAdCounter(count) {
+        const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
+        if (savedSettings) {
+            const settings = JSON.parse(savedSettings);
+            settings.adsBloqueados = (settings.adsBloqueados || 0) + count;
+            localStorage.setItem('firedeluxe_configuracoes', JSON.stringify(settings));
+        }
+    }
+    
     function removeElements() {
         if (!shouldBlockAds) return;
     
-        adPatterns.scripts.forEach(pattern => {
-            document.querySelectorAll(`script[src*="${pattern}"]`).forEach(e => e.remove());
-        });
+        let adCounter = 0;
     
-        adPatterns.meta.forEach(pattern => {
-            document.querySelectorAll(`meta[name="${pattern}"]`).forEach(e => e.remove());
-        });
+        const patterns = [
+            { type: 'scripts', selector: 'script[src*=""]' },
+            { type: 'meta', selector: 'meta[name=""]' },
+            { type: 'links', selector: 'link[href*=""]' },
+            { type: 'elements', selector: '' }
+        ];
     
-        adPatterns.links.forEach(pattern => {
-            document.querySelectorAll(`link[href*="${pattern}"]`).forEach(e => e.remove());
-        });
-    
-        adPatterns.elements.forEach(selector => {
-            document.querySelectorAll(selector).forEach(e => e.remove());
+        patterns.forEach(pattern => {
+            if (pattern.type === 'elements') {
+                adPatterns.elements.forEach(selector => {
+                    document.querySelectorAll(selector).forEach(e => {
+                        e.remove();
+                        adCounter++;
+                    });
+                });
+            } else {
+                adPatterns[pattern.type].forEach(item => {
+                    const selector = pattern.selector.replace('*=""', `*="${item}"`);
+                    document.querySelectorAll(selector).forEach(e => {
+                        e.remove();
+                        adCounter++;
+                    });
+                });
+            }
         });
     
         document.querySelectorAll('iframe').forEach(iframe => {
-            if (matchesStyles(iframe, adPatterns.iframeStyles)) iframe.remove();
+            if (matchesStyles(iframe, adPatterns.iframeStyles)) {
+                iframe.remove();
+                adCounter++;
+            }
         });
     
         document.querySelectorAll('script').forEach(script => {
@@ -90,10 +114,15 @@
             if (content.includes('showAdAlert') || 
                 content.includes('site_url') || 
                 content.includes('aclib.runPop') || 
-                content.trim().startsWith(`(function(options){`)) {
+                content.trim().startsWith('(function(options){')) {
                 script.remove();
+                adCounter++;
             }
         });
+    
+        if (adCounter > 0) {
+            updateAdCounter(adCounter);
+        }
     }
     
     function cleanStorage() {
@@ -139,7 +168,10 @@
         const observer = new MutationObserver(() => {
             removeElements();
             document.querySelectorAll('iframe').forEach(iframe => {
-                if (blockedDomains.some(d => iframe.src.includes(d))) iframe.remove();
+                if (blockedDomains.some(d => iframe.src.includes(d))) {
+                    iframe.remove();
+                    updateAdCounter(1);
+                }
             });
         });
     
