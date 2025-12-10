@@ -1109,7 +1109,7 @@
                     </label>
                 </div>
                 <div class="counter-text" id="adblockCounter">
-                    Anúncios bloqueados nesta sessão: 0
+                    Elementos de anúncios removidos: 0
                 </div>
             </div>
     
