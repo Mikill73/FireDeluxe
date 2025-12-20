@@ -1525,6 +1525,11 @@ const codigoJS = `
             titulo: 'Vídeo do FireDeluxe',
             descricao: 'Crie um vídeo do AnimeFire e promova o FireDeluxe, poste no YouTube e outras redes sociais',
             icone: '🎬'
+        },
+        {
+            titulo: 'Doar para o Projeto',
+            descricao: 'Faça uma doação para a chave pix 1cff435b-5c42-411b-9470-18aba4cd11d1',
+            icone: '❤️'
         }
     ];
 
