@@ -3356,7 +3356,6 @@ if (document.body.innerHTML.includes('<h1>404 Not Found</h1>') && location.href.
 })();
 
 //Divulgar discord da maior comunidade do animefire
-
 (function() {
     'use strict';
 
