@@ -4920,7 +4920,168 @@ if (!welcomeCookie || welcomeCookie.split('=')[1] !== 'true') {
     
         const shouldSendToId = (id, lastSentData) => {
             if (!lastSentData) return true;
-            const lastSentTime = lastSentData[id];
+            const lastSentTime = la
+
+//Pedir doações
+(function() {
+    'use strict';
+
+    const checkCookie = () => {
+        return document.cookie.split(';').some(cookie => cookie.trim().startsWith('firedeluxe_donation='));
+      };
+    
+      if (checkCookie()) return;
+    
+      const getThemeColor = () => {
+        try {
+          const config = localStorage.getItem('firedeluxe_configuracoes');
+          if (config) {
+            const parsed = JSON.parse(config);
+            if (parsed.themeColor) return parsed.themeColor;
+          }
+        } catch {}
+        return '#FFA500';
+      };
+    
+      const setCookie = () => {
+        const date = new Date();
+        date.setDate(date.getDate() + 5);
+        document.cookie = `firedeluxe_donation=shown; expires=${date.toUTCString()}; path=/`;
+      };
+    
+      const themeColor = getThemeColor();
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+          to { opacity: 0; }
+        }
+        .firedeluxe-donation {
+          position: fixed;
+          top: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: #222;
+          border: 1px solid #444;
+          border-radius: 8px;
+          padding: 20px;
+          max-width: 500px;
+          width: 90%;
+          z-index: 9999;
+          box-shadow: 0 0 40px rgba(0,0,0,0.8);
+          animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .firedeluxe-donation.fade-out {
+          animation: fadeOut 0.5s ease forwards;
+        }
+        .firedeluxe-donation h3 {
+          color: ${themeColor};
+          margin: 0 0 15px 0;
+          font-weight: bold;
+          font-size: 18px;
+        }
+        .firedeluxe-donation p {
+          color: #eee;
+          margin: 0 0 10px 0;
+          font-size: 14px;
+          line-height: 1.5;
+        }
+        .firedeluxe-donation small {
+          color: #ccc;
+          font-size: 12px;
+          display: block;
+          margin-bottom: 15px;
+        }
+        .firedeluxe-pix {
+          background: #333;
+          border: 1px solid #444;
+          border-radius: 4px;
+          padding: 12px;
+          margin: 15px 0;
+          color: #fff;
+          font-family: monospace;
+          font-size: 13px;
+          word-break: break-all;
+          transition: all 0.3s ease;
+        }
+        .firedeluxe-pix:hover {
+          border-color: ${themeColor}50;
+          box-shadow: 0 0 10px ${themeColor}20;
+        }
+        .firedeluxe-buttons {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .firedeluxe-btn {
+          background: ${themeColor};
+          border: none;
+          border-radius: 6px;
+          color: #222;
+          padding: 8px 16px;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          flex: 1;
+          min-width: 120px;
+        }
+        .firedeluxe-btn:hover {
+          transform: translateY(-2px) scale(1.05);
+          box-shadow: 0 5px 15px ${themeColor}50;
+        }
+        .firedeluxe-btn-copy {
+          background: #444;
+          color: #eee;
+        }
+        .firedeluxe-btn-copy:hover {
+          background: #555;
+        }
+      `;
+      document.head.appendChild(style);
+    
+      const container = document.createElement('div');
+      container.className = 'firedeluxe-donation';
+      container.innerHTML = `
+        <h3>Apoie o FireDeluxe</h3>
+        <p>Se você gosta do FireDeluxe e tem condições, considere apoiar o projeto com uma doação, de qualquer valor.</p>
+        <small>Sua contribuição ajuda a manter o FireDeluxe ativo, melhorando recursos e garantindo que ele continue evoluindo.</small>
+        <div class="firedeluxe-pix">1cff435b-5c42-411b-9470-18aba4cd11d1</div>
+        <div class="firedeluxe-buttons">
+          <button class="firedeluxe-btn firedeluxe-btn-copy">Copiar PIX</button>
+          <button class="firedeluxe-btn firedeluxe-btn-close">Fechar</button>
+        </div>
+      `;
+    
+      document.body.appendChild(container);
+    
+      const copyBtn = container.querySelector('.firedeluxe-btn-copy');
+      const closeBtn = container.querySelector('.firedeluxe-btn-close');
+    
+      const handleClose = () => {
+        setCookie();
+        container.classList.add('fade-out');
+        setTimeout(() => container.remove(), 500);
+      };
+    
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText('1cff435b-5c42-411b-9470-18aba4cd11d1')
+          .then(() => {
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Copiado!';
+            copyBtn.style.background = '#2ecc71';
+            setTimeout(() => {
+              copyBtn.textContent = originalText;
+              copyBtn.style.background = '';
+            }, 2000);
+          });
+      });
+    
+      closeBtn.addEventListener('click', handleClose);
+      setTimeout(handleClose, 60000);
+})();stSentData[id];
             if (!lastSentTime) return true;
             const timeSinceLast = Date.now() - lastSentTime;
             return timeSinceLast >= DAILY_INTERVAL_MS;
