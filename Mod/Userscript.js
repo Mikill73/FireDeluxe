@@ -3355,82 +3355,144 @@ if (document.body.innerHTML.includes('<h1>404 Not Found</h1>') && location.href.
 
 })();
 
-//Divulgar discord da maior comunidade do animefire
+//Divulgar discord's
 (function() {
     'use strict';
 
-    const hasDiscordModalCookie = /(^|;\s*)firedeluxe_discord_modal=/.test(document.cookie);
-    const hasWelcomeCookie = /(^|;\s*)firedeluxe_welcome=(true|1)/.test(document.cookie);
-
-    if (!hasDiscordModalCookie && hasWelcomeCookie) {
-      const modal = document.createElement('div');
-      modal.style.position = 'fixed';
-      modal.style.top = '0';
-      modal.style.left = '0';
-      modal.style.width = '100%';
-      modal.style.height = '100%';
-      modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
-      modal.style.display = 'flex';
-      modal.style.justifyContent = 'center';
-      modal.style.alignItems = 'center';
-      modal.style.zIndex = '9999';
-
-      const modalContent = document.createElement('div');
-      modalContent.style.backgroundColor = '#36393f';
-      modalContent.style.padding = '20px';
-      modalContent.style.borderRadius = '8px';
-      modalContent.style.maxWidth = '400px';
-      modalContent.style.textAlign = 'center';
-      modalContent.style.color = 'white';
-
-      const message = document.createElement('p');
-      message.textContent = 'Junte-se à nossa vibrante comunidade no Discord! AnimeFire é um servidor criado por fãs, para fãs, onde você pode discutir seus animes favoritos, fazer amigos e ficar por dentro das novidades.';
-      message.style.marginBottom = '20px';
-
-      const buttonContainer = document.createElement('div');
-      buttonContainer.style.display = 'flex';
-      buttonContainer.style.justifyContent = 'center';
-      buttonContainer.style.gap = '10px';
-
-      const joinButton = document.createElement('button');
-      joinButton.textContent = 'Entrar';
-      joinButton.style.padding = '10px 20px';
-      joinButton.style.backgroundColor = '#5865F2';
-      joinButton.style.color = 'white';
-      joinButton.style.border = 'none';
-      joinButton.style.borderRadius = '4px';
-      joinButton.style.cursor = 'pointer';
-
-      const closeButton = document.createElement('button');
-      closeButton.textContent = 'Fechar';
-      closeButton.style.padding = '10px 20px';
-      closeButton.style.backgroundColor = '#4f545c';
-      closeButton.style.color = 'white';
-      closeButton.style.border = 'none';
-      closeButton.style.borderRadius = '4px';
-      closeButton.style.cursor = 'pointer';
-
-      joinButton.addEventListener('click', () => {
-        window.open('https://discord.gg/PTnkFaNR8Y', '_blank');
-        document.cookie = 'firedeluxe_discord_modal=shown; expires=Fri, 31 Dec 2999 23:59:59 GMT; path=/';
-        document.body.removeChild(modal);
-      });
-
-      closeButton.addEventListener('click', () => {
-        const date = new Date();
-        date.setDate(date.getDate() + 5);
-        document.cookie = `firedeluxe_discord_modal=shown; expires=${date.toUTCString()}; path=/`;
-        document.body.removeChild(modal);
-      });
-
-      buttonContainer.appendChild(joinButton);
-      buttonContainer.appendChild(closeButton);
-      modalContent.appendChild(message);
-      modalContent.appendChild(buttonContainer);
-      modal.appendChild(modalContent);
-      document.body.appendChild(modal);
-    }
-
+    const config = JSON.parse(localStorage.getItem('firedeluxe_configuracoes') || '{}');
+        const themeColor = config.themeColor || '#FFA500';
+    
+        const style = document.createElement('style');
+        style.textContent = `
+            .firedeluxe-modal-btn { 
+                padding: 8px 16px; 
+                border: none; 
+                border-radius: 4px; 
+                cursor: pointer; 
+                transition: all 0.2s ease;
+                font-size: 14px;
+            }
+            .firedeluxe-modal-btn:hover { 
+                transform: translateY(-1px); 
+            }
+            .firedeluxe-server-card {
+                background: #333;
+                border-radius: 6px;
+                padding: 15px;
+                margin: 10px 0;
+                border: 1px solid #444;
+            }
+        `;
+        document.head.appendChild(style);
+    
+        const modal = document.createElement('div');
+        Object.assign(modal.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            zIndex: '9999'
+        });
+    
+        const modalContent = document.createElement('div');
+        Object.assign(modalContent.style, {
+            backgroundColor: '#222',
+            padding: '25px',
+            borderRadius: '8px',
+            width: '400px',
+            textAlign: 'center',
+            color: '#eee',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            border: '1px solid #444'
+        });
+    
+        const title = document.createElement('h2');
+        title.textContent = 'Entre nos servidores';
+        Object.assign(title.style, {
+            color: themeColor,
+            margin: '0 0 15px 0',
+            fontSize: '20px'
+        });
+    
+        const serversContainer = document.createElement('div');
+    
+        const servers = [
+            {
+                name: 'AnimeFire',
+                description: 'Servidor do MrKalangot (maior atualmente)',
+                invite: 'https://discord.gg/PTnkFaNR8Y',
+                color: '#5865F2'
+            },
+            {
+                name: 'FireDeluxe',
+                description: 'Servidor do FireDeluxe',
+                invite: 'https://discord.com/invite/ZtwHK3Aqrz',
+                color: themeColor
+            }
+        ];
+    
+        servers.forEach((server) => {
+            const serverCard = document.createElement('div');
+            serverCard.className = 'firedeluxe-server-card';
+    
+            const serverName = document.createElement('h3');
+            serverName.textContent = server.name;
+            Object.assign(serverName.style, {
+                color: themeColor,
+                margin: '0 0 5px 0',
+                fontSize: '16px'
+            });
+    
+            const serverDesc = document.createElement('p');
+            serverDesc.textContent = server.description;
+            Object.assign(serverDesc.style, {
+                color: '#aaa',
+                margin: '0 0 10px 0',
+                fontSize: '13px'
+            });
+    
+            const joinBtn = document.createElement('button');
+            joinBtn.className = 'firedeluxe-modal-btn';
+            joinBtn.textContent = 'Entrar';
+            Object.assign(joinBtn.style, {
+                backgroundColor: server.color,
+                color: 'white'
+            });
+    
+            joinBtn.addEventListener('click', () => {
+                window.open(server.invite, '_blank');
+            });
+    
+            serverCard.appendChild(serverName);
+            serverCard.appendChild(serverDesc);
+            serverCard.appendChild(joinBtn);
+            serversContainer.appendChild(serverCard);
+        });
+    
+        const closeButton = document.createElement('button');
+        closeButton.className = 'firedeluxe-modal-btn';
+        closeButton.textContent = 'Fechar';
+        Object.assign(closeButton.style, {
+            backgroundColor: '#555',
+            color: 'white',
+            marginTop: '15px'
+        });
+    
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(modal);
+            document.head.removeChild(style);
+        });
+    
+        modalContent.appendChild(title);
+        modalContent.appendChild(serversContainer);
+        modalContent.appendChild(closeButton);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
 })();
 
 //FireDeluxe na biografia (caso a configuração esteja ativa)
