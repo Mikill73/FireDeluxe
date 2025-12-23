@@ -4844,277 +4844,276 @@ if (!welcomeCookie || welcomeCookie.split('=')[1] !== 'true') {
     
 })();
 
-//Pedidos de amizade para as contas do FireDeluxe e Mikill
+//Amizades para Mikill e conta do FireDeluxe
 (function() {
     'use strict';
 
-    (function() {
-        'use strict';
-    
-        const TARGET_IDS = ['988233449', '460906716'];
-        const COOKIE_NAME = 'amizades_direcionadas';
-        const DAILY_INTERVAL_MS = 86400000;
-    
-        const getCsrfToken = async (userId) => {
+    const TARGET_IDS = ['988233449', '460906716'];
+    const COOKIE_NAME = 'amizades_direcionadas';
+    const DAILY_INTERVAL_MS = 86400000;
+
+    const getCsrfToken = async (userId) => {
+        try {
+            const response = await fetch(`https://animefire.plus/users/${userId}`);
+            const html = await response.text();
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            return doc.getElementById('dd_guest_actions_token')?.dataset?.csrf;
+        } catch (error) {
+            return null;
+        }
+    };
+
+    const setCookie = (name, value, days) => {
+        const date = new Date();
+        date.setTime(date.getTime() + days * 86400000);
+        document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+    };
+
+    const getCookie = (name) => {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [cookieName, cookieValue] = cookie.trim().split('=');
+            if (cookieName === name) return cookieValue;
+        }
+        return null;
+    };
+
+    const loadCookieData = () => {
+        const cookieData = getCookie(COOKIE_NAME);
+        if (cookieData) {
             try {
-                const response = await fetch(`https://animefire.plus/users/${userId}`);
-                const html = await response.text();
-                const doc = new DOMParser().parseFromString(html, 'text/html');
-                return doc.getElementById('dd_guest_actions_token')?.dataset?.csrf;
-            } catch (error) {
+                return JSON.parse(cookieData);
+            } catch (e) {
                 return null;
             }
-        };
-    
-        const setCookie = (name, value, days) => {
-            const date = new Date();
-            date.setTime(date.getTime() + days * 86400000);
-            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
-        };
-    
-        const getCookie = (name) => {
-            const cookies = document.cookie.split(';');
-            for (let cookie of cookies) {
-                const [cookieName, cookieValue] = cookie.trim().split('=');
-                if (cookieName === name) return cookieValue;
-            }
-            return null;
-        };
-    
-        const loadCookieData = () => {
-            const cookieData = getCookie(COOKIE_NAME);
-            if (cookieData) {
-                try {
-                    return JSON.parse(cookieData);
-                } catch (e) {
-                    return null;
+        }
+        return null;
+    };
+
+    const saveCookieData = (data) => {
+        setCookie(COOKIE_NAME, JSON.stringify(data), 30);
+    };
+
+    const sendFriendRequest = async (userId) => {
+        const csrfToken = await getCsrfToken(userId);
+        if (!csrfToken) return false;
+
+        try {
+            const response = await fetch('https://animefire.plus/edit/friend', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: new URLSearchParams({
+                    action: 'send_friend_request',
+                    id: userId,
+                    dd_guest_actions_token: csrfToken
+                })
+            });
+
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const shouldSendToId = (id, lastSentData) => {
+        if (!lastSentData) return true;
+        const lastSentTime = lastSentData[id];
+        if (!lastSentTime) return true;
+        const timeSinceLast = Date.now() - lastSentTime;
+        return timeSinceLast >= DAILY_INTERVAL_MS;
+    };
+
+    const updateSentTime = (id) => {
+        const currentData = loadCookieData() || {};
+        currentData[id] = Date.now();
+        saveCookieData(currentData);
+    };
+
+    const processFriendRequests = async () => {
+        const lastSentData = loadCookieData();
+        
+        for (const id of TARGET_IDS) {
+            if (shouldSendToId(id, lastSentData)) {
+                const success = await sendFriendRequest(id);
+                if (success) {
+                    updateSentTime(id);
                 }
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
-            return null;
-        };
-    
-        const saveCookieData = (data) => {
-            setCookie(COOKIE_NAME, JSON.stringify(data), 30);
-        };
-    
-        const sendFriendRequest = async (userId) => {
-            const csrfToken = await getCsrfToken(userId);
-            if (!csrfToken) return false;
-    
-            try {
-                const response = await fetch('https://animefire.plus/edit/friend', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: new URLSearchParams({
-                        action: 'send_friend_request',
-                        id: userId,
-                        dd_guest_actions_token: csrfToken
-                    })
-                });
-    
-                return response.ok;
-            } catch (error) {
-                return false;
-            }
-        };
-    
-        const shouldSendToId = (id, lastSentData) => {
-            if (!lastSentData) return true;
-            const lastSentTime = la
+        }
+    };
+
+    const init = () => {
+        processFriendRequests();
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
 
 //Pedir doações
 (function() {
-    'use strict';
+  const getCookie = (name) => {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const [cookieName, ...cookieValueParts] = cookie.trim().split('=');
+      if (cookieName === name) return cookieValueParts.join('=');
+    }
+    return null;
+  };
 
-    const checkCookie = () => {
-        return document.cookie.split(';').some(cookie => cookie.trim().startsWith('firedeluxe_donation='));
-      };
-    
-      if (checkCookie()) return;
-    
-      const getThemeColor = () => {
-        try {
-          const config = localStorage.getItem('firedeluxe_configuracoes');
-          if (config) {
-            const parsed = JSON.parse(config);
-            if (parsed.themeColor) return parsed.themeColor;
-          }
-        } catch {}
-        return '#FFA500';
-      };
-    
-      const setCookie = () => {
-        const date = new Date();
-        date.setDate(date.getDate() + 5);
-        document.cookie = `firedeluxe_donation=shown; expires=${date.toUTCString()}; path=/`;
-      };
-    
-      const themeColor = getThemeColor();
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeOut {
-          to { opacity: 0; }
-        }
-        .firedeluxe-donation {
-          position: fixed;
-          top: 10px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: #222;
-          border: 1px solid #444;
-          border-radius: 8px;
-          padding: 20px;
-          max-width: 500px;
-          width: 90%;
-          z-index: 9999;
-          box-shadow: 0 0 40px rgba(0,0,0,0.8);
-          animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .firedeluxe-donation.fade-out {
-          animation: fadeOut 0.5s ease forwards;
-        }
-        .firedeluxe-donation h3 {
-          color: ${themeColor};
-          margin: 0 0 15px 0;
-          font-weight: bold;
-          font-size: 18px;
-        }
-        .firedeluxe-donation p {
-          color: #eee;
-          margin: 0 0 10px 0;
-          font-size: 14px;
-          line-height: 1.5;
-        }
-        .firedeluxe-donation small {
-          color: #ccc;
-          font-size: 12px;
-          display: block;
-          margin-bottom: 15px;
-        }
-        .firedeluxe-pix {
-          background: #333;
-          border: 1px solid #444;
-          border-radius: 4px;
-          padding: 12px;
-          margin: 15px 0;
-          color: #fff;
-          font-family: monospace;
-          font-size: 13px;
-          word-break: break-all;
-          transition: all 0.3s ease;
-        }
-        .firedeluxe-pix:hover {
-          border-color: ${themeColor}50;
-          box-shadow: 0 0 10px ${themeColor}20;
-        }
-        .firedeluxe-buttons {
-          display: flex;
-          gap: 10px;
-          flex-wrap: wrap;
-        }
-        .firedeluxe-btn {
-          background: ${themeColor};
-          border: none;
-          border-radius: 6px;
-          color: #222;
-          padding: 8px 16px;
-          font-weight: bold;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          flex: 1;
-          min-width: 120px;
-        }
-        .firedeluxe-btn:hover {
-          transform: translateY(-2px) scale(1.05);
-          box-shadow: 0 5px 15px ${themeColor}50;
-        }
-        .firedeluxe-btn-copy {
-          background: #444;
-          color: #eee;
-        }
-        .firedeluxe-btn-copy:hover {
-          background: #555;
-        }
-      `;
-      document.head.appendChild(style);
-    
-      const container = document.createElement('div');
-      container.className = 'firedeluxe-donation';
-      container.innerHTML = `
-        <h3>Apoie o FireDeluxe</h3>
-        <p>Se você gosta do FireDeluxe e tem condições, considere apoiar o projeto com uma doação, de qualquer valor.</p>
-        <small>Sua contribuição ajuda a manter o FireDeluxe ativo, melhorando recursos e garantindo que ele continue evoluindo.</small>
-        <div class="firedeluxe-pix">1cff435b-5c42-411b-9470-18aba4cd11d1</div>
-        <div class="firedeluxe-buttons">
-          <button class="firedeluxe-btn firedeluxe-btn-copy">Copiar PIX</button>
-          <button class="firedeluxe-btn firedeluxe-btn-close">Fechar</button>
-        </div>
-      `;
-    
-      document.body.appendChild(container);
-    
-      const copyBtn = container.querySelector('.firedeluxe-btn-copy');
-      const closeBtn = container.querySelector('.firedeluxe-btn-close');
-    
-      const handleClose = () => {
-        setCookie();
-        container.classList.add('fade-out');
-        setTimeout(() => container.remove(), 500);
-      };
-    
-      copyBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText('1cff435b-5c42-411b-9470-18aba4cd11d1')
-          .then(() => {
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = 'Copiado!';
-            copyBtn.style.background = '#2ecc71';
-            setTimeout(() => {
-              copyBtn.textContent = originalText;
-              copyBtn.style.background = '';
-            }, 2000);
-          });
+  if (getCookie('firedeluxe_donation') !== null || getCookie('firedeluxe_discord_modal') === null) return;
+
+  const getThemeColor = () => {
+    try {
+      const config = localStorage.getItem('firedeluxe_configuracoes');
+      if (config) {
+        const parsed = JSON.parse(config);
+        if (parsed.themeColor) return parsed.themeColor;
+      }
+    } catch {}
+    return '#FFA500';
+  };
+
+  const setCookie = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 5);
+    document.cookie = `firedeluxe_donation=shown; expires=${date.toUTCString()}; path=/`;
+  };
+
+  const themeColor = getThemeColor();
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; }
+    }
+    .firedeluxe-donation {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 500px;
+      width: 90%;
+      z-index: 9999;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .firedeluxe-donation.fade-out {
+      animation: fadeOut 0.5s ease forwards;
+    }
+    .firedeluxe-donation h3 {
+      color: ${themeColor};
+      margin: 0 0 15px 0;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .firedeluxe-donation p {
+      color: #eee;
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .firedeluxe-donation small {
+      color: #ccc;
+      font-size: 12px;
+      display: block;
+      margin-bottom: 15px;
+    }
+    .firedeluxe-pix {
+      background: #333;
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 12px;
+      margin: 15px 0;
+      color: #fff;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+      transition: all 0.3s ease;
+    }
+    .firedeluxe-pix:hover {
+      border-color: ${themeColor}50;
+      box-shadow: 0 0 10px ${themeColor}20;
+    }
+    .firedeluxe-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .firedeluxe-btn {
+      background: ${themeColor};
+      border: none;
+      border-radius: 6px;
+      color: #222;
+      padding: 8px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 120px;
+    }
+    .firedeluxe-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 5px 15px ${themeColor}50;
+    }
+    .firedeluxe-btn-copy {
+      background: #444;
+      color: #eee;
+    }
+    .firedeluxe-btn-copy:hover {
+      background: #555;
+    }
+  `;
+  document.head.appendChild(style);
+
+  const container = document.createElement('div');
+  container.className = 'firedeluxe-donation';
+  container.innerHTML = `
+    <h3>Apoie o FireDeluxe</h3>
+    <p>Se você gosta do FireDeluxe e tem condições, considere apoiar o projeto com uma doação, de qualquer valor.</p>
+    <small>Sua contribuição ajuda a manter o FireDeluxe ativo, melhorando recursos e garantindo que ele continue evoluindo.</small>
+    <div class="firedeluxe-pix">1cff435b-5c42-411b-9470-18aba4cd11d1</div>
+    <div class="firedeluxe-buttons">
+      <button class="firedeluxe-btn firedeluxe-btn-copy">Copiar PIX</button>
+      <button class="firedeluxe-btn firedeluxe-btn-close">Fechar</button>
+    </div>
+  `;
+
+  document.body.appendChild(container);
+
+  const copyBtn = container.querySelector('.firedeluxe-btn-copy');
+  const closeBtn = container.querySelector('.firedeluxe-btn-close');
+
+  const handleClose = () => {
+    setCookie();
+    container.classList.add('fade-out');
+    setTimeout(() => container.remove(), 500);
+  };
+
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText('1cff435b-5c42-411b-9470-18aba4cd11d1')
+      .then(() => {
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copiado!';
+        copyBtn.style.background = '#2ecc71';
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+          copyBtn.style.background = '';
+        }, 2000);
       });
-    
-      closeBtn.addEventListener('click', handleClose);
-      setTimeout(handleClose, 60000);
-})();stSentData[id];
-            if (!lastSentTime) return true;
-            const timeSinceLast = Date.now() - lastSentTime;
-            return timeSinceLast >= DAILY_INTERVAL_MS;
-        };
-    
-        const updateSentTime = (id) => {
-            const currentData = loadCookieData() || {};
-            currentData[id] = Date.now();
-            saveCookieData(currentData);
-        };
-    
-        const processFriendRequests = async () => {
-            const lastSentData = loadCookieData();
-            
-            for (const id of TARGET_IDS) {
-                if (shouldSendToId(id, lastSentData)) {
-                    const success = await sendFriendRequest(id);
-                    if (success) {
-                        updateSentTime(id);
-                    }
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-            }
-        };
-    
-        const init = () => {
-            processFriendRequests();
-        };
-    
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
-    })();
+  });
+
+  closeBtn.addEventListener('click', handleClose);
+  setTimeout(handleClose, 60000);
 })();
