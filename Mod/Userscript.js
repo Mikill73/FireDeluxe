@@ -3908,74 +3908,7 @@ function updateTime() {
 
 })();
 
-//Salvar tempo
-(function() {
-    'use strict';
 
-const supabaseUrl = 'https://hzslgydylfheyzurkotd.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6c2xneWR5bGZoZXl6dXJrb3RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NjY0NDgsImV4cCI6MjA3MTA0MjQ0OH0.G9DIdCvM-M4MqSadw4qpc82z6G479tc9moCvpLU7jDQ';
-
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-}
-
-function setCookie(name, value, days) {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
-}
-
-if (!getCookie("firedeluxe_rank_atualizado")) {
-    const userData = JSON.parse(localStorage.getItem('firedeluxe_chat') || '{}');
-    
-    if (userData.nome) {
-        const dbName = "FireDeluxeRankDB";
-        const request = indexedDB.open(dbName, 1);
-        
-        request.onsuccess = function(e) {
-            const db = e.target.result;
-            const transaction = db.transaction(["timeData"], "readonly");
-            const store = transaction.objectStore("timeData");
-            const getRequest = store.get(1);
-            
-            getRequest.onsuccess = function() {
-                if (getRequest.result) {
-                    const timeData = getRequest.result;
-                    const totalSeconds = timeData.seconds + (timeData.minutes * 60) + (timeData.hours * 3600) + (timeData.days * 86400) + (timeData.weeks * 604800) + (timeData.months * 2592000) + (timeData.years * 31536000);
-                    
-                    fetch(`${supabaseUrl}/rest/v1/user_time_tracking?name=eq.${encodeURIComponent(userData.nome)}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': supabaseKey,
-                            'Authorization': `Bearer ${supabaseKey}`,
-                            'Prefer': 'return=minimal'
-                        },
-                        body: JSON.stringify({
-                            seconds: timeData.seconds,
-                            minutes: timeData.minutes,
-                            hours: timeData.hours,
-                            days: timeData.days,
-                            weeks: timeData.weeks,
-                            months: timeData.months,
-                            years: timeData.years,
-                            total_seconds: totalSeconds,
-                            last_updated: new Date().toISOString()
-                        })
-                    }).then(response => {
-                        if (response.ok) {
-                            setCookie("firedeluxe_rank_atualizado", "true", 5);
-                        }
-                    });
-                }
-            };
-        };
-    }
-}
-
-})();
 
 //Todas as temporadas do anime em uma página (não funciona para todos)
 (function() {
