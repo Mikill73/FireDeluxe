@@ -557,52 +557,58 @@
     columnsContainer.style.width = '100%';
     columnsContainer.style.alignItems = 'flex-start';
 
-    const columnsData = [
-        {
-            name: 'Informações',
-            buttons: [
-                {
-                    name: 'Contribuição',
-                    storageKey: 'contribuição',
-                    type: 'js',
-                    info: 'Formas de contribuir ou agradecer (não inclui uso monetário)'
-                }
-            ]
-        },
-        {
-            name: 'Informações',
-            buttons: [
-                {
-                    name: 'Funcionalidades',
-                    storageKey: 'funcionalidades',
-                    type: 'js',
-                    info: 'Tudo que o FireDeluxe tem a oferecer'
-                }
-            ]
-        },
-        {
-            name: 'Funções',
-            buttons: [
-                {
-                    name: 'Configurações',
-                    storageKey: 'configuracoes',
-                    type: 'html',
-                    info: 'Configura diversas funções do FireDeluxe, incluindo aparência, comportamentos e preferências.'
-                }
-            ]
-        },
-        {
-            name: 'Funções',
-            buttons: [
-                {
-                    name: 'Bloqueados',
-                    storageKey: 'bloqueados',
-                    type: 'html',
-                    info: 'Bloqueie usuários com o FireDeluxe (o bloquear do site não funciona)'
-                }
-            ]
-        }
-    ];
+const columnsData = [
+    {
+        name: 'Informações',
+        buttons: [
+            {
+                name: 'Contribuição',
+                storageKey: 'contribuição',
+                type: 'js',
+                info: 'Formas de contribuir ou agradecer (não inclui uso monetário)'
+            },
+            {
+                name: 'Tempo no site',
+                storageKey: 'tempo_site',
+                type: 'js',
+                info: 'Mostra o tempo total gasto no site (com o FireDeluxe)'
+            }
+        ]
+    },
+    {
+        name: 'Informações',
+        buttons: [
+            {
+                name: 'Funcionalidades',
+                storageKey: 'funcionalidades',
+                type: 'js',
+                info: 'Tudo que o FireDeluxe tem a oferecer'
+            }
+        ]
+    },
+    {
+        name: 'Funções',
+        buttons: [
+            {
+                name: 'Configurações',
+                storageKey: 'configuracoes',
+                type: 'html',
+                info: 'Configura diversas funções do FireDeluxe, incluindo aparência, comportamentos e preferências.'
+            }
+        ]
+    },
+    {
+        name: 'Funções',
+        buttons: [
+            {
+                name: 'Bloqueados',
+                storageKey: 'bloqueados',
+                type: 'html',
+                info: 'Bloqueie usuários com o FireDeluxe (o bloquear do site não funciona)'
+            }
+        ]
+    }
+];
 
     function groupColumns(data) {
         const grouped = {};
@@ -1434,6 +1440,117 @@
     const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_html')) || {};
     dados.configuracoes = configuracoesHTML;
     localStorage.setItem('firedeluxe_codigos_html', JSON.stringify(dados));
+})();
+
+//Código do botão Tempo no Site
+(function() {
+    'use strict';
+
+const dbName = "FireDeluxeRankDB";
+let timeInterval;
+
+function showTimeModal() {
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.backgroundColor = '#222';
+    modal.style.border = '2px solid #FFA500';
+    modal.style.borderRadius = '12px';
+    modal.style.padding = '25px';
+    modal.style.boxShadow = '0 0 40px rgba(255,165,0,0.4)';
+    modal.style.zIndex = '10000';
+    modal.style.color = '#eee';
+    modal.style.minWidth = '350px';
+    modal.style.fontFamily = 'Arial, sans-serif';
+    
+    const timeDisplay = document.createElement('div');
+    timeDisplay.id = 'timeDisplay';
+    timeDisplay.style.fontSize = '18px';
+    timeDisplay.style.lineHeight = '1.8';
+    
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'Fechar';
+    closeButton.style.marginTop = '20px';
+    closeButton.style.padding = '10px 25px';
+    closeButton.style.backgroundColor = '#FFA500';
+    closeButton.style.color = '#222';
+    closeButton.style.border = 'none';
+    closeButton.style.borderRadius = '6px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.fontWeight = 'bold';
+    closeButton.style.display = 'block';
+    closeButton.style.marginLeft = 'auto';
+    closeButton.style.marginRight = 'auto';
+    closeButton.style.transition = 'all 0.2s ease';
+    
+    closeButton.onmouseenter = () => {
+        closeButton.style.transform = 'scale(1.05)';
+        closeButton.style.boxShadow = '0 0 15px #FFA500';
+    };
+    
+    closeButton.onmouseleave = () => {
+        closeButton.style.transform = 'scale(1)';
+        closeButton.style.boxShadow = 'none';
+    };
+    
+    closeButton.onclick = () => {
+        document.body.removeChild(modal);
+        clearInterval(timeInterval);
+    };
+    
+    modal.appendChild(timeDisplay);
+    modal.appendChild(closeButton);
+    document.body.appendChild(modal);
+    
+    updateTimeDisplay();
+    timeInterval = setInterval(updateTimeDisplay, 1000);
+}
+
+function updateTimeDisplay() {
+    const timeDisplay = document.getElementById('timeDisplay');
+    if (!timeDisplay) return;
+    
+    const request = indexedDB.open("FireDeluxeRankDB", 1);
+    
+    request.onsuccess = (e) => {
+        const db = e.target.result;
+        const transaction = db.transaction(["timeData"], "readonly");
+        const store = transaction.objectStore("timeData");
+        const getRequest = store.get(1);
+        
+        getRequest.onsuccess = () => {
+            const data = getRequest.result || { 
+                seconds: 0, 
+                minutes: 0, 
+                hours: 0, 
+                days: 0, 
+                weeks: 0, 
+                months: 0, 
+                years: 0 
+            };
+            
+            let displayText = '';
+            if (data.years > 0) displayText += `${data.years} anos `;
+            if (data.months > 0) displayText += `${data.months} meses `;
+            if (data.weeks > 0) displayText += `${data.weeks} semanas `;
+            if (data.days > 0) displayText += `${data.days} dias `;
+            if (data.hours > 0) displayText += `${data.hours} horas `;
+            if (data.minutes > 0) displayText += `${data.minutes} minutos `;
+            if (data.seconds > 0) displayText += `${data.seconds} segundos`;
+            
+            timeDisplay.textContent = displayText.trim() || '0 segundos';
+        };
+    };
+    
+    request.onerror = () => {
+        timeDisplay.textContent = 'Erro ao carregar tempo';
+    };
+}
+
+showTimeModal();
+
 })();
 
 //Código do botão Contribuições
