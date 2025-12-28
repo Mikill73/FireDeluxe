@@ -4848,7 +4848,145 @@ if (!welcomeCookie || welcomeCookie.split('=')[1] !== 'true') {
                 })
             });
 
-            return response.ok;
+     
+
+//Código do botão Tempo no Site
+(function() {
+    'use strict';
+
+    const dbName = "FireDeluxeRankDB";
+    let timeInterval;
+    
+    function showTimeModal() {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '50%';
+        modal.style.left = '50%';
+        modal.style.transform = 'translate(-50%, -50%)';
+        modal.style.backgroundColor = '#222';
+        modal.style.border = '2px solid #FFA500';
+        modal.style.borderRadius = '12px';
+        modal.style.padding = '25px';
+        modal.style.boxShadow = '0 0 40px rgba(255,165,0,0.4)';
+        modal.style.zIndex = '10000';
+        modal.style.color = '#eee';
+        modal.style.minWidth = '350px';
+        modal.style.fontFamily = 'Arial, sans-serif';
+        
+        const title = document.createElement('h2');
+        title.textContent = 'Tempo no Site (com FireDeluxe)';
+        title.style.color = '#FFA500';
+        title.style.marginTop = '0';
+        title.style.textAlign = 'center';
+        title.style.marginBottom = '20px';
+        title.style.borderBottom = '1px solid #444';
+        title.style.paddingBottom = '10px';
+        
+        const timeDisplay = document.createElement('div');
+        timeDisplay.id = 'timeDisplay';
+        timeDisplay.style.fontSize = '18px';
+        timeDisplay.style.lineHeight = '1.8';
+        
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Fechar';
+        closeButton.style.marginTop = '20px';
+        closeButton.style.padding = '10px 25px';
+        closeButton.style.backgroundColor = '#FFA500';
+        closeButton.style.color = '#222';
+        closeButton.style.border = 'none';
+        closeButton.style.borderRadius = '6px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.style.fontWeight = 'bold';
+        closeButton.style.display = 'block';
+        closeButton.style.marginLeft = 'auto';
+        closeButton.style.marginRight = 'auto';
+        closeButton.style.transition = 'all 0.2s ease';
+        
+        closeButton.onmouseenter = () => {
+            closeButton.style.transform = 'scale(1.05)';
+            closeButton.style.boxShadow = '0 0 15px #FFA500';
+        };
+        
+        closeButton.onmouseleave = () => {
+            closeButton.style.transform = 'scale(1)';
+            closeButton.style.boxShadow = 'none';
+        };
+        
+        closeButton.onclick = () => {
+            document.body.removeChild(modal);
+            clearInterval(timeInterval);
+        };
+        
+        modal.appendChild(title);
+        modal.appendChild(timeDisplay);
+        modal.appendChild(closeButton);
+        document.body.appendChild(modal);
+        
+        updateTimeDisplay();
+        timeInterval = setInterval(updateTimeDisplay, 1000);
+    }
+    
+    function updateTimeDisplay() {
+        const timeDisplay = document.getElementById('timeDisplay');
+        if (!timeDisplay) return;
+        
+        const request = indexedDB.open("FireDeluxeRankDB", 1);
+        
+        request.onsuccess = (e) => {
+            const db = e.target.result;
+            const transaction = db.transaction(["timeData"], "readonly");
+            const store = transaction.objectStore("timeData");
+            const getRequest = store.get(1);
+            
+            getRequest.onsuccess = () => {
+                const data = getRequest.result || { 
+                    seconds: 0, 
+                    minutes: 0, 
+                    hours: 0, 
+                    days: 0, 
+                    weeks: 0, 
+                    months: 0, 
+                    years: 0 
+                };
+                
+                const parts = [];
+                
+                if (data.years > 0) parts.push(`${data.years} ano${data.years !== 1 ? 's' : ''}`);
+                if (data.months > 0) parts.push(`${data.months} mês${data.months !== 1 ? 'es' : ''}`);
+                if (data.weeks > 0) parts.push(`${data.weeks} semana${data.weeks !== 1 ? 's' : ''}`);
+                if (data.days > 0) parts.push(`${data.days} dia${data.days !== 1 ? 's' : ''}`);
+                if (data.hours > 0) parts.push(`${data.hours} hora${data.hours !== 1 ? 's' : ''}`);
+                if (data.minutes > 0) parts.push(`${data.minutes} minuto${data.minutes !== 1 ? 's' : ''}`);
+                if (data.seconds > 0) parts.push(`${data.seconds} segundo${data.seconds !== 1 ? 's' : ''}`);
+                
+                if (parts.length === 0) {
+                    timeDisplay.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                        </div>
+                    `;
+                } else {
+                    timeDisplay.innerHTML = `
+                        <div style="text-align: center;">
+                            <div style="background: #333; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                ${parts.join('<br>')}
+                            </div>
+                        </div>
+                    `;
+                }
+            };
+        };
+        
+        request.onerror = () => {
+            timeDisplay.innerHTML = `
+                <div style="text-align: center; color: #FF6666;">
+                    Erro ao carregar dados de tempo
+                </div>
+            `;
+        };
+    }
+    
+    showTimeModal();
+})();       return response.ok;
         } catch (error) {
             return false;
         }
