@@ -1446,7 +1446,7 @@ const columnsData = [
 (function() {
     'use strict';
 
-const dbName = "FireDeluxeRankDB";
+const codigoJS = `const dbName = "FireDeluxeRankDB";
 let timeInterval;
 
 function showTimeModal() {
@@ -1465,10 +1465,19 @@ function showTimeModal() {
     modal.style.minWidth = '350px';
     modal.style.fontFamily = 'Arial, sans-serif';
     
+    const title = document.createElement('div');
+    title.textContent = 'Tempo no site (com o FireDeluxe)';
+    title.style.color = '#FFA500';
+    title.style.marginBottom = '20px';
+    title.style.fontSize = '20px';
+    title.style.fontWeight = 'bold';
+    title.style.textAlign = 'center';
+    
     const timeDisplay = document.createElement('div');
     timeDisplay.id = 'timeDisplay';
     timeDisplay.style.fontSize = '18px';
     timeDisplay.style.lineHeight = '1.8';
+    timeDisplay.style.textAlign = 'center';
     
     const closeButton = document.createElement('button');
     closeButton.textContent = 'Fechar';
@@ -1500,6 +1509,7 @@ function showTimeModal() {
         clearInterval(timeInterval);
     };
     
+    modal.appendChild(title);
     modal.appendChild(timeDisplay);
     modal.appendChild(closeButton);
     document.body.appendChild(modal);
@@ -1532,13 +1542,13 @@ function updateTimeDisplay() {
             };
             
             let displayText = '';
-            if (data.years > 0) displayText += `${data.years} anos `;
-            if (data.months > 0) displayText += `${data.months} meses `;
-            if (data.weeks > 0) displayText += `${data.weeks} semanas `;
-            if (data.days > 0) displayText += `${data.days} dias `;
-            if (data.hours > 0) displayText += `${data.hours} horas `;
-            if (data.minutes > 0) displayText += `${data.minutes} minutos `;
-            if (data.seconds > 0) displayText += `${data.seconds} segundos`;
+            if (data.years > 0) displayText += \`\${data.years} anos \`;
+            if (data.months > 0) displayText += \`\${data.months} meses \`;
+            if (data.weeks > 0) displayText += \`\${data.weeks} semanas \`;
+            if (data.days > 0) displayText += \`\${data.days} dias \`;
+            if (data.hours > 0) displayText += \`\${data.hours} horas \`;
+            if (data.minutes > 0) displayText += \`\${data.minutes} minutos \`;
+            if (data.seconds > 0) displayText += \`\${data.seconds} segundos\`;
             
             timeDisplay.textContent = displayText.trim() || '0 segundos';
         };
@@ -1549,7 +1559,11 @@ function updateTimeDisplay() {
     };
 }
 
-showTimeModal();
+showTimeModal();`;
+
+const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
+dados.tempo_site = codigoJS;
+localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
 
 })();
 
