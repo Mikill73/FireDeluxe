@@ -811,751 +811,631 @@ const columnsData = [
     'use strict';
 
     const configuracoesHTML = `
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurações</title>
-    <style>
-        body {
-            background-color: #222;
-            margin: 0;
-            padding: 0;
-        }
-        .settings-panel {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #222;
-            border: 1px solid #444;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow: auto;
-            color: #eee;
-            z-index: 10000;
-        }
-        .settings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #444;
-        }
-        .settings-title {
-            margin: 0;
-            color: #FFA500;
-            font-size: 1.3em;
-        }
-        .close-button {
-            background: none;
-            border: none;
-            color: #ccc;
-            font-size: 1.5em;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .close-button:hover {
-            color: #FFA500;
-        }
-        .settings-section {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #444;
-        }
-        .section-title {
-            color: #FFA500;
-            font-size: 1.1em;
-            margin-bottom: 15px;
-        }
-        .settings-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-        .settings-label {
-            width: 150px;
-            color: #ccc;
-        }
-        .settings-input {
-            flex: 1;
-            min-width: 200px;
-            padding: 8px 12px;
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #444;
-            border-radius: 6px;
-        }
-        .settings-button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .primary-button {
-            padding: 10px 16px;
-            background-color: #444;
-            color: #fff;
-            border: 1px solid #555;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        .primary-button:hover {
-            background-color: #555;
-            border-color: #FFA500;
-        }
-        .secondary-button {
-            padding: 10px 16px;
-            background: linear-gradient(135deg, #444, #555);
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .secondary-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
-        }
-        .preview-container {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #333;
-            border-radius: 6px;
-            border: 1px solid #444;
-        }
-        .preview-title {
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 0.9em;
-            color: #ccc;
-        }
-        .preview-image {
-            max-width: 100%;
-            max-height: 200px;
-            display: block;
-            margin: 0 auto;
-            border-radius: 4px;
-        }
-        .color-picker-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .color-preview {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid #555;
-            cursor: pointer;
-        }
-        .theme-sample {
-            width: 100%;
-            height: 40px;
-            border-radius: 6px;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            border: 1px solid #444;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #FFA500;
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        .info-text {
-            font-size: 0.85em;
-            color: #aaa;
-            margin-top: 5px;
-            line-height: 1.4;
-        }
-        .warning-text {
-            font-size: 0.85em;
-            color: #FFA500;
-            margin-top: 5px;
-            line-height: 1.4;
-        }
-        .random-color-btn, .remove-btn {
-            padding: 8px 12px;
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #555;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        .random-color-btn:hover, .remove-btn:hover {
-            background-color: #444;
-            border-color: #FFA500;
-        }
-        .error-text {
-            font-size: 0.85em;
-            color: #ff6b6b;
-            margin-top: 5px;
-            line-height: 1.4;
-            display: none;
-        }
-        .counter-text {
-            font-size: 0.85em;
-            color: #4CAF50;
-            margin-top: 5px;
-            line-height: 1.4;
-            font-weight: bold;
-        }
-        .font-preview {
-            width: 100%;
-            height: 40px;
-            border-radius: 6px;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            border: 1px solid #444;
-            background-color: #333;
-            font-size: 1.2em;
-        }
-        .font-select {
-            padding: 8px 12px;
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #444;
-            border-radius: 6px;
-            flex: 1;
-            min-width: 200px;
-        }
-        .custom-font-input {
-            margin-top: 10px;
-        }
-        @media (max-width: 768px) {
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Configurações</title>
+        <style>
+            body {
+                background-color: #222;
+                margin: 0;
+                padding: 0;
+            }
+            .settings-panel {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #222;
+                border: 1px solid #444;
+                border-radius: 8px;
+                padding: 20px;
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+                width: 90%;
+                max-width: 800px;
+                max-height: 90vh;
+                overflow: auto;
+                color: #eee;
+                z-index: 10000;
+            }
+            .settings-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #444;
+            }
+            .settings-title {
+                margin: 0;
+                color: #FFA500;
+                font-size: 1.3em;
+            }
+            .close-button {
+                background: none;
+                border: none;
+                color: #ccc;
+                font-size: 1.5em;
+                cursor: pointer;
+                transition: color 0.2s;
+            }
+            .close-button:hover {
+                color: #FFA500;
+            }
+            .settings-section {
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid #444;
+            }
+            .section-title {
+                color: #FFA500;
+                font-size: 1.1em;
+                margin-bottom: 15px;
+            }
             .settings-row {
-                flex-direction: column;
-                align-items: flex-start;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                margin-bottom: 15px;
+                align-items: center;
             }
             .settings-label {
+                width: 150px;
+                color: #ccc;
+            }
+            .settings-input {
+                flex: 1;
+                min-width: 200px;
+                padding: 8px 12px;
+                background-color: #333;
+                color: #fff;
+                border: 1px solid #444;
+                border-radius: 6px;
+            }
+            .settings-button-group {
+                display: flex;
+                gap: 10px;
+                margin-top: 10px;
+            }
+            .primary-button {
+                padding: 10px 16px;
+                background-color: #444;
+                color: #fff;
+                border: 1px solid #555;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s ease;
+            }
+            .primary-button:hover {
+                background-color: #555;
+                border-color: #FFA500;
+            }
+            .secondary-button {
+                padding: 10px 16px;
+                background: linear-gradient(135deg, #444, #555);
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            .secondary-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            }
+            .preview-container {
+                margin-top: 15px;
+                padding: 15px;
+                background-color: #333;
+                border-radius: 6px;
+                border: 1px solid #444;
+            }
+            .preview-title {
+                margin-top: 0;
+                margin-bottom: 10px;
+                font-size: 0.9em;
+                color: #ccc;
+            }
+            .preview-image {
+                max-width: 100%;
+                max-height: 200px;
+                display: block;
+                margin: 0 auto;
+                border-radius: 4px;
+            }
+            .color-picker-container {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .color-preview {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                border: 2px solid #555;
+                cursor: pointer;
+            }
+            .theme-actions {
+                display: flex;
+                gap: 10px;
+            }
+            .theme-sample {
                 width: 100%;
+                height: 40px;
+                border-radius: 6px;
+                margin-top: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                border: 1px solid #444;
             }
-            .settings-input, .font-select {
-                width: 100%;
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 60px;
+                height: 34px;
             }
-        }
-    </style>
-</head>
-<body>
-    <div class="settings-panel" id="settingsPanel">
-        <div class="settings-header">
-            <h2 class="settings-title">Configurações</h2>
-        </div>
-
-        <div class="settings-section">
-            <h3 class="section-title">Configurações de Automação</h3>
-            <div class="settings-row">
-                <label class="settings-label">Email da conta principal:</label>
-                <input type="email" class="settings-input" id="automationEmail" placeholder="Seu email no AnimeFire">
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: .4s;
+                border-radius: 34px;
+            }
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+            input:checked + .slider {
+                background-color: #FFA500;
+            }
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+            .info-text {
+                font-size: 0.85em;
+                color: #aaa;
+                margin-top: 5px;
+                line-height: 1.4;
+            }
+            .warning-text {
+                font-size: 0.85em;
+                color: #FFA500;
+                margin-top: 5px;
+                line-height: 1.4;
+            }
+            .random-color-btn, .remove-btn {
+                padding: 8px 12px;
+                background-color: #333;
+                color: #fff;
+                border: 1px solid #555;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s ease;
+            }
+            .random-color-btn:hover, .remove-btn:hover {
+                background-color: #444;
+                border-color: #FFA500;
+            }
+            .error-text {
+                font-size: 0.85em;
+                color: #ff6b6b;
+                margin-top: 5px;
+                line-height: 1.4;
+                display: none;
+            }
+            .counter-text {
+                font-size: 0.85em;
+                color: #4CAF50;
+                margin-top: 5px;
+                line-height: 1.4;
+                font-weight: bold;
+            }
+            @media (max-width: 768px) {
+                .settings-row {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+                .settings-label {
+                    width: 100%;
+                }
+                .settings-input {
+                    width: 100%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h2 class="settings-title">Configurações</h2>
             </div>
-            <div class="settings-row">
-                <label class="settings-label">Senha da conta principal:</label>
-                <input type="password" class="settings-input" id="automationPassword" placeholder="Sua senha no AnimeFire">
-            </div>
-            <div class="warning-text">
-                <strong>Atenção:</strong> Estas credenciais são necessárias apenas para funções avançadas de automação do FireDeluxe. 
-                Se você não confia totalmente no FireDeluxe, pode deixar em branco.
-            </div>
-            <div class="info-text">
-                Sua experiência normal no FireDeluxe não será afetada se você não preencher estes campos.
-            </div>
-        </div>
-
-        <div class="settings-section">
-            <h3 class="section-title">Intervalo entre Downloads</h3>
-            <div class="settings-row">
-                <label class="settings-label">Tempo (minutos):</label>
-                <input type="number" class="settings-input" id="downloadInterval" min="3" max="30" value="5">
-            </div>
-            <div class="info-text">
-                Define o intervalo entre downloads automáticos de episódios. Mínimo: 3 minutos, Máximo: 30 minutos.
-            </div>
-            <div class="warning-text">
-                Esta configuração é usada pela função de download automático de múltiplos episódios.
-            </div>
-        </div>
-
-        <div class="settings-section">
-            <h3 class="section-title">AdBlock</h3>
-            <div class="settings-row">
-                <label class="settings-label">Bloquear anúncios:</label>
-                <label class="switch">
-                    <input type="checkbox" id="adblockerToggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="counter-text" id="adblockCounter">
-                Elementos de anúncios removidos: 0
-            </div>
-        </div>
-
-        <div class="settings-section">
-            <h3 class="section-title">Divulgar o FireDeluxe</h3>
-            <div class="settings-row">
-                <label class="settings-label">Permitir divulgação:</label>
-                <label class="switch">
-                    <input type="checkbox" id="divulgarToggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="info-text">
-                Quando ativado, verifica se tem caracteres suficientes na sua biografia, se tiver, coloca o link do site do FireDeluxe.
-            </div>
-        </div>
-
-        <div class="settings-section">
-            <h3 class="section-title">Carregar Todas as Temporadas</h3>
-            <div class="settings-row">
-                <label class="settings-label">Ativar função:</label>
-                <label class="switch">
-                    <input type="checkbox" id="allSeasonsToggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="info-text">
-                Quando ativado, tenta carregar todas as temporadas de um anime em uma única página. Uma tela de carregamento será exibida durante o processo.
-            </div>
-            <div class="warning-text">
-                Esta função não funciona para todos os animes e pode aumentar o tempo de carregamento.
-            </div>
-        </div>
-
-        <div class="settings-section">
-            <h3 class="section-title">Fonte Personalizada</h3>
-            <div class="settings-row">
-                <label class="settings-label">Escolher fonte:</label>
-                <select class="font-select" id="fontSelector">
-                    <option value="padrao">Fonte Padrão (Sem alteração)</option>
-                    <option value="padrao1">Jersey 25 + Oswald + Science Gothic</option>
-                    <option value="padrao2">Trochut + Jersey 25 + Science Gothic</option>
-                    <option value="padrao3">Dancing Script + Jersey 25 + Oswald</option>
-                    <option value="custom">Fonte Personalizada (Google Fonts)</option>
-                </select>
-            </div>
-            <div class="settings-row custom-font-input" id="customFontRow" style="display: none;">
-                <label class="settings-label">Embed Code:</label>
-                <textarea class="settings-input" id="customFontEmbed" placeholder="Cole o código embed do Google Fonts aqui..." rows="3"></textarea>
-            </div>
-            <div class="info-text">
-                Escolha uma das fontes padrão ou cole seu código embed personalizado do Google Fonts.
-            </div>
-            <div class="preview-container">
-                <div class="font-preview" id="fontPreview">
-                    FireDeluxe Fonte Personalizada
+    
+            <div class="settings-section">
+                <h3 class="section-title">Configurações de Automação</h3>
+                <div class="settings-row">
+                    <label class="settings-label">Email da conta principal:</label>
+                    <input type="email" class="settings-input" id="automationEmail" placeholder="Seu email no AnimeFire">
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">Senha da conta principal:</label>
+                    <input type="password" class="settings-input" id="automationPassword" placeholder="Sua senha no AnimeFire">
+                </div>
+                <div class="warning-text">
+                    <strong>Atenção:</strong> Estas credenciais são necessárias apenas para funções avançadas de automação do FireDeluxe. 
+                    Se você não confia totalmente no FireDeluxe, pode deixar em branco.
+                </div>
+                <div class="info-text">
+                    Sua experiência normal no FireDeluxe não será afetada se você não preencher estes campos.
                 </div>
             </div>
-        </div>
-
-        <div class="settings-section">
-            <h3 class="section-title">Tema do Site</h3>
-            <div class="settings-row">
-                <label class="settings-label">Cor do Tema:</label>
-                <div class="color-picker-container">
-                    <input type="color" class="settings-input" id="themeColor" value="#FFA500" style="width: 70px; height: 40px; padding: 0;">
-                    <button class="random-color-btn" id="randomColorBtn">Aleatório</button>
-                    <button class="remove-btn" id="removeThemeColor">Remover</button>
+    
+            <div class="settings-section">
+                <h3 class="section-title">Intervalo entre Downloads</h3>
+                <div class="settings-row">
+                    <label class="settings-label">Tempo (minutos):</label>
+                    <input type="number" class="settings-input" id="downloadInterval" min="3" max="30" value="5">
+                </div>
+                <div class="info-text">
+                    Define o intervalo entre downloads automáticos de episódios. Mínimo: 3 minutos, Máximo: 30 minutos.
+                </div>
+                <div class="warning-text">
+                    Esta configuração é usada pela função de download automático de múltiplos episódios.
                 </div>
             </div>
-            <div class="preview-container">
-                <div class="theme-sample" id="themeSample" style="background-color: rgba(255, 165, 0, 0.2); color: #FFA500;">
-                    Exemplo do Tema Aplicado
+    
+            <div class="settings-section">
+                <h3 class="section-title">AdBlock</h3>
+                <div class="settings-row">
+                    <label class="settings-label">Bloquear anúncios:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="adblockerToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="counter-text" id="adblockCounter">
+                    Elementos de anúncios removidos: 0
                 </div>
             </div>
+    
+            <div class="settings-section">
+                <h3 class="section-title">Divulgar o FireDeluxe</h3>
+                <div class="settings-row">
+                    <label class="settings-label">Permitir divulgação:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="divulgarToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="info-text">
+                    Quando ativado, verifica se tem caracteres suficientes na sua biografia, se tiver, coloca o link do site do FireDeluxe.
+                </div>
+            </div>
+    
+            <div class="settings-section">
+                <h3 class="section-title">Carregar Todas as Temporadas</h3>
+                <div class="settings-row">
+                    <label class="settings-label">Ativar função:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="allSeasonsToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="info-text">
+                    Quando ativado, tenta carregar todas as temporadas de um anime em uma única página. Uma tela de carregamento será exibida durante o processo.
+                </div>
+                <div class="warning-text">
+                    Esta função não funciona para todos os animes e pode aumentar o tempo de carregamento.
+                </div>
+            </div>
+    
+            <div class="settings-section">
+                <h3 class="section-title">Tema do Site</h3>
+                <div class="settings-row">
+                    <label class="settings-label">Cor do Tema:</label>
+                    <div class="color-picker-container">
+                        <input type="color" class="settings-input" id="themeColor" value="#FFA500" style="width: 70px; height: 40px; padding: 0;">
+                        <button class="random-color-btn" id="randomColorBtn">Aleatório</button>
+                        <button class="remove-btn" id="removeThemeColor">Remover</button>
+                    </div>
+                </div>
+                <div class="preview-container">
+                    <div class="theme-sample" id="themeSample" style="background-color: rgba(255, 165, 0, 0.2); color: #FFA500;">
+                        Exemplo do Tema Aplicado
+                    </div>
+                </div>
+            </div>
+    
+            <div class="settings-section">
+                <h3 class="section-title">Fundo do Site</h3>
+                <div class="settings-row">
+                    <label class="settings-label">Imagem de Fundo:</label>
+                    <input type="file" class="settings-input" id="siteBgImage" accept="image/*">
+                </div>
+                <div class="info-text">
+                    Formatos aceitos: JPG, PNG, WEBP e GIF. A imagem será convertida para Data URL.
+                    Prefira imagens PNG com tamanho inferior a 2MB para melhor desempenho.
+                </div>
+                <div class="error-text" id="siteBgError">
+                    Não foi possível carregar a imagem. O arquivo pode ser muito grande (>5MB). 
+                    Tente usar uma imagem menor ou em formato PNG.
+                </div>
+                <div class="settings-button-group">
+                    <button class="remove-btn" id="removeSiteBg">Remover Imagem</button>
+                </div>
+                <div class="preview-container" id="siteBgPreviewContainer" style="display: none;">
+                    <h4 class="preview-title">Prévia do Fundo do Site:</h4>
+                    <img src="" class="preview-image" id="siteBgPreview">
+                </div>
+            </div>
+    
+            <div class="settings-section">
+                <h3 class="section-title">Fundo do Chat</h3>
+                <div class="settings-row">
+                    <label class="settings-label">Imagem de Fundo:</label>
+                    <input type="file" class="settings-input" id="chatBgImage" accept="image/*">
+                </div>
+                <div class="info-text">
+                    Formatos aceitos: JPG, PNG, WEBP e GIF. A imagem será convertida para Data URL.
+                    Prefira imagens PNG com tamanho inferior a 2MB para melhor desempenho.
+                </div>
+                <div class="error-text" id="chatBgError">
+                    Não foi possível carregar a imagem. O arquivo pode ser muito grande (>5MB). 
+                    Tente usar uma imagem menor ou em formato PNG.
+                </div>
+                <div class="settings-button-group">
+                    <button class="remove-btn" id="removeChatBg">Remover Imagem</button>
+                </div>
+                <div class="preview-container" id="chatBgPreviewContainer" style="display: none;">
+                    <h4 class="preview-title">Prévia do Fundo do Chat:</h4>
+                    <img src="" class="preview-image" id="chatBgPreview">
+                </div>
+            </div>
+    
+            <div class="settings-button-group" style="justify-content: flex-end; margin-top: 20px;">
+                <button class="secondary-button" id="saveSettings">Salvar e Fechar</button>
+                <button class="primary-button" id="resetSettings">Redefinir Padrões</button>
+            </div>
         </div>
-
-        <div class="settings-section">
-            <h3 class="section-title">Fundo do Site</h3>
-            <div class="settings-row">
-                <label class="settings-label">Imagem de Fundo:</label>
-                <input type="file" class="settings-input" id="siteBgImage" accept="image/*">
-            </div>
-            <div class="info-text">
-                Formatos aceitos: JPG, PNG, WEBP e GIF. A imagem será convertida para Data URL.
-                Prefira imagens PNG com tamanho inferior a 2MB para melhor desempenho.
-            </div>
-            <div class="error-text" id="siteBgError">
-                Não foi possível carregar a imagem. O arquivo pode ser muito grande (>5MB). 
-                Tente usar uma imagem menor ou em formato PNG.
-            </div>
-            <div class="settings-button-group">
-                <button class="remove-btn" id="removeSiteBg">Remover Imagem</button>
-            </div>
-            <div class="preview-container" id="siteBgPreviewContainer" style="display: none;">
-                <h4 class="preview-title">Prévia do Fundo do Site:</h4>
-                <img src="" class="preview-image" id="siteBgPreview">
-            </div>
-        </div>
-
-        <div class="settings-section">
-            <h3 class="section-title">Fundo do Chat</h3>
-            <div class="settings-row">
-                <label class="settings-label">Imagem de Fundo:</label>
-                <input type="file" class="settings-input" id="chatBgImage" accept="image/*">
-            </div>
-            <div class="info-text">
-                Formatos aceitos: JPG, PNG, WEBP e GIF. A imagem será convertida para Data URL.
-                Prefira imagens PNG com tamanho inferior a 2MB para melhor desempenho.
-            </div>
-            <div class="error-text" id="chatBgError">
-                Não foi possível carregar a imagem. O arquivo pode ser muito grande (>5MB). 
-                Tente usar uma imagem menor ou em formato PNG.
-            </div>
-            <div class="settings-button-group">
-                <button class="remove-btn" id="removeChatBg">Remover Imagem</button>
-            </div>
-            <div class="preview-container" id="chatBgPreviewContainer" style="display: none;">
-                <h4 class="preview-title">Prévia do Fundo do Chat:</h4>
-                <img src="" class="preview-image" id="chatBgPreview">
-            </div>
-        </div>
-
-        <div class="settings-button-group" style="justify-content: flex-end; margin-top: 20px;">
-            <button class="secondary-button" id="saveSettings">Salvar e Fechar</button>
-            <button class="primary-button" id="resetSettings">Redefinir Padrões</button>
-        </div>
-    </div>
-    <script>
-        let siteBgDataUrl = '';
-        let chatBgDataUrl = '';
-        let themeColor = '#FFA500';
-        let selectedFont = 'padrao';
-        let customFontEmbed = '';
-        let adblockerEnabled = false;
-        let divulgarEnabled = false;
-        let allSeasonsEnabled = false;
-
-        const fontConfigs = {
-            padrao: { name: 'Padrão', css: '' },
-            padrao1: { 
-                name: 'Jersey 25 + Oswald + Science Gothic',
-                css: 'font-family: "Jersey 25", "Oswald", "Science Gothic", sans-serif;'
-            },
-            padrao2: { 
-                name: 'Trochut + Jersey 25 + Science Gothic',
-                css: 'font-family: "Trochut", "Jersey 25", "Science Gothic", sans-serif;'
-            },
-            padrao3: { 
-                name: 'Dancing Script + Jersey 25 + Oswald',
-                css: 'font-family: "Dancing Script", "Jersey 25", "Oswald", cursive;'
-            },
-            custom: { 
-                name: 'Personalizada',
-                css: ''
-            }
-        };
-
-        function loadSettings() {
-            const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-
-                if (settings.siteBgImage) {
-                    siteBgDataUrl = settings.siteBgImage;
-                    document.getElementById('siteBgPreview').src = siteBgDataUrl;
-                    document.getElementById('siteBgPreviewContainer').style.display = 'block';
-                }
-                if (settings.chatBgImage) {
-                    chatBgDataUrl = settings.chatBgImage;
-                    document.getElementById('chatBgPreview').src = chatBgDataUrl;
-                    document.getElementById('chatBgPreviewContainer').style.display = 'block';
-                }
-
-                if (settings.themeColor) {
-                    themeColor = settings.themeColor;
-                    document.getElementById('themeColor').value = themeColor;
-                    updateThemeSample(themeColor);
-                }
-
-                if (settings.selectedFont) {
-                    selectedFont = settings.selectedFont;
-                    document.getElementById('fontSelector').value = selectedFont;
-                    updateFontPreview();
-                }
-
-                if (settings.customFontEmbed) {
-                    customFontEmbed = settings.customFontEmbed;
-                    document.getElementById('customFontEmbed').value = customFontEmbed;
-                }
-
-                if (selectedFont === 'custom') {
-                    document.getElementById('customFontRow').style.display = 'flex';
-                }
-
-                if (settings.adblocker) {
-                    adblockerEnabled = settings.adblocker === 'on';
-                    document.getElementById('adblockerToggle').checked = adblockerEnabled;
-                }
-
-                if (settings.divulgar) {
-                    divulgarEnabled = settings.divulgar === 'on';
-                    document.getElementById('divulgarToggle').checked = divulgarEnabled;
-                }
-
-                if (settings.allSeasons) {
-                    allSeasonsEnabled = settings.allSeasons === 'on';
-                    document.getElementById('allSeasonsToggle').checked = allSeasonsEnabled;
-                }
-
-                if (settings.email) {
-                    document.getElementById('automationEmail').value = settings.email;
-                }
-
-                if (settings.senha) {
-                    document.getElementById('automationPassword').value = settings.senha;
-                }
-
-                if (settings.downloadInterval) {
-                    document.getElementById('downloadInterval').value = settings.downloadInterval;
-                }
-
-                if (settings.adsBloqueados) {
-                    document.getElementById('adblockCounter').textContent = 'Elementos de anúncios removidos: ' + settings.adsBloqueados;
+        <script>
+            let siteBgDataUrl = '';
+            let chatBgDataUrl = '';
+            let themeColor = '#FFA500';
+            let adblockerEnabled = false;
+            let divulgarEnabled = false;
+            let allSeasonsEnabled = false;
+    
+            function loadSettings() {
+                const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+    
+                    if (settings.siteBgImage) {
+                        siteBgDataUrl = settings.siteBgImage;
+                        document.getElementById('siteBgPreview').src = siteBgDataUrl;
+                        document.getElementById('siteBgPreviewContainer').style.display = 'block';
+                    }
+                    if (settings.chatBgImage) {
+                        chatBgDataUrl = settings.chatBgImage;
+                        document.getElementById('chatBgPreview').src = chatBgDataUrl;
+                        document.getElementById('chatBgPreviewContainer').style.display = 'block';
+                    }
+    
+                    if (settings.themeColor) {
+                        themeColor = settings.themeColor;
+                        document.getElementById('themeColor').value = themeColor;
+                        updateThemeSample(themeColor);
+                    }
+    
+                    if (settings.adblocker) {
+                        adblockerEnabled = settings.adblocker === 'on';
+                        document.getElementById('adblockerToggle').checked = adblockerEnabled;
+                    }
+    
+                    if (settings.divulgar) {
+                        divulgarEnabled = settings.divulgar === 'on';
+                        document.getElementById('divulgarToggle').checked = divulgarEnabled;
+                    }
+    
+                    if (settings.allSeasons) {
+                        allSeasonsEnabled = settings.allSeasons === 'on';
+                        document.getElementById('allSeasonsToggle').checked = allSeasonsEnabled;
+                    }
+    
+                    if (settings.email) {
+                        document.getElementById('automationEmail').value = settings.email;
+                    }
+    
+                    if (settings.senha) {
+                        document.getElementById('automationPassword').value = settings.senha;
+                    }
+    
+                    if (settings.downloadInterval) {
+                        document.getElementById('downloadInterval').value = settings.downloadInterval;
+                    }
+    
+                    if (settings.adsBloqueados) {
+                        document.getElementById('adblockCounter').textContent = 'Elementos de anúncios removidos: ' + settings.adsBloqueados;
+                    }
                 }
             }
-        }
-
-        function updateThemeSample(color) {
-            const sample = document.getElementById('themeSample');
-            sample.style.backgroundColor = hexToRgba(color, 0.2);
-            sample.style.color = color;
-            sample.style.borderColor = color;
-        }
-
-        function updateFontPreview() {
-            const preview = document.getElementById('fontPreview');
-            const fontConfig = fontConfigs[selectedFont];
-            
-            if (selectedFont === 'padrao') {
-                preview.style.fontFamily = '';
-                preview.style.cssText = '';
-            } else if (selectedFont === 'custom' && customFontEmbed) {
-                preview.style.cssText = '';
-            } else {
-                preview.style.cssText = fontConfig.css;
+    
+            function updateThemeSample(color) {
+                const sample = document.getElementById('themeSample');
+                sample.style.backgroundColor = hexToRgba(color, 0.2);
+                sample.style.color = color;
+                sample.style.borderColor = color;
             }
-        }
-
-        function hexToRgba(hex, alpha) {
-            const r = parseInt(hex.slice(1, 3), 16);
-            const g = parseInt(hex.slice(3, 5), 16);
-            const b = parseInt(hex.slice(5, 7), 16);
-            return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
-        }
-
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
+    
+            function hexToRgba(hex, alpha) {
+                const r = parseInt(hex.slice(1, 3), 16);
+                const g = parseInt(hex.slice(3, 5), 16);
+                const b = parseInt(hex.slice(5, 7), 16);
+                return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
             }
-            return color;
-        }
-
-        function handleImageUpload(inputId, previewId, containerId, errorId) {
-            const file = document.getElementById(inputId).files[0];
-            const errorElement = document.getElementById(errorId);
-            errorElement.style.display = 'none';
-            
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    errorElement.style.display = 'block';
-                    document.getElementById(inputId).value = '';
-                    return;
+    
+            function getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
                 }
+                return color;
+            }
+    
+            function handleImageUpload(inputId, previewId, containerId, errorId) {
+                const file = document.getElementById(inputId).files[0];
+                const errorElement = document.getElementById(errorId);
+                errorElement.style.display = 'none';
                 
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    if (inputId === 'siteBgImage') {
-                        siteBgDataUrl = event.target.result;
-                    } else if (inputId === 'chatBgImage') {
-                        chatBgDataUrl = event.target.result;
+                if (file) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        errorElement.style.display = 'block';
+                        document.getElementById(inputId).value = '';
+                        return;
                     }
                     
-                    document.getElementById(previewId).src = event.target.result;
-                    document.getElementById(containerId).style.display = 'block';
-                };
-                reader.onerror = function() {
-                    errorElement.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        if (inputId === 'siteBgImage') {
+                            siteBgDataUrl = event.target.result;
+                        } else if (inputId === 'chatBgImage') {
+                            chatBgDataUrl = event.target.result;
+                        }
+                        
+                        document.getElementById(previewId).src = event.target.result;
+                        document.getElementById(containerId).style.display = 'block';
+                    };
+                    reader.onerror = function() {
+                        errorElement.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
             }
-        }
-
-        function removeImage(inputId, previewId, containerId, errorId) {
-            document.getElementById(inputId).value = '';
-            document.getElementById(previewId).src = '';
-            document.getElementById(containerId).style.display = 'none';
-            document.getElementById(errorId).style.display = 'none';
-            
-            if (inputId === 'siteBgImage') {
-                siteBgDataUrl = '';
-            } else if (inputId === 'chatBgImage') {
-                chatBgDataUrl = '';
+    
+            function removeImage(inputId, previewId, containerId, errorId) {
+                document.getElementById(inputId).value = '';
+                document.getElementById(previewId).src = '';
+                document.getElementById(containerId).style.display = 'none';
+                document.getElementById(errorId).style.display = 'none';
+                
+                if (inputId === 'siteBgImage') {
+                    siteBgDataUrl = '';
+                } else if (inputId === 'chatBgImage') {
+                    chatBgDataUrl = '';
+                }
             }
-        }
-
-        document.getElementById('randomColorBtn').addEventListener('click', function() {
-            const randomColor = getRandomColor();
-            themeColor = randomColor;
-            document.getElementById('themeColor').value = randomColor;
-            updateThemeSample(randomColor);
-        });
-
-        document.getElementById('themeColor').addEventListener('input', function(e) {
-            themeColor = e.target.value;
-            updateThemeSample(themeColor);
-        });
-
-        document.getElementById('removeThemeColor').addEventListener('click', function() {
-            themeColor = '#FFA500';
-            document.getElementById('themeColor').value = themeColor;
-            updateThemeSample(themeColor);
-        });
-
-        document.getElementById('fontSelector').addEventListener('change', function(e) {
-            selectedFont = e.target.value;
-            if (selectedFont === 'custom') {
-                document.getElementById('customFontRow').style.display = 'flex';
-            } else {
-                document.getElementById('customFontRow').style.display = 'none';
-                updateFontPreview();
-            }
-        });
-
-        document.getElementById('customFontEmbed').addEventListener('input', function(e) {
-            customFontEmbed = e.target.value;
-        });
-
-        document.getElementById('siteBgImage').addEventListener('change', function() {
-            handleImageUpload('siteBgImage', 'siteBgPreview', 'siteBgPreviewContainer', 'siteBgError');
-        });
-
-        document.getElementById('removeSiteBg').addEventListener('click', function() {
-            removeImage('siteBgImage', 'siteBgPreview', 'siteBgPreviewContainer', 'siteBgError');
-        });
-
-        document.getElementById('chatBgImage').addEventListener('change', function() {
-            handleImageUpload('chatBgImage', 'chatBgPreview', 'chatBgPreviewContainer', 'chatBgError');
-        });
-
-        document.getElementById('removeChatBg').addEventListener('click', function() {
-            removeImage('chatBgImage', 'chatBgPreview', 'chatBgPreviewContainer', 'chatBgError');
-        });
-
-        document.getElementById('saveSettings').addEventListener('click', function() {
-            const downloadInterval = document.getElementById('downloadInterval').value;
-            const intervalValue = Math.min(30, Math.max(3, parseInt(downloadInterval) || 5));
-            
-            const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
-            const currentSettings = savedSettings ? JSON.parse(savedSettings) : {};
-            const currentAds = currentSettings.adsBloqueados || 0;
-            
-            const settings = {
-                themeColor: themeColor,
-                siteBgImage: siteBgDataUrl,
-                chatBgImage: chatBgDataUrl,
-                selectedFont: selectedFont,
-                customFontEmbed: customFontEmbed,
-                adblocker: document.getElementById('adblockerToggle').checked ? 'on' : 'off',
-                divulgar: document.getElementById('divulgarToggle').checked ? 'on' : 'off',
-                allSeasons: document.getElementById('allSeasonsToggle').checked ? 'on' : 'off',
-                email: document.getElementById('automationEmail').value,
-                senha: document.getElementById('automationPassword').value,
-                downloadInterval: intervalValue,
-                adsBloqueados: currentAds
-            };
-            localStorage.setItem('firedeluxe_configuracoes', JSON.stringify(settings));
-            window.location.reload();
-        });
-
-        document.getElementById('resetSettings').addEventListener('click', function() {
-            if (confirm('Tem certeza que deseja redefinir todas as configurações para os valores padrão?')) {
-                localStorage.removeItem('firedeluxe_configuracoes');
+    
+            document.getElementById('randomColorBtn').addEventListener('click', function() {
+                const randomColor = getRandomColor();
+                themeColor = randomColor;
+                document.getElementById('themeColor').value = randomColor;
+                updateThemeSample(randomColor);
+            });
+    
+            document.getElementById('themeColor').addEventListener('input', function(e) {
+                themeColor = e.target.value;
+                updateThemeSample(themeColor);
+            });
+    
+            document.getElementById('removeThemeColor').addEventListener('click', function() {
                 themeColor = '#FFA500';
                 document.getElementById('themeColor').value = themeColor;
                 updateThemeSample(themeColor);
-                document.getElementById('siteBgImage').value = '';
-                document.getElementById('siteBgPreview').src = '';
-                document.getElementById('siteBgPreviewContainer').style.display = 'none';
-                siteBgDataUrl = '';
-                document.getElementById('siteBgError').style.display = 'none';
-                document.getElementById('chatBgImage').value = '';
-                document.getElementById('chatBgPreview').src = '';
-                document.getElementById('chatBgPreviewContainer').style.display = 'none';
-                chatBgDataUrl = '';
-                document.getElementById('chatBgError').style.display = 'none';
-                selectedFont = 'padrao';
-                document.getElementById('fontSelector').value = 'padrao';
-                customFontEmbed = '';
-                document.getElementById('customFontEmbed').value = '';
-                document.getElementById('customFontRow').style.display = 'none';
-                updateFontPreview();
-                document.getElementById('adblockerToggle').checked = false;
-                document.getElementById('divulgarToggle').checked = false;
-                document.getElementById('allSeasonsToggle').checked = false;
-                document.getElementById('automationEmail').value = '';
-                document.getElementById('automationPassword').value = '';
-                document.getElementById('downloadInterval').value = '5';
-                document.getElementById('adblockCounter').textContent = 'Anúncios bloqueados nesta sessão: 0';
+            });
+    
+            document.getElementById('siteBgImage').addEventListener('change', function() {
+                handleImageUpload('siteBgImage', 'siteBgPreview', 'siteBgPreviewContainer', 'siteBgError');
+            });
+    
+            document.getElementById('removeSiteBg').addEventListener('click', function() {
+                removeImage('siteBgImage', 'siteBgPreview', 'siteBgPreviewContainer', 'siteBgError');
+            });
+    
+            document.getElementById('chatBgImage').addEventListener('change', function() {
+                handleImageUpload('chatBgImage', 'chatBgPreview', 'chatBgPreviewContainer', 'chatBgError');
+            });
+    
+            document.getElementById('removeChatBg').addEventListener('click', function() {
+                removeImage('chatBgImage', 'chatBgPreview', 'chatBgPreviewContainer', 'chatBgError');
+            });
+    
+            document.getElementById('saveSettings').addEventListener('click', function() {
+                const downloadInterval = document.getElementById('downloadInterval').value;
+                const intervalValue = Math.min(30, Math.max(3, parseInt(downloadInterval) || 5));
+                
+                const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
+                const currentSettings = savedSettings ? JSON.parse(savedSettings) : {};
+                const currentAds = currentSettings.adsBloqueados || 0;
+                
+                const settings = {
+                    themeColor: themeColor,
+                    siteBgImage: siteBgDataUrl,
+                    chatBgImage: chatBgDataUrl,
+                    adblocker: document.getElementById('adblockerToggle').checked ? 'on' : 'off',
+                    divulgar: document.getElementById('divulgarToggle').checked ? 'on' : 'off',
+                    allSeasons: document.getElementById('allSeasonsToggle').checked ? 'on' : 'off',
+                    email: document.getElementById('automationEmail').value,
+                    senha: document.getElementById('automationPassword').value,
+                    downloadInterval: intervalValue,
+                    adsBloqueados: currentAds
+                };
+                localStorage.setItem('firedeluxe_configuracoes', JSON.stringify(settings));
                 window.location.reload();
-            }
-        });
-
-        loadSettings();
-    </script>
-</body>
-</html>`;
+            });
+    
+            document.getElementById('resetSettings').addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja redefinir todas as configurações para os valores padrão?')) {
+                    localStorage.removeItem('firedeluxe_configuracoes');
+                    themeColor = '#FFA500';
+                    document.getElementById('themeColor').value = themeColor;
+                    updateThemeSample(themeColor);
+                    document.getElementById('siteBgImage').value = '';
+                    document.getElementById('siteBgPreview').src = '';
+                    document.getElementById('siteBgPreviewContainer').style.display = 'none';
+                    siteBgDataUrl = '';
+                    document.getElementById('siteBgError').style.display = 'none';
+                    document.getElementById('chatBgImage').value = '';
+                    document.getElementById('chatBgPreview').src = '';
+                    document.getElementById('chatBgPreviewContainer').style.display = 'none';
+                    chatBgDataUrl = '';
+                    document.getElementById('chatBgError').style.display = 'none';
+                    document.getElementById('adblockerToggle').checked = false;
+                    document.getElementById('divulgarToggle').checked = false;
+                    document.getElementById('allSeasonsToggle').checked = false;
+                    document.getElementById('automationEmail').value = '';
+                    document.getElementById('automationPassword').value = '';
+                    document.getElementById('downloadInterval').value = '5';
+                    document.getElementById('adblockCounter').textContent = 'Anúncios bloqueados nesta sessão: 0';
+                    window.location.reload();
+                }
+            });
+    
+            loadSettings();
+        </script>
+    </body>
+    </html>`;
     
     const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_html')) || {};
     dados.configuracoes = configuracoesHTML;
@@ -1566,7 +1446,7 @@ const columnsData = [
 (function() {
     'use strict';
 
-const codigoJS = `const dbName = "FireDeluxeRankDB";
+const dbName = "FireDeluxeRankDB";
 let timeInterval;
 
 function showTimeModal() {
@@ -1585,19 +1465,10 @@ function showTimeModal() {
     modal.style.minWidth = '350px';
     modal.style.fontFamily = 'Arial, sans-serif';
     
-    const title = document.createElement('div');
-    title.textContent = 'Tempo no site (com o FireDeluxe)';
-    title.style.color = '#FFA500';
-    title.style.marginBottom = '20px';
-    title.style.fontSize = '20px';
-    title.style.fontWeight = 'bold';
-    title.style.textAlign = 'center';
-    
     const timeDisplay = document.createElement('div');
     timeDisplay.id = 'timeDisplay';
     timeDisplay.style.fontSize = '18px';
     timeDisplay.style.lineHeight = '1.8';
-    timeDisplay.style.textAlign = 'center';
     
     const closeButton = document.createElement('button');
     closeButton.textContent = 'Fechar';
@@ -1629,7 +1500,6 @@ function showTimeModal() {
         clearInterval(timeInterval);
     };
     
-    modal.appendChild(title);
     modal.appendChild(timeDisplay);
     modal.appendChild(closeButton);
     document.body.appendChild(modal);
@@ -1662,13 +1532,13 @@ function updateTimeDisplay() {
             };
             
             let displayText = '';
-            if (data.years > 0) displayText += \`\${data.years} anos \`;
-            if (data.months > 0) displayText += \`\${data.months} meses \`;
-            if (data.weeks > 0) displayText += \`\${data.weeks} semanas \`;
-            if (data.days > 0) displayText += \`\${data.days} dias \`;
-            if (data.hours > 0) displayText += \`\${data.hours} horas \`;
-            if (data.minutes > 0) displayText += \`\${data.minutes} minutos \`;
-            if (data.seconds > 0) displayText += \`\${data.seconds} segundos\`;
+            if (data.years > 0) displayText += `${data.years} anos `;
+            if (data.months > 0) displayText += `${data.months} meses `;
+            if (data.weeks > 0) displayText += `${data.weeks} semanas `;
+            if (data.days > 0) displayText += `${data.days} dias `;
+            if (data.hours > 0) displayText += `${data.hours} horas `;
+            if (data.minutes > 0) displayText += `${data.minutes} minutos `;
+            if (data.seconds > 0) displayText += `${data.seconds} segundos`;
             
             timeDisplay.textContent = displayText.trim() || '0 segundos';
         };
@@ -1679,11 +1549,7 @@ function updateTimeDisplay() {
     };
 }
 
-showTimeModal();`;
-
-const dados = JSON.parse(localStorage.getItem('firedeluxe_codigos_js')) || {};
-dados.tempo_site = codigoJS;
-localStorage.setItem('firedeluxe_codigos_js', JSON.stringify(dados));
+showTimeModal();
 
 })();
 
@@ -5298,176 +5164,4 @@ if (!welcomeCookie || welcomeCookie.split('=')[1] !== 'true') {
 
   closeBtn.addEventListener('click', handleClose);
   setTimeout(handleClose, 60000);
-})();
-
-//Função de fonte personalizada
-(function() {
-    function loadFontSettings() {
-        const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
-        if (!savedSettings) return;
-        
-        const settings = JSON.parse(savedSettings);
-        const fontConfig = getFontConfig(settings);
-        
-        if (fontConfig.css) {
-            applyFontToDocument(fontConfig.css);
-        }
-        
-        if (settings.customFontEmbed && settings.selectedFont === 'custom') {
-            loadCustomFont(settings.customFontEmbed);
-        } else if (settings.selectedFont && settings.selectedFont !== 'padrao' && settings.selectedFont !== 'custom') {
-            loadDefaultFont(settings.selectedFont);
-        }
-        
-        setupMutationObserver();
-    }
-
-    function getFontConfig(settings) {
-        const fontConfigs = {
-            padrao: { name: 'Padrão', css: '' },
-            padrao1: { 
-                name: 'Jersey 25 + Oswald + Science Gothic',
-                css: 'font-family: "Jersey 25", "Oswald", "Science Gothic", sans-serif;'
-            },
-            padrao2: { 
-                name: 'Trochut + Jersey 25 + Science Gothic',
-                css: 'font-family: "Trochut", "Jersey 25", "Science Gothic", sans-serif;'
-            },
-            padrao3: { 
-                name: 'Dancing Script + Jersey 25 + Oswald',
-                css: 'font-family: "Dancing Script", "Jersey 25", "Oswald", cursive;'
-            },
-            custom: { 
-                name: 'Personalizada',
-                css: ''
-            }
-        };
-        
-        return fontConfigs[settings.selectedFont] || fontConfigs.padrao;
-    }
-
-    function applyFontToDocument(css) {
-        document.documentElement.style.cssText += css;
-        
-        const style = document.createElement('style');
-        style.id = 'firedeluxe-font-styles';
-        style.textContent = `
-            * {
-                ${css}
-            }
-            input, textarea, select, button {
-                ${css.replace('font-family:', 'font:')}
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    function loadCustomFont(embedCode) {
-        if (!embedCode.trim()) return;
-        
-        try {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(embedCode, 'text/html');
-            const links = doc.querySelectorAll('link[rel="stylesheet"]');
-            
-            links.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href && href.includes('fonts.googleapis.com')) {
-                    const existing = document.querySelector(`link[href="${href}"]`);
-                    if (!existing) {
-                        document.head.appendChild(link.cloneNode(true));
-                    }
-                }
-            });
-            
-            const fontFamilyMatch = embedCode.match(/family=([^&]+)/);
-            if (fontFamilyMatch) {
-                const fontFamilies = decodeURIComponent(fontFamilyMatch[1]).split('|');
-                fontFamilies.forEach(font => {
-                    const fontName = font.split(':')[0].replace(/\+/g, ' ');
-                    applyFontStyle(fontName);
-                });
-            }
-        } catch (e) {}
-    }
-
-    function loadDefaultFont(fontType) {
-        const fontLinks = {
-            padrao1: 'https://fonts.googleapis.com/css2?family=Jersey+25&family=Oswald:wght@200..700&family=Science+Gothic:wght@100..900&family=Trochut:ital,wght@0,400;0,700;1,400&display=swap',
-            padrao2: 'https://fonts.googleapis.com/css2?family=Jersey+25&family=Oswald:wght@200..700&family=Science+Gothic:wght@100..900&family=Trochut:ital,wght@0,400;0,700;1,400&display=swap',
-            padrao3: 'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Jersey+25&family=Oswald:wght@200..700&family=Science+Gothic:wght@100..900&family=Trochut:ital,wght@0,400;0,700;1,400&display=swap'
-        };
-        
-        if (fontLinks[fontType]) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = fontLinks[fontType];
-            link.crossOrigin = 'anonymous';
-            document.head.appendChild(link);
-        }
-    }
-
-    function applyFontStyle(fontFamily) {
-        const style = document.createElement('style');
-        style.textContent = `
-            * {
-                font-family: "${fontFamily}", sans-serif !important;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    function setupMutationObserver() {
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                    const savedSettings = localStorage.getItem('firedeluxe_configuracoes');
-                    if (savedSettings) {
-                        const settings = JSON.parse(savedSettings);
-                        const fontConfig = getFontConfig(settings);
-                        
-                        if (fontConfig.css) {
-                            mutation.addedNodes.forEach(function(node) {
-                                if (node.nodeType === 1) {
-                                    applyFontToElement(node, fontConfig.css);
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-    }
-
-    function applyFontToElement(element, css) {
-        if (element.nodeType !== 1) return;
-        
-        element.style.cssText += css;
-        
-        const children = element.querySelectorAll('*');
-        children.forEach(child => {
-            child.style.cssText += css;
-        });
-        
-        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA' || element.tagName === 'SELECT' || element.tagName === 'BUTTON') {
-            element.style.font = css.replace('font-family:', 'font:');
-        }
-    }
-
-    function initializeFontSystem() {
-        loadFontSettings();
-        
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadFontSettings);
-        } else {
-            loadFontSettings();
-        }
-    }
-
-    initializeFontSystem();
 })();
